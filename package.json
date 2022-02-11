@@ -1,0 +1,29 @@
+{
+    "private": true,
+    "scripts": {
+        "start": "webpack serve --env dev",
+        "build": "webpack --env prod"
+    },
+    "dependencies": {
+        "@emotion/react": "^11.7.1",
+        "@emotion/styled": "^11.6.0",
+        "@mui/material": "^5.4.1",
+        "gl-matrix": "^3.4.3",
+        "model-react": "^4.0.2",
+        "react": "^17.0.2",
+        "react-dom": "^17.0.2",
+        "three": "^0.137.5"
+    },
+    "devDependencies": {
+        "@types/gl-matrix": "^3.2.0",
+        "@types/react": "^17.0.39",
+        "@types/react-dom": "^17.0.11",
+        "@types/three": "^0.137.0",
+        "filter-webpack-output": "^1.2.0",
+        "ts-loader": "^9.2.6",
+        "typescript": "^4.5.5",
+        "webpack": "^5.68.0",
+        "webpack-cli": "^4.9.2",
+        "webpack-dev-server": "^4.7.4"
+    }
+}
