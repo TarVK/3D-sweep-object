@@ -7,7 +7,9 @@ export const App: FC<{state: AppState}> = ({state}) => {
 
     return (
         <>
-            {state.getText(h)}
+            <div css={{color: "purple", ":hover": {color: "red"}}}>
+                {state.getText(h)}
+            </div>
             <input
                 type="text"
                 value={state.getText(h)}
