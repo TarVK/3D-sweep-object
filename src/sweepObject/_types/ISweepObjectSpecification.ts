@@ -1,3 +1,6 @@
+import {ISweepLine} from "./ISweepLine";
+
 export type ISweepObjectSpecification = {
-    // TODO: figure out the data format
+    /** The sweep line to be used for the object */
+    sweepLine: ISweepLine;
 };

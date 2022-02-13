@@ -8,4 +8,5 @@ import {ISweepObjectSpecification} from "./_types/ISweepObjectSpecification";
  */
 export function createSweepObject(spec: ISweepObjectSpecification): IMesh {
     // TODO: implement
+    return null as any;
 }

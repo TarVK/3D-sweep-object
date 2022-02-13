@@ -5,6 +5,16 @@ import {Vec4} from "./Vec4";
 /** The homogenous representation of 3D points */
 export class Point3D extends Vec4 {
     /**
+     * Creates a new 3 dimensional vector
+     * @param x The x component of the point
+     * @param y The y component of the point
+     * @param z The z component of the point
+     */
+    public constructor(x: number, y: number, z: number) {
+        super(x, y, z, 1);
+    }
+
+    /**
      * Converts this homogenous 3D point to its cartesian representation
      * @returns The cartesian representation
      */
@@ -19,7 +29,7 @@ export class Point3D extends Vec4 {
      */
     public static create(vec: Vec3 | Point3D): Point3D {
         if (vec instanceof Point3D) return vec;
-        return new Point3D(vec.x, vec.y, vec.z, 1);
+        return new Point3D(vec.x, vec.y, vec.z);
     }
 }
 

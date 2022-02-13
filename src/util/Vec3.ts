@@ -8,7 +8,7 @@ export class Vec3 {
     public z: number;
 
     /**
-     * Creates a new 2 dimensional vector
+     * Creates a new 3 dimensional vector
      * @param x The x component of the vector
      * @param y The y component of the vector
      * @param z The z component of the vector

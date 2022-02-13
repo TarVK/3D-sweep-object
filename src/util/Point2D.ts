@@ -5,6 +5,15 @@ import {Vec3} from "./Vec3";
 /** The homogenous representation of 2D points */
 export class Point2D extends Vec3 {
     /**
+     * Creates a new 3 dimensional vector
+     * @param x The x component of the point
+     * @param y The y component of the point
+     */
+    public constructor(x: number, y: number) {
+        super(x, y, 1);
+    }
+
+    /**
      * Converts this homogenous 2D point to its cartesian representation
      * @returns The cartesian representation
      */
@@ -19,7 +28,7 @@ export class Point2D extends Vec3 {
      */
     public static create(vec: Vec2 | Point2D): Point2D {
         if (vec instanceof Point2D) return vec;
-        return new Point2D(vec.x, vec.y, 1);
+        return new Point2D(vec.x, vec.y);
     }
 }
 
