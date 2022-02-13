@@ -8,13 +8,14 @@
         "@emotion/react": "^11.7.1",
         "@emotion/styled": "^11.6.0",
         "@mui/material": "^5.4.1",
-        "gl-matrix": "^3.4.3",
+        "earcut": "^2.2.3",
         "model-react": "^4.0.2",
         "react": "^17.0.2",
         "react-dom": "^17.0.2",
         "three": "^0.137.5"
     },
     "devDependencies": {
+        "@types/earcut": "^2.1.1",
         "@types/gl-matrix": "^3.2.0",
         "@types/react": "^17.0.39",
         "@types/react-dom": "^17.0.11",
