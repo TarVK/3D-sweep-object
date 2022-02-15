@@ -1,6 +1,7 @@
 import {useDataHook} from "model-react";
 import {FC} from "react";
 import {AppState} from "../state/AppState";
+import ThreeScene from "./Three";
 
 export const App: FC<{state: AppState}> = ({state}) => {
     const [h] = useDataHook();
@@ -15,6 +16,7 @@ export const App: FC<{state: AppState}> = ({state}) => {
                 value={state.getText(h)}
                 onChange={event => state.setText(event.target.value)}
             />
+            <ThreeScene />
         </>
     );
 };

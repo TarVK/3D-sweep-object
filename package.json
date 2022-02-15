@@ -15,7 +15,8 @@
         "model-react": "^4.0.2",
         "react": "^17.0.2",
         "react-dom": "^17.0.2",
-        "three": "^0.137.5"
+        "three": "^0.137.5",
+        "three-orbitcontrols": "^2.110.3"
     },
     "devDependencies": {
         "@types/earcut": "^2.1.1",
