@@ -14,28 +14,48 @@ class ThreeScene extends Component{
         this.initThreeJS();
     }
 
+    // each face needs to exist once in the polygon, so possibly a vertex can exist multiple times
+    // for more info https://threejs.org/manual/?q=custom#en/custom-buffergeometry 
+    addPolygonToScene = (polygon:[number, number, number][], color = 0x0000ff) => {
+        const positions: Array<number> = [];
+        polygon.forEach(point => {
+            point.forEach(coordinate => {
+                positions.push(coordinate);
+            });
+        });
+        console.log(positions);
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+        geometry.computeVertexNormals();
+        const material = new THREE.MeshBasicMaterial( { 
+            color,
+            // wireframe: true,
+            side: THREE.DoubleSide
+        });
+        const mesh = new THREE.Mesh( geometry, material);
+        this.scene.add(mesh);
+    }
+
     initThreeJS = () => {
         const width = window.innerWidth - 200;
         const height = window.innerHeight - 200;
 
         this.scene = new THREE.Scene();
         this.renderer = new THREE.WebGLRenderer();
-
-        this.addGridToScene();
-
-
+        
         this.renderer.setSize(width, height);
         this.mount?.appendChild(this.renderer.domElement);
     
         this.camera = new THREE.PerspectiveCamera(90, width / height, 0.1, 1000);
         this.camera.position.z = 5;
         
+        this.addGridToScene();
         this.addCubeToScene();
-        this.animate()
- 
-        this.renderer.render(this.scene, this.camera);
+        this.addPolygonToScene([[0,0,1], [1,1,1], [0,1,1]]);
+        this.addPolygonToScene([[0,0,2], [1,0,2], [1,1,2], [0,1,2], [0,0,2], [1,1,2]], 0xdd22aa);
+        
+        this.animate();
         new OrbitControls(this.camera, this.renderer.domElement);
-
     }
 
 
@@ -43,11 +63,11 @@ class ThreeScene extends Component{
         this.scene.add(new THREE.GridHelper(size, divisions));
     }
 
-    addCubeToScene = () => {
+    addCubeToScene = (color = 0x00ff00) => {
         let geometry = new THREE.BoxGeometry(1, 1, 1);
         let material = new THREE.MeshBasicMaterial({
-            color: 0x00ff00,
-            wireframe: true
+            color,
+            // wireframe: true
         })
 
         let cube = new THREE.Mesh(geometry, material);
