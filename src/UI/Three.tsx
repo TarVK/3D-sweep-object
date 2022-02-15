@@ -4,6 +4,21 @@ import * as THREE from "three";
 import OrbitControls from "three-orbitcontrols";
 
 
+const polygonToPositionCoordinates = (polygon:[number, number][], posZ = 1) => {
+    const vecArr = polygon.map(point => new THREE.Vector2(point[0], point[1]), []);
+    const triangles = THREE.ShapeUtils.triangulateShape(vecArr, []);
+    const positions: Array<number> = [];
+
+    for (const triangle of triangles){
+        for (const pointId of triangle){
+            positions.push(polygon[pointId][0])
+            positions.push(polygon[pointId][1])
+            positions.push(posZ)
+        } 
+    }
+    return positions;
+}
+
 class ThreeScene extends Component{
     private mount: HTMLDivElement | null;
     private scene: THREE.Scene;
@@ -16,13 +31,8 @@ class ThreeScene extends Component{
 
     // each face needs to exist once in the polygon, so possibly a vertex can exist multiple times
     // for more info https://threejs.org/manual/?q=custom#en/custom-buffergeometry 
-    addPolygonToScene = (polygon:[number, number, number][], color = 0x0000ff) => {
-        const positions: Array<number> = [];
-        polygon.forEach(point => {
-            point.forEach(coordinate => {
-                positions.push(coordinate);
-            });
-        });
+    addPolygonToScene = (polygon:[number, number][], posZ = 1, color = 0x0000ff) => {
+        const positions = polygonToPositionCoordinates(polygon, posZ);
         console.log(positions);
         const geometry = new THREE.BufferGeometry();
         geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
@@ -51,8 +61,9 @@ class ThreeScene extends Component{
         
         this.addGridToScene();
         this.addCubeToScene();
-        this.addPolygonToScene([[0,0,1], [1,1,1], [0,1,1]]);
-        this.addPolygonToScene([[0,0,2], [1,0,2], [1,1,2], [0,1,2], [0,0,2], [1,1,2]], 0xdd22aa);
+        this.addPolygonToScene([[0,0], [1,1], [0,1]], 1);
+        this.addPolygonToScene([[0,0], [1,0], [1,1], [0,1]], 2, 0xdd22aa);
+        this.addPolygonToScene([[0,0], [0,1], [0.5, 0.5], [1,1], [1,0]], 3, 0xbbaa44);
         
         this.animate();
         new OrbitControls(this.camera, this.renderer.domElement);
