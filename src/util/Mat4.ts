@@ -2,6 +2,25 @@ import {Vec4} from "./Vec4";
 
 /** An immutable 4d matrix class */
 export class Mat4 {
+    /**
+     * Creates a new 4d matrix, by supplying values in row major order
+     * @param a11 Row 1, column 1
+     * @param a12 Row 1, column 2
+     * @param a13 Row 1, column 3
+     * @param a14 Row 1, column 4
+     * @param a21 Row 2, column 1
+     * @param a22 Row 2, column 2
+     * @param a23 Row 2, column 3
+     * @param a24 Row 2, column 4
+     * @param a31 Row 3, column 1
+     * @param a32 Row 3, column 2
+     * @param a33 Row 3, column 3
+     * @param a34 Row 3, column 4
+     * @param a31 Row 4, column 1
+     * @param a32 Row 4, column 2
+     * @param a33 Row 4, column 3
+     * @param a34 Row 4, column 4
+     */
     public constructor(
         public a11: number,
         public a12: number,
@@ -20,6 +39,64 @@ export class Mat4 {
         public a43: number,
         public a44: number
     ) {}
+
+    /**
+     * Creates a new material of this class. Should be overridden by classes extending this class
+     * @param a11 Row 1, column 1
+     * @param a12 Row 1, column 2
+     * @param a13 Row 1, column 3
+     * @param a14 Row 1, column 4
+     * @param a21 Row 2, column 1
+     * @param a22 Row 2, column 2
+     * @param a23 Row 2, column 3
+     * @param a24 Row 2, column 4
+     * @param a31 Row 3, column 1
+     * @param a32 Row 3, column 2
+     * @param a33 Row 3, column 3
+     * @param a34 Row 3, column 4
+     * @param a31 Row 4, column 1
+     * @param a32 Row 4, column 2
+     * @param a33 Row 4, column 3
+     * @param a34 Row 4, column 4
+     * @returns The created matrix
+     */
+    protected create(
+        a11: number,
+        a12: number,
+        a13: number,
+        a14: number,
+        a21: number,
+        a22: number,
+        a23: number,
+        a24: number,
+        a31: number,
+        a32: number,
+        a33: number,
+        a34: number,
+        a41: number,
+        a42: number,
+        a43: number,
+        a44: number
+    ): this {
+        return new Mat4(
+            a11,
+            a12,
+            a13,
+            a14,
+            a21,
+            a22,
+            a23,
+            a24,
+            a31,
+            a32,
+            a33,
+            a34,
+            a41,
+            a42,
+            a43,
+            a44
+        ) as any;
+    }
 
     /**
      * Updates the data of this matrix
@@ -49,7 +126,7 @@ export class Mat4 {
      * @param amount The value to multiply the matrix by
      * @returns THe new matrix
      */
-    public mul(amount: number): Mat4;
+    public mul(amount: number): this;
     /**
      * Multiplies this matrix by the given vector
      * @param vec The vector to be multiplied by this matrix
@@ -59,10 +136,10 @@ export class Mat4 {
      * Multiplies this matrix by the given matrix
      * @param mat The matrix to multiply with
      */
-    public mul(mat: Mat4): Mat4;
-    public mul(mat: Mat4 | Vec4 | number): Mat4 | Vec4 {
+    public mul(mat: Mat4): this;
+    public mul(mat: Mat4 | Vec4 | number): this | Vec4 {
         if (typeof mat == "number")
-            return new Mat4(
+            return this.create(
                 this.a11 * mat,
                 this.a12 * mat,
                 this.a13 * mat,
@@ -89,7 +166,7 @@ export class Mat4 {
             );
         else
             // prettier-ignore
-            return new Mat4(
+            return this.create(
                 this.a11 * mat.a11 + this.a12 * mat.a21 + this.a13 * mat.a31 + this.a14 * mat.a41,
                 this.a11 * mat.a12 + this.a12 * mat.a22 + this.a13 * mat.a32 + this.a14 * mat.a42,
                 this.a11 * mat.a13 + this.a12 * mat.a23 + this.a13 * mat.a33 + this.a14 * mat.a43,
@@ -113,8 +190,8 @@ export class Mat4 {
      * Transposes this matrix
      * @returns The transposed matrix
      */
-    public transpose(): Mat4 {
-        return new Mat4(
+    public transpose(): this {
+        return this.create(
             this.a11,
             this.a21,
             this.a31,
@@ -139,8 +216,8 @@ export class Mat4 {
      * @param mat The matrix to add
      * @returns The sum of matrices
      */
-    public add(mat: Mat4): Mat4 {
-        return new Mat4(
+    public add(mat: Mat4): this {
+        return this.create(
             this.a11 + mat.a11,
             this.a12 + mat.a12,
             this.a13 * mat.a13,
@@ -165,8 +242,8 @@ export class Mat4 {
      * @param mat The matrix to subtract
      * @returns The sum of matrices
      */
-    public sub(mat: Mat4): Mat4 {
-        return new Mat4(
+    public sub(mat: Mat4): this {
+        return this.create(
             this.a11 - mat.a11,
             this.a12 - mat.a12,
             this.a13 - mat.a13,

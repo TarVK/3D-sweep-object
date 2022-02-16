@@ -21,6 +21,26 @@ export class Mat2 {
     ) {}
 
     /**
+     * Creates a new material of this class. Should be overridden by classes extending this class
+     * @param a11 Row 1, column 1
+     * @param a12 Row 1, column 2
+     * @param a21 Row 2, column 1
+     * @param a22 Row 2, column 2
+     * @returns The created matrix
+     */
+    protected create(a11: number, a12: number, a21: number, a22: number): this {
+        return new Mat2(a11, a12, a21, a22) as any;
+    }
+
+    /**
+     * Creates a copy of this matrix
+     * @returns The copy of this matrix
+     */
+    public copy(): this {
+        return this.create(this.a11, this.a12, this.a21, this.a22);
+    }
+
+    /**
      * Updates the data of this matrix
      * @param mat The matrix to copy into this matrix
      */
@@ -36,7 +56,7 @@ export class Mat2 {
      * @param amount The value to multiply the matrix by
      * @returns THe new matrix
      */
-    public mul(amount: number): Mat2;
+    public mul(amount: number): this;
     /**
      * Multiplies this matrix by the given vector
      * @param vec The vector to be multiplied by this matrix
@@ -46,10 +66,10 @@ export class Mat2 {
      * Multiplies this matrix by the given matrix
      * @param mat The matrix to multiply with
      */
-    public mul(mat: Mat2 | Mat3 | Mat4): Mat2;
-    public mul(mat: Mat2 | Mat3 | Mat4 | Vec2 | Vec3 | Vec4 | number): Mat2 | Vec2 {
+    public mul(mat: Mat2 | Mat3 | Mat4): this;
+    public mul(mat: Mat2 | Mat3 | Mat4 | Vec2 | Vec3 | Vec4 | number): this | Vec2 {
         if (typeof mat == "number")
-            return new Mat2(
+            return this.create(
                 this.a11 * mat,
                 this.a12 * mat,
                 this.a21 * mat,
@@ -61,7 +81,7 @@ export class Mat2 {
                 this.a21 * mat.x + this.a22 * mat.y
             );
         else
-            return new Mat2(
+            return this.create(
                 this.a11 * mat.a11 + this.a12 * mat.a21,
                 this.a11 * mat.a12 + this.a12 * mat.a22,
                 this.a21 * mat.a11 + this.a22 * mat.a21,
@@ -73,8 +93,8 @@ export class Mat2 {
      * Transposes this matrix
      * @returns The transposed matrix
      */
-    public transpose(): Mat2 {
-        return new Mat2(this.a11, this.a21, this.a12, this.a22);
+    public transpose(): this {
+        return this.create(this.a11, this.a21, this.a12, this.a22);
     }
 
     /**
@@ -82,8 +102,8 @@ export class Mat2 {
      * @param mat The matrix to add
      * @returns The sum of matrices
      */
-    public add(mat: Mat2 | Mat3 | Mat4): Mat2 {
-        return new Mat2(
+    public add(mat: Mat2 | Mat3 | Mat4): this {
+        return this.create(
             this.a11 + mat.a11,
             this.a12 + mat.a12,
             this.a21 + mat.a21,
@@ -96,8 +116,8 @@ export class Mat2 {
      * @param mat The matrix to subtract
      * @returns The sum of matrices
      */
-    public sub(mat: Mat2 | Mat3 | Mat4): Mat2 {
-        return new Mat2(
+    public sub(mat: Mat2 | Mat3 | Mat4): this {
+        return this.create(
             this.a11 - mat.a11,
             this.a12 - mat.a12,
             this.a21 - mat.a21,

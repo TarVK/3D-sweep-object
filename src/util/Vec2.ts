@@ -1,4 +1,3 @@
-import {Point2D} from "./Point2D";
 import {Vec3} from "./Vec3";
 import {Vec4} from "./Vec4";
 
@@ -18,11 +17,21 @@ export class Vec2 {
     }
 
     /**
+     * Creates a new vector of this class. Should be overridden by classes extending this class
+     * @param x The x component of the vector
+     * @param y The y component of the vector
+     * @returns The created vector
+     */
+    protected create(x: number, y: number): this {
+        return new Vec2(x, y) as any;
+    }
+
+    /**
      * Copies this vector
      * @returns The copy
      */
-    public copy(): Vec2 {
-        return new Vec2(this.x, this.y);
+    public copy(): this {
+        return this.create(this.x, this.y);
     }
 
     /**
@@ -52,16 +61,16 @@ export class Vec2 {
      * @param y The y component of the vector
      * @returns The new vector
      */
-    public add(x: number, y: number): Vec2;
+    public add(x: number, y: number): this;
     /**
      * Adds the given vector to this vector
      * @param vec The vector to add tp this vector
      * @returns The new vector
      */
-    public add(vec: Vec2 | Vec3 | Vec4): Vec2;
-    public add(x: number | Vec2 | Vec3 | Vec4, y?: number): Vec2 {
-        if (typeof x == "number") return new Vec2(this.x + x, this.y + y!);
-        else return new Vec2(this.x + x.x, this.y + x.y);
+    public add(vec: Vec2 | Vec3 | Vec4): this;
+    public add(x: number | Vec2 | Vec3 | Vec4, y?: number): this {
+        if (typeof x == "number") return this.create(this.x + x, this.y + y!);
+        else return this.create(this.x + x.x, this.y + x.y);
     }
 
     /**
@@ -70,16 +79,16 @@ export class Vec2 {
      * @param y The y component of the vector
      * @returns The new vector
      */
-    public sub(x: number, y: number): Vec2;
+    public sub(x: number, y: number): this;
     /**
      * Subtracts the given vector from this vector
      * @param vec The vector to subtract from this vector
      * @returns The new vector
      */
-    public sub(vec: Vec2 | Vec3 | Vec4): Vec2;
-    public sub(x: number | Vec2 | Vec3 | Vec4, y?: number): Vec2 {
-        if (typeof x == "number") return new Vec2(this.x - x, this.y - y!);
-        else return new Vec2(this.x - x.x, this.y - x.y);
+    public sub(vec: Vec2 | Vec3 | Vec4): this;
+    public sub(x: number | Vec2 | Vec3 | Vec4, y?: number): this {
+        if (typeof x == "number") return this.create(this.x - x, this.y - y!);
+        else return this.create(this.x - x.x, this.y - x.y);
     }
 
     /**
@@ -88,18 +97,18 @@ export class Vec2 {
      * @param y The y component of the vector
      * @returns The new vector
      */
-    public mul(x: number, y?: number): Vec2;
+    public mul(x: number, y?: number): this;
     /**
      * Multiplies the given vector with this vector
      * @param vec The vector to multiply with this vector
      * @returns The new vector
      */
-    public mul(vec: Vec2 | Vec3 | Vec4): Vec2;
-    public mul(x: number | Vec2 | Vec3 | Vec4, y?: number): Vec2 {
+    public mul(vec: Vec2 | Vec3 | Vec4): this;
+    public mul(x: number | Vec2 | Vec3 | Vec4, y?: number): this {
         if (typeof x == "number") {
             if (y == undefined) y = x;
-            return new Vec2(this.x * x, this.y * y!);
-        } else return new Vec2(this.x * x.x, this.y * x.y);
+            return this.create(this.x * x, this.y * y!);
+        } else return this.create(this.x * x.x, this.y * x.y);
     }
 
     /**
@@ -108,16 +117,16 @@ export class Vec2 {
      * @param y The y component of the vector
      * @returns The new vector
      */
-    public div(x: number, y: number): Vec2;
+    public div(x: number, y: number): this;
     /**
      * Divides this vector by the given vector
      * @param vec Divides this vector by the given vector
      * @returns The new vector
      */
-    public div(vec: Vec2 | Vec3 | Vec4): Vec2;
-    public div(x: number | Vec2 | Vec3 | Vec4, y?: number): Vec2 {
-        if (typeof x == "number") return new Vec2(this.x / x, this.y / y!);
-        else return new Vec2(this.x / x.x, this.y / x.y);
+    public div(vec: Vec2 | Vec3 | Vec4): this;
+    public div(x: number | Vec2 | Vec3 | Vec4, y?: number): this {
+        if (typeof x == "number") return this.create(this.x / x, this.y / y!);
+        else return this.create(this.x / x.x, this.y / x.y);
     }
 
     /**
@@ -150,7 +159,7 @@ export class Vec2 {
      * Retrieves the normalized vector
      * @returns The normalized vector
      */
-    public normalize(): Vec2 {
+    public normalize(): this {
         return this.mul(1 / this.length());
     }
 }
