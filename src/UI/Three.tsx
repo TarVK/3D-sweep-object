@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import * as THREE from "three";
 //@ts-ignore
 import OrbitControls from "three-orbitcontrols";
+import sky from "../../public/skybox.jpg";
 import flameBK from "../../public/flame/flame_bk.jpg";
 import flameDN from "../../public/flame/flame_dn.jpg";
 import flameFT from "../../public/flame/flame_ft.jpg";
@@ -75,6 +76,16 @@ class ThreeScene extends Component{
         const skybox = new THREE.Mesh(skyboxGeo, materials);
         this.scene.add(skybox);
     }
+
+    addSkysphere = () => {
+        const texture = new THREE.TextureLoader().load(sky);
+        const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.BackSide });
+        const geo = new THREE.SphereBufferGeometry(1000);
+        const skysphere = new THREE.Mesh(geo, material);
+        this.scene.add(skysphere);
+    }
+
+
     initThreeJS = () => {
         const width = window.innerWidth - 200;
         const height = window.innerHeight - 200;
@@ -89,7 +100,8 @@ class ThreeScene extends Component{
         this.camera.position.z = 5;
         
         
-        this.addSkybox();
+        this.addSkysphere();
+        // this.addSkybox();
         this.addGridToScene();
         this.addCubeToScene();
         this.addPolygonToScene([[0,0], [1,1], [0,1]], 1);
@@ -102,7 +114,7 @@ class ThreeScene extends Component{
     }
 
 
-    addGridToScene = (size = 10, divisions = 100) => {
+    addGridToScene = (size = 100, divisions = 100) => {
         this.scene.add(new THREE.GridHelper(size, divisions));
     }
 
