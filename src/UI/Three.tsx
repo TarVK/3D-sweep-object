@@ -96,7 +96,7 @@ class ThreeScene extends Component{
         this.renderer.setSize(width, height);
         this.mount?.appendChild(this.renderer.domElement);
     
-        this.camera = new THREE.PerspectiveCamera(90, width / height, 0.1, 1000);
+        this.camera = new THREE.PerspectiveCamera(90, width / height, 0.1, 10000);
         this.camera.position.z = 5;
         
         
