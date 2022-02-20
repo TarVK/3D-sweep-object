@@ -12,7 +12,8 @@
         "preserveSymlinks": true,
         "strictNullChecks": true,
         "noImplicitAny": true,
-        "esModuleInterop": true
+        "esModuleInterop": true,
+        "resolveJsonModule": true
     },
     "include": ["src/**/*", "src/_types/*"],
     "types": ["node", "@emotion/core"],

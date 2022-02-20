@@ -4,11 +4,10 @@
 export type ISyncer<F, D> = {
     /**
      * Changes the text at the given range
-     * @param start The start index of the range to replace
-     * @param end The end index of the range to replace
+     * @param range The range of the input that was replaced by the given text
      * @param text The new text that was replaced by this range
      */
-    changeText: (start: number, end: number, text: string) => void;
+    changeText: (range: IInputRange, text: string) => void;
     /**
      * Updates the contents of this node
      * @param path The path to the value to be updated
@@ -42,7 +41,7 @@ export type ISyncDispatcher<F, D> = {
      * @param value The value to be changed to
      * @value The new value to be set
      */
-    setData: (path: F, value: D) => void;
+    changeData: (path: F, value: D) => void;
     /**
      * Adds a new property at the given path in the data model
      * @param path The path to the value to be added
@@ -80,3 +79,22 @@ export type IUpdate<F, D> = {
     value: D;
 };
 export type IErrorRemover = () => void;
+
+export type IInputRange = {
+    /** The start index when text is considered 1d */
+    start: number;
+    /** The end index when text is considered 1d */
+    end: number;
+    /** A 2d position, which can slightly increase performance if this data is already available, will be recalculated otherwise */
+    twoDimensional?: ITwoDimensionalInputRange;
+};
+export type ITwoDimensionalInputRange = {
+    /** The start row (0 indexed) */
+    startRow: number;
+    /** The start column (0 indexed) */
+    startColumn: number;
+    /** The end row (0 indexed) */
+    endRow: number;
+    /** The end column (0 indexed) */
+    endColumn: number;
+};
