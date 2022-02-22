@@ -131,7 +131,7 @@ export class Mat4 {
      * Multiplies this matrix by the given vector
      * @param vec The vector to be multiplied by this matrix
      */
-    public mul(vec: Vec4): Vec4;
+    public mul<V extends Vec4>(vec: V): V;
     /**
      * Multiplies this matrix by the given matrix
      * @param mat The matrix to multiply with
@@ -158,11 +158,11 @@ export class Mat4 {
                 this.a44 * mat
             );
         else if (mat instanceof Vec4)
-            return new Vec4(
+            return mat.create(
                 this.a11 * mat.x + this.a12 * mat.y + this.a13 * mat.z + this.a14 * mat.w,
-                this.a21 * mat.x + this.a22 * mat.y * this.a23 * mat.z + this.a24 * mat.w,
-                this.a31 * mat.x + this.a32 * mat.y * this.a33 * mat.z + this.a34 * mat.w,
-                this.a41 * mat.x + this.a42 * mat.y * this.a43 * mat.z + this.a44 * mat.w,
+                this.a21 * mat.x + this.a22 * mat.y + this.a23 * mat.z + this.a24 * mat.w,
+                this.a31 * mat.x + this.a32 * mat.y + this.a33 * mat.z + this.a34 * mat.w,
+                this.a41 * mat.x + this.a42 * mat.y + this.a43 * mat.z + this.a44 * mat.w,
             );
         else
             // prettier-ignore
@@ -261,5 +261,17 @@ export class Mat4 {
             this.a43 - mat.a43,
             this.a44 - mat.a44
         );
+    }
+
+    /** @override */
+    public toString(): string {
+        const p = (val: number) => (val + "").padStart(4, " ");
+        return `[[${p(this.a11)}, ${p(this.a12)}, ${p(this.a13)}, ${p(this.a14)}],\n [${p(
+            this.a21
+        )}, ${p(this.a22)}, ${p(this.a23)}, ${p(this.a24)}],\n [${p(this.a31)}, ${p(
+            this.a32
+        )}, ${p(this.a33)}, ${p(this.a34)}],\n [${p(this.a41)}, ${p(this.a42)}, ${p(
+            this.a43
+        )}, ${p(this.a44)}]]`;
     }
 }

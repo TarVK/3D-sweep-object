@@ -26,7 +26,7 @@ export class Vec3 {
      * @param z The z component of the vector
      * @returns The created vector
      */
-    protected create(x: number, y: number, z: number): this {
+    public create(x: number, y: number, z: number): this {
         return new Vec3(x, y, z) as any;
     }
 
@@ -192,5 +192,10 @@ export class Vec3 {
      */
     public normalize(): this {
         return this.mul(1 / this.length());
+    }
+
+    /** @override */
+    public toString(): string {
+        return `(${this.x}, ${this.y}, ${this.z})`;
     }
 }
