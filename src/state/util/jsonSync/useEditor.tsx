@@ -26,7 +26,11 @@ export const useEditor = ({
     useEffect(() => {
         if (elementRef.current && monaco) {
             const modelUri = monaco.Uri.parse(`a://b/smth${id++}.json`); // a made up unique URI for our model
-            const model = monaco.editor.createModel(value, "json", modelUri);
+            const model = monaco.editor.createModel(
+                value,
+                options.language ?? "json",
+                modelUri
+            );
             model.setEOL(editor.EndOfLineSequence.LF);
             const e = (editorRef.current = monaco.editor.create(elementRef.current, {
                 value: value,
@@ -67,6 +71,10 @@ export const useEditor = ({
 };
 
 loader.init().then(monaco => {
+    monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+        comments: "ignore",
+    });
+
     monaco.editor.defineTheme("blueTheme", {
         base: "vs", // can also be vs-dark or hc-black
         inherit: true, // can also be false to completely replace the builtin rules

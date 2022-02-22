@@ -39,13 +39,10 @@ export function createJSONDocumentNode(
         data,
         onCreateChild: node => {
             const value = createJSONValueNode(node, dispatcher);
+            if (!value) return;
             syncNode.data = value.data;
-            dispatcher.changeData([], data.value);
+            dispatcher.changeData([], syncNode.data.value);
             return value;
-        },
-        onDeleteChild: (node: ISyncNode) => {
-            data.value = null;
-            dispatcher.changeData([], data.value);
         },
     };
     return syncNode;

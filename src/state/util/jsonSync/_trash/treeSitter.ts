@@ -52,10 +52,10 @@ export const result = (async () => {
         // const orText = `{"snuff": 5, "poop": {"woo": "ye", "shit": 4, "smth": 5, "crap": true}, "oranges": 34}`;
         // const newText = `{"snuff": 5, "poop": {"woo": "ye", "shit": 5, "crap": true}, "oranges": 34}`;
 
-        const orText = `{"snuff": 5, "poop": {"woo": "ye", "shit": 5, "crap": true}, "oranges": 34}`;
-        const newText = `{"snuff": 5, "poop": {"woo": "ye", "shit": 4, "smth": 5, "crap": true}, "oranges": 34}`;
-        // const orText = `{"hoi": 4}`;
-        // const newText = `{"hoi": 5}`;
+        // const orText = `{"snuff": 5, "poop": {"woo": "ye", "shit": 5, "crap": true}, "oranges": 34}`;
+        // const newText = `{"snuff": 5, "poop": {"woo": "ye", "shit": 4, "smth": 5, "crap": true}, "oranges": 34}`;
+        const orText = `{"hoi": }`;
+        const newText = `{"hoi": 5}`;
 
         const obj = {value: null as IJSON};
         const dispatcher = createValueSyncDispatcher(obj, {

@@ -6,4 +6,4 @@ import {result} from "./state/util/jsonSync/_trash/treeSitter";
 const state = new AppState();
 ReactDOM.render(<App state={state} />, document.getElementById("root"));
 
-const s = result;
+// const s = result;

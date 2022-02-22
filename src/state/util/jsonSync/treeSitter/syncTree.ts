@@ -39,16 +39,16 @@ function syncTreeRec<T, C extends ISyncDataNode>(
     const syncCL = syncChildren.length;
 
     let first;
-    for (first = 0; first < syntaxCL; first++) {
+    for (first = 0; first < syncCL && first < syntaxCL; first++) {
         const syncChild = syncChildren[first];
         const syntaxChild = syntaxChildren[first];
 
         // if (!syncChild.node.equals(syntaxChild)) break;
         if (syncChild.node.hasChanges()) break;
-        // if (syncChild.node.id != syntaxChild.id) {
-        //     if (syncChild.node.type != syntaxChild.type) break;
-        //     if (syncChild.node.text != syntaxChild.text) break;
-        // }
+        if (syncChild.node.id != syntaxChild.id) {
+            if (syncChild.node.type != syntaxChild.type) break;
+            if (syncChild.node.text != syntaxChild.text) break;
+        }
     }
 
     // Find the last affected child index
@@ -63,13 +63,15 @@ function syncTreeRec<T, C extends ISyncDataNode>(
 
         // if (!syncChild.node.equals(syntaxChild)) break;
         if (syncChild.node.hasChanges()) break;
-        // if (syncChild.node.id != syntaxChild.id) {
-        //     if (syncChild.node.type != syntaxChild.type) break;
-        //     if (syncChild.node.text != syntaxChild.text) break;
-        // }
+        if (syncChild.node.id != syntaxChild.id) {
+            if (syncChild.node.type != syntaxChild.type) break;
+            if (syncChild.node.text != syntaxChild.text) break;
+        }
     }
     const syncLast = syncCL - deltaLast;
     const syntaxLast = syntaxCL - deltaLast;
+
+    debugger;
 
     // Update the changed children
     for (let i = first; i <= syncLast && i <= syntaxLast; i++) {

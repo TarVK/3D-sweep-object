@@ -13,14 +13,14 @@ export function createJSONBooleanNode(
     node: SyntaxNode,
     dispatcher: IJSONDispatcher
 ): IJSONBooleanNode {
-    const computeValue = (node: SyntaxNode) => Boolean(node.text);
+    const computeValue = (node: SyntaxNode) => node.text == "true";
     const data = {value: computeValue(node)};
     return {
         children: node.children.map(createBaseSyncNode),
         node,
         data,
         onChange: (node: SyntaxNode) => {
-            const value = Boolean(node.text);
+            const value = computeValue(node);
             if (value != data.value) {
                 data.value = value;
                 dispatcher.changeData([], value);

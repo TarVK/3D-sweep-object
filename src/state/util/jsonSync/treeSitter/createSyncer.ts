@@ -49,6 +49,7 @@ export async function createSyncer<C extends ISyncDataNode>(
             tree.edit(delta);
             tree = parser.parse(newText, tree);
             text = newText;
+            console.log(newText);
 
             syncTree(root, tree.rootNode);
         },

@@ -21,6 +21,7 @@ export function createJSONNumberNode(
         node,
         data,
         onChange: (node: SyntaxNode) => {
+            console.log(node, node.text);
             const value = Number(node.text);
             if (!isNaN(value) && data.value != value) {
                 data.value = value;
