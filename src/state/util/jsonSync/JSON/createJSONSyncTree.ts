@@ -1,4 +1,5 @@
 import {SyntaxNode} from "web-tree-sitter";
+import {createBaseSyncNode} from "../treeSitter/createBaseSyncNode";
 import {ISyncDataNode, ISyncNode} from "../treeSitter/_types/ISyncNode";
 import {ISyncRoot} from "../treeSitter/_types/ISyncRoot";
 import {createJSONValueNode} from "./createJSONValueNode";
@@ -11,9 +12,15 @@ import {IJSONNode, IJSONNodeData} from "./_types/IJSONNode";
  * @returns The JSON synchronization tree root
  */
 export function createJSONSyncTree(dispatcher: IJSONDispatcher): ISyncRoot<IJSONNode> {
+    let first = true;
     return {
         root: undefined,
-        onCreate: node => createJSONDocumentNode(node, dispatcher),
+        onCreate: node => {
+            const documentNode = createJSONDocumentNode(node, dispatcher);
+            if (!first) dispatcher.changeData([], documentNode.data.value);
+            first = false;
+            return documentNode;
+        },
     };
 }
 
@@ -32,6 +39,7 @@ export function createJSONDocumentNode(
     const syncNode: IJSONNode = {
         children: node.children.map(child => {
             const value = createJSONValueNode(child, dispatcher);
+            if (!value) return createBaseSyncNode(node);
             data.value = value.data.value;
             return value;
         }),

@@ -99,7 +99,7 @@ export function createJSONObjectFieldNode(
     };
     const updateValue = (dispatch = true) => {
         const newValue = data.valueNode?.data.value ?? null;
-        if (newValue != data.value) {
+        if (newValue !== data.value) {
             data.value = newValue;
             if (dispatch) dispatcher.changeData([data.key], newValue);
         }
