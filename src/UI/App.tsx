@@ -1,7 +1,7 @@
 import {useDataHook} from "model-react";
 import {FC} from "react";
 import {AppState} from "../state/AppState";
-import ThreeScene from "./Three";
+import {Canvas} from "./3D/Canvas";
 
 export const App: FC<{state: AppState}> = ({state}) => {
     const [h] = useDataHook();
@@ -16,7 +16,13 @@ export const App: FC<{state: AppState}> = ({state}) => {
                 value={state.getText(h)}
                 onChange={event => state.setText(event.target.value)}
             />
-            <ThreeScene />
+            <Canvas
+                css={{
+                    height: 600,
+                    width: 700,
+                }}
+                sweepObjectMesh={{faces: [], points: []}}
+            />
         </>
     );
 };
