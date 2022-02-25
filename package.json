@@ -12,10 +12,12 @@
         "@emotion/styled": "^11.6.0",
         "@mui/material": "^5.4.1",
         "earcut": "^2.2.3",
+        "file-loader": "^6.2.0",
         "model-react": "^4.0.2",
         "react": "^17.0.2",
         "react-dom": "^17.0.2",
-        "three": "^0.137.5"
+        "three": "^0.137.5",
+        "three-orbitcontrols": "^2.110.3"
     },
     "devDependencies": {
         "@types/earcut": "^2.1.1",

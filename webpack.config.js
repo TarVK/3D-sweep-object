@@ -16,6 +16,12 @@ module.exports = env => ({
                 test: /\.css$/i,
                 use: ["style-loader", "css-loader"],
             },
+            {
+                test: /\.(png|jpeg|jpg|gif|svg)$/,
+                use: {
+                    loader: "file-loader"
+                },
+            }
         ],
     },
     devServer: {
