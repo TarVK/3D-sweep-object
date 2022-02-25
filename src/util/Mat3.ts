@@ -99,7 +99,12 @@ export class Mat3 {
      * Multiplies this matrix by the given vector
      * @param vec The vector to be multiplied by this matrix
      */
-    public mul(vec: Vec3 | Vec4): Vec3;
+    public mul<V extends Vec3>(vec: V): V;
+    /**
+     * Multiplies this matrix by the given vector
+     * @param vec The vector to be multiplied by this matrix
+     */
+    public mul(vec: Vec4): Vec3;
     /**
      * Multiplies this matrix by the given matrix
      * @param mat The matrix to multiply with
@@ -118,11 +123,17 @@ export class Mat3 {
                 this.a32 * mat,
                 this.a33 * mat
             );
-        else if (mat instanceof Vec3 || mat instanceof Vec4)
+        else if (mat instanceof Vec3)
+            return mat.create(
+                this.a11 * mat.x + this.a12 * mat.y + this.a13 * mat.z,
+                this.a21 * mat.x + this.a22 * mat.y + this.a23 * mat.z,
+                this.a31 * mat.x + this.a32 * mat.y + this.a33 * mat.z
+            );
+        else if (mat instanceof Vec4)
             return new Vec3(
                 this.a11 * mat.x + this.a12 * mat.y + this.a13 * mat.z,
-                this.a21 * mat.x + this.a22 * mat.y * this.a23 * mat.z,
-                this.a31 * mat.x + this.a32 * mat.y * this.a33 * mat.z
+                this.a21 * mat.x + this.a22 * mat.y + this.a23 * mat.z,
+                this.a31 * mat.x + this.a32 * mat.y + this.a33 * mat.z
             );
         else
             return this.create(
@@ -192,5 +203,13 @@ export class Mat3 {
             this.a32 - mat.a32,
             this.a33 - mat.a33
         );
+    }
+
+    /** @override */
+    public toString(): string {
+        const p = (val: number) => (val + "").padStart(4, " ");
+        return `[[${p(this.a11)}, ${p(this.a12)}, ${p(this.a13)}],\n [${p(this.a21)}, ${p(
+            this.a22
+        )}, ${p(this.a23)}],\n [${p(this.a31)}, ${p(this.a32)}, ${p(this.a33)}]]`;
     }
 }

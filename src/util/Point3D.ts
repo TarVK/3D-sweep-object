@@ -9,9 +9,23 @@ export class Point3D extends Vec4 {
      * @param x The x component of the point
      * @param y The y component of the point
      * @param z The z component of the point
+     * @param w The w component of the point
      */
-    public constructor(x: number, y: number, z: number) {
-        super(x, y, z, 1);
+    public constructor(x: number, y: number, z: number, w: number = 1) {
+        super(x, y, z, w);
+    }
+
+    /**
+     * Creates a new vector of this class. Should be overridden by classes extending this class
+     * @param x The x component of the vector
+     * @param y The y component of the vector
+     * @param z The z component of the vector
+     * @param w The w component of the vector
+     * @returns The created vector
+     * @override
+     */
+    public create(x: number, y: number, z: number, w: number): this {
+        return new Point3D(x, y, z, w) as any;
     }
 
     /**

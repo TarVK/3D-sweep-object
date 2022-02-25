@@ -61,7 +61,12 @@ export class Mat2 {
      * Multiplies this matrix by the given vector
      * @param vec The vector to be multiplied by this matrix
      */
-    public mul(vec: Vec2 | Vec3 | Vec4): Vec2;
+    public mul<V extends Vec2>(vec: V): V;
+    /**
+     * Multiplies this matrix by the given vector
+     * @param vec The vector to be multiplied by this matrix
+     */
+    public mul(vec: Vec3 | Vec4): Vec2;
     /**
      * Multiplies this matrix by the given matrix
      * @param mat The matrix to multiply with
@@ -75,7 +80,12 @@ export class Mat2 {
                 this.a21 * mat,
                 this.a22 * mat
             );
-        else if (mat instanceof Vec2 || mat instanceof Vec3 || mat instanceof Vec4)
+        else if (mat instanceof Vec2)
+            return mat.create(
+                this.a11 * mat.x + this.a12 * mat.y,
+                this.a21 * mat.x + this.a22 * mat.y
+            );
+        else if (mat instanceof Vec3 || mat instanceof Vec4)
             return new Vec2(
                 this.a11 * mat.x + this.a12 * mat.y,
                 this.a21 * mat.x + this.a22 * mat.y
@@ -123,5 +133,11 @@ export class Mat2 {
             this.a21 - mat.a21,
             this.a22 - mat.a22
         );
+    }
+
+    /** @override */
+    public toString(): string {
+        const p = (val: number) => (val + "").padStart(4, " ");
+        return `[[${p(this.a11)}, ${p(this.a12)}],\n [${p(this.a21)}, ${p(this.a22)}]]`;
     }
 }

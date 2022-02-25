@@ -27,7 +27,7 @@ export class Vec4 {
      * @param w The w component of the vector
      * @returns The created vector
      */
-    protected create(x: number, y: number, z: number, w: number): this {
+    public create(x: number, y: number, z: number, w: number): this {
         return new Vec4(x, y, z, w) as any;
     }
 
@@ -190,5 +190,10 @@ export class Vec4 {
      */
     public normalize(): this {
         return this.mul(1 / this.length());
+    }
+
+    /** @override */
+    public toString(): string {
+        return `(${this.x}, ${this.y}, ${this.z}, ${this.w})`;
     }
 }

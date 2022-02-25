@@ -22,7 +22,7 @@ export class Vec2 {
      * @param y The y component of the vector
      * @returns The created vector
      */
-    protected create(x: number, y: number): this {
+    public create(x: number, y: number): this {
         return new Vec2(x, y) as any;
     }
 
@@ -161,5 +161,10 @@ export class Vec2 {
      */
     public normalize(): this {
         return this.mul(1 / this.length());
+    }
+
+    /** @override */
+    public toString(): string {
+        return `(${this.x}, ${this.y})`;
     }
 }

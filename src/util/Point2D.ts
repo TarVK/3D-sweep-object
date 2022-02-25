@@ -1,4 +1,5 @@
 import {Mat3} from "./Mat3";
+import {Point3D} from "./Point3D";
 import {Vec2} from "./Vec2";
 import {Vec3} from "./Vec3";
 
@@ -8,9 +9,22 @@ export class Point2D extends Vec3 {
      * Creates a new 3 dimensional vector
      * @param x The x component of the point
      * @param y The y component of the point
+     * @param z The z component of the point
      */
-    public constructor(x: number, y: number) {
-        super(x, y, 1);
+    public constructor(x: number, y: number, z: number = 1) {
+        super(x, y, z);
+    }
+
+    /**
+     * Creates a new vector of this class. Should be overridden by classes extending this class
+     * @param x The x component of the vector
+     * @param y The y component of the vector
+     * @param z The z component of the vector
+     * @returns The created vector
+     * @override
+     */
+    public create(x: number, y: number, z: number): this {
+        return new Point2D(x, y, z) as any;
     }
 
     /**
@@ -26,8 +40,9 @@ export class Point2D extends Vec3 {
      * @param vec The vector to turn into the homogenous form
      * @returns The homogenous coordinate (equal to the input if it already was homogeneous)
      */
-    public static create(vec: Vec2 | Point2D): Point2D {
+    public static create(vec: Vec2 | Vec3 | Point2D | Point3D): Point2D {
         if (vec instanceof Point2D) return vec;
+        if (vec instanceof Point3D) vec = vec.toCartesian();
         return new Point2D(vec.x, vec.y);
     }
 }
