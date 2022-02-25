@@ -1,10 +1,53 @@
 import {useDataHook} from "model-react";
-import {FC} from "react";
+import {FC, useMemo} from "react";
 import {AppState} from "../state/AppState";
+import {createSweepObject} from "../sweepObject/createSweepObject";
+import {IMesh} from "../sweepObject/_types/IMesh";
+import {Vec2} from "../util/Vec2";
+import {Vec3} from "../util/Vec3";
 import {Canvas} from "./3D/Canvas";
 
 export const App: FC<{state: AppState}> = ({state}) => {
     const [h] = useDataHook();
+    const mesh = useMemo<IMesh>(() => {
+        // return {
+        //     faces: [
+        //         [1, 0, 2],
+        //         [0, 1, 3],
+        //         [2, 0, 3],
+        //         [1, 2, 3],
+        //     ],
+        //     points: [
+        //         new Vec3(-1, 0, 0),
+        //         new Vec3(1, 0, 0),
+        //         new Vec3(0, 1, 0),
+        //         new Vec3(0, 0, 1),
+        //     ],
+        // };
+        return createSweepObject({
+            sweepPointDistance: 0.2,
+            sweepLine: [
+                {
+                    start: new Vec3(0, 0, 0),
+                    startControl: new Vec3(0, 2, 0),
+                    endControl: new Vec3(2, 4, 0),
+                    end: new Vec3(4, 4, 0),
+                },
+                {
+                    start: new Vec3(4, 4, 0),
+                    startControl: new Vec3(6, 4, 0),
+                    endControl: new Vec3(8, 6, 0),
+                    end: new Vec3(8, 8, 0),
+                },
+            ],
+            crossSection: [
+                new Vec2(-1, -1),
+                new Vec2(1, -1),
+                new Vec2(1, 1),
+                new Vec2(-1, 1),
+            ],
+        });
+    }, []);
 
     return (
         <>
@@ -21,7 +64,7 @@ export const App: FC<{state: AppState}> = ({state}) => {
                     height: 600,
                     width: 700,
                 }}
-                sweepObjectMesh={{faces: [], points: []}}
+                sweepObjectMesh={mesh}
             />
         </>
     );

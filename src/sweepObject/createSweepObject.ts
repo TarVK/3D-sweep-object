@@ -24,21 +24,21 @@ export function createSweepObject({
     const nodes = approximateSweepLine(sweepLine, sweepPointDistance);
     const startPoints = transformCrossSection(crossSection, nodes[0].dir, nodes[0].point);
     mesh.points.push(...startPoints);
-    mesh.faces.push(...crossSectionFaces);
+    mesh.faces.push(...crossSectionFaces.map(([i1, i2, i3]) => [i2, i1, i3] as IFace));
 
     // Go through the nodes along the sweep line and connect cross-sections
     for (let {dir, point} of nodes.slice(1)) {
+        const startIndex = mesh.points.length;
         const points = transformCrossSection(crossSection, dir, point);
         mesh.points.push(...points);
-        const startIndex = mesh.points.length;
         const length = points.length;
         for (let i = 0; i < length; i++) {
-            const ring1Index1 = startIndex + i;
-            const ring1Index2 = (ring1Index1 + 1) % length;
-            const ring2Index1 = ring1Index1 + length;
-            const ring2Index2 = (ring2Index1 + 1) % length;
+            const ring1Index1 = startIndex - length + i;
+            const ring1Index2 = startIndex - length + ((i + 1) % length);
+            const ring2Index1 = startIndex + i;
+            const ring2Index2 = startIndex + ((i + 1) % length);
 
-            mesh.faces.push([ring1Index1, ring2Index1, ring1Index2]);
+            mesh.faces.push([ring2Index1, ring1Index1, ring1Index2]);
             mesh.faces.push([ring1Index2, ring2Index2, ring2Index1]);
         }
     }

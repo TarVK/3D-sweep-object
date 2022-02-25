@@ -25,8 +25,14 @@ export class Scene extends THREE.Scene {
 
     public addPointLight = (color = 0xffffff) => {
         const light = new THREE.PointLight(color, 3, 1000, 0.01);
-        light.position.set(-5, 10, -5);
+        light.position.set(-3, 6, -3);
         this.add(light);
+        const ambientLight = new THREE.AmbientLight(0x808080); // soft white light
+        this.add(ambientLight);
+
+        const sphereSize = 1;
+        const pointLightHelper = new THREE.PointLightHelper(light, sphereSize);
+        this.add(pointLightHelper);
     };
 
     public addGrid = (size = 100, divisions = 100) => {

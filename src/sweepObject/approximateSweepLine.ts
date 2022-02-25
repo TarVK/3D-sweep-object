@@ -14,9 +14,13 @@ export function approximateSweepLine(
     spacing: number
 ): IBezierNode<Vec3>[] {
     const nodes: IBezierNode<Vec3>[] = [];
+    let first = true;
     for (let segment of sweepLine) {
         const points = approximateBezier(segment, {spacing: spacing});
+        const dropFirstDuplicatePoint = !first;
+        if (dropFirstDuplicatePoint) points.shift();
         nodes.push(...points);
+        first = false;
     }
 
     return nodes;
