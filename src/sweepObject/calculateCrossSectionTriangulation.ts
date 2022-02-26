@@ -8,7 +8,6 @@ import {IFace} from "./_types/IMesh";
  * @returns The triangle index list
  */
 export function calculateCrossSectionTriangulation(crossSection: ICrossSection): IFace[] {
-    console.log(crossSection.flatMap(point => [point.x, point.y]));
     const indices = earcut(
         crossSection.flatMap(point => [point.x, point.y]),
         []

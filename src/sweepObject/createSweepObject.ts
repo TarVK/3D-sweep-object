@@ -2,7 +2,8 @@ import {IFace, IMesh} from "./_types/IMesh";
 import {ISweepObjectSpecification} from "./_types/ISweepObjectSpecification";
 import {approximateSweepLine} from "./approximateSweepLine";
 import {calculateCrossSectionTriangulation} from "./calculateCrossSectionTriangulation";
-import {transformCrossSection} from "./transformCrossSection";
+import {createCrossSectionTransformer} from "./createCrossSectionTransformer";
+import {Point3D} from "../util/Point3D";
 
 /**
  * Creates the mesh from a given sweep object specification
@@ -20,16 +21,19 @@ export function createSweepObject({
     };
     const crossSectionFaces = calculateCrossSectionTriangulation(crossSection);
 
+    const crossSection3D = crossSection.map(point => new Point3D(point.x, point.y, 0));
+    const transform = createCrossSectionTransformer();
+
     // Create the start of the mesh
     const nodes = approximateSweepLine(sweepLine, sweepPointDistance);
-    const startPoints = transformCrossSection(crossSection, nodes[0].dir, nodes[0].point);
+    const startPoints = transform(crossSection3D, nodes[0].dir, nodes[0].point);
     mesh.points.push(...startPoints);
     mesh.faces.push(...crossSectionFaces.map(([i1, i2, i3]) => [i2, i1, i3] as IFace));
 
     // Go through the nodes along the sweep line and connect cross-sections
     for (let {dir, point} of nodes.slice(1)) {
         const startIndex = mesh.points.length;
-        const points = transformCrossSection(crossSection, dir, point);
+        const points = transform(crossSection3D, dir, point);
         mesh.points.push(...points);
         const length = points.length;
         for (let i = 0; i < length; i++) {

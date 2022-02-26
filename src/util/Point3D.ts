@@ -99,13 +99,31 @@ export function RotateZ(amount: number): Mat4 {
 }
 
 /**
+ * Creates a rotation matrix for the given quaternion
+ * @param quaternion The quaternion to be rotated by
+ * @returns The rotation matrix
+ */
+export function Rotate(quaternion: Vec4): Mat4 {
+    const q = quaternion.normalize();
+
+    // Source: https://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToMatrix/index.htm
+    // prettier-ignore
+    return new Mat4 (
+        1-2*q.y*q.y-2*q.z*q.z, 2*q.x*q.y-2*q.z*q.w,   2*q.x*q.z+2*q.y*q.w,   0,
+        2*q.x*q.y+2*q.z*q.w,   1-2*q.x*q.x-2*q.z*q.z, 2*q.y*q.z-2*q.x*q.w,   0,
+        2*q.x*q.z-2*q.y*q.w,   2*q.y*q.z + 2*q.x*q.w, 1-2*q.x*q.x-2*q.y*q.y, 0,
+        0,                     0,                     0,                     1
+    );
+}
+
+/**
  * Creates a 3d translation matrix that operates on homogenous coordinates
  * @param x The translation amount on the x-axis
  * @param y The translation amount on the y-axis
  * @param z The translation amount on the z-axis
  * @returns The transformation matrix
  */
-export function Translate(x: number, y: number): Mat4;
+export function Translate(x: number, y: number, z: number): Mat4;
 
 /**
  * Creates a 3d translation matrix that operates on homogenous coordinates

@@ -1,6 +1,7 @@
 import {Mat4} from "../util/Mat4";
-import {Point3D, RotateX, RotateY, RotateZ} from "../util/Point3D";
+import {Point3D, Rotate, RotateX, RotateY, RotateZ} from "../util/Point3D";
 import {Vec3} from "../util/Vec3";
+import {Vec4} from "../util/Vec4";
 
 /**
  * Creates a rotation matrix such that the point (0, 0, 1) is pointed along the direction vector

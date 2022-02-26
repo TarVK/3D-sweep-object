@@ -166,7 +166,7 @@ export class Vec3 {
     public dot(x: number, y: number, z: number): number;
     /**
      * Retrieves the dot product of this vector and the given vector
-     * @param vec The dot product to get the dot product with
+     * @param vec The vector product to get the dot product with
      * @returns The dot product
      */
     public dot(vec: Vec3 | Vec4): number;
@@ -174,7 +174,37 @@ export class Vec3 {
         if (typeof x == "number") return this.x * x + this.y * y! + this.z * z!;
         else {
             if (x instanceof Point3D) x = x.toCartesian();
-            return this.x * x.x + this.y * x.y * this.z * x.z;
+            return this.x * x.x + this.y * x.y + this.z * x.z;
+        }
+    }
+
+    /**
+     * Retrieves the cross product of this vector and the components
+     * @param x The x component of the vector
+     * @param y The y component of the vector
+     * @param z The z component of the vector
+     * @returns The cross product
+     */
+    public cross(x: number, y: number, z: number): this;
+    /**
+     * Retrieves the cross product of this vector and the given vector
+     * @param vec The vector to get the cross product with
+     * @returns The cross product
+     */
+    public cross(vec: Vec3 | Vec4): this;
+    public cross(x: number | Vec3 | Vec4, y?: number, z?: number): this {
+        if (typeof x == "number") {
+            return this.create(
+                this.y * z! - this.z * y!,
+                this.z * x - this.x * z!,
+                this.x * y! - this.y * x
+            );
+        } else {
+            return this.create(
+                this.y * x.z - this.z * x.y,
+                this.z * x.x - this.x * x.z,
+                this.x * x.y - this.y * x.x
+            );
         }
     }
 

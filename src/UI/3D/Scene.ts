@@ -37,6 +37,7 @@ export class Scene extends THREE.Scene {
 
     public addGrid = (size = 100, divisions = 100) => {
         this.add(new THREE.GridHelper(size, divisions));
+        this.add(new THREE.AxesHelper(5));
     };
 
     public addCube = (color = 0x00ff00) => {
