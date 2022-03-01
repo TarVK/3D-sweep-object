@@ -116,3 +116,6 @@ export const result = (async () => {
         console.log(tree, newTree);
     }
 })();
+
+// const rec = (v=4)=>v>0?({a: rec(v-1), b: rec(v-1)}):true;
+// copy(JSON.stringify(Object.fromEntries(new Array(1000).fill(rec()).map((val, i)=>[i, val])), null, 4));

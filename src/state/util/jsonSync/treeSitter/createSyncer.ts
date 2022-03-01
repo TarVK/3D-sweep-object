@@ -5,6 +5,7 @@ import {get2DRange} from "./get2DRange";
 import {ISyncRoot} from "./_types/ISyncRoot";
 import {ISyncDataNode} from "./_types/ISyncNode";
 import {syncTree} from "./syncTree";
+import {IChangedRange} from "./_types/IChangedRange";
 
 /**
  * Creates a new synchroniser
@@ -27,7 +28,7 @@ export async function createSyncer<C extends ISyncDataNode>(
 
     let text = initText;
     let tree = parser.parse(text);
-    syncTree(root, tree.rootNode);
+    syncTree(root, tree.rootNode, {start: 0, addLength: text.length, removeLength: 0});
 
     return {
         changeText: (range, replaceText) => {
@@ -51,7 +52,12 @@ export async function createSyncer<C extends ISyncDataNode>(
             text = newText;
             console.log(newText);
 
-            syncTree(root, tree.rootNode);
+            const syncChange: IChangedRange = {
+                start: range.start,
+                addLength: replaceText.length,
+                removeLength: range.end - range.start,
+            };
+            syncTree(root, tree.rootNode, syncChange);
         },
         setData: () => void 0,
     };
