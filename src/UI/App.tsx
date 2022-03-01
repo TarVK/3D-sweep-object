@@ -25,7 +25,7 @@ export const App: FC<{state: AppState}> = ({state}) => {
         //     ],
         // };
         return createSweepObject({
-            sweepPointDistance: 0.1,
+            sampleCount: 10,
             sweepLine: [
                 {
                     start: new Vec3(0, 0, 0),
@@ -40,18 +40,18 @@ export const App: FC<{state: AppState}> = ({state}) => {
                     end: new Vec3(8, 8, 4),
                 },
             ],
-            crossSection: [
-                new Vec2(0, -0.3),
-                new Vec2(0.6, -0.8),
-                new Vec2(0.3, -0.1),
-                new Vec2(1, 0.4),
-                new Vec2(0.2, 0.3),
-                new Vec2(0, 1),
-                new Vec2(-0.2, 0.3),
-                new Vec2(-1, 0.4),
-                new Vec2(-0.3, -0.1),
-                new Vec2(-0.6, -0.8),
-            ],
+            // crossSection: [
+            //     new Vec2(0, -0.3),
+            //     new Vec2(0.6, -0.8),
+            //     new Vec2(0.3, -0.1),
+            //     new Vec2(1, 0.4),
+            //     new Vec2(0.2, 0.3),
+            //     new Vec2(0, 1),
+            //     new Vec2(-0.2, 0.3),
+            //     new Vec2(-1, 0.4),
+            //     new Vec2(-0.3, -0.1),
+            //     new Vec2(-0.6, -0.8),
+            // ],
             // sweepLine: [
             //     {
             //         start: new Vec3(0, 0, 0),
@@ -60,12 +60,12 @@ export const App: FC<{state: AppState}> = ({state}) => {
             //         end: new Vec3(4, 3, 4),
             //     },
             // ],
-            // crossSection: [
-            //     new Vec2(-1, -2),
-            //     new Vec2(1, -2),
-            //     new Vec2(1, 2),
-            //     new Vec2(-1, 2),
-            // ],
+            crossSection: [
+                new Vec2(-1, -2),
+                new Vec2(1, -2),
+                new Vec2(1, 2),
+                new Vec2(-1, 2),
+            ],
         });
     }, []);
 

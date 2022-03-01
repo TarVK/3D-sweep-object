@@ -12,7 +12,7 @@ import {Point3D} from "../util/Point3D";
  */
 export function createSweepObject({
     sweepLine,
-    sweepPointDistance,
+    sampleCount,
     crossSection,
 }: ISweepObjectSpecification): IMesh {
     const mesh: IMesh = {
@@ -25,10 +25,11 @@ export function createSweepObject({
     const transform = createCrossSectionTransformer();
 
     // Create the start of the mesh
-    const nodes = approximateSweepLine(sweepLine, sweepPointDistance);
+    const nodes = approximateSweepLine(sweepLine, sampleCount);
     const startPoints = transform(crossSection3D, nodes[0].dir, nodes[0].point);
     mesh.points.push(...startPoints);
-    mesh.faces.push(...crossSectionFaces.map(([i1, i2, i3]) => [i2, i1, i3] as IFace));
+    const reverseFaces = crossSectionFaces.map(([i1, i2, i3]) => [i2, i1, i3] as IFace);
+    mesh.faces.push(...reverseFaces);
 
     // Go through the nodes along the sweep line and connect cross-sections
     for (let {dir, point} of nodes.slice(1)) {
