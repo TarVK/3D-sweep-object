@@ -6,6 +6,7 @@ import {IMesh} from "../sweepObject/_types/IMesh";
 import {Vec2} from "../util/Vec2";
 import {Vec3} from "../util/Vec3";
 import {Canvas} from "./3D/Canvas";
+import {InputMenu} from "./InputMenu";
 
 export const App: FC<{state: AppState}> = ({state}) => {
     const [h] = useDataHook();
@@ -71,18 +72,23 @@ export const App: FC<{state: AppState}> = ({state}) => {
 
     return (
         <>
-            <div css={{color: "purple", ":hover": {color: "red"}}}>
+            {/* <div css={{color: "purple", ":hover": {color: "red"}}}>
                 {state.getText(h)}
             </div>
             <input
                 type="text"
                 value={state.getText(h)}
                 onChange={event => state.setText(event.target.value)}
-            />
+            /> */}
+            <div className="input-menu-holder" css={{
+                width: "100%",
+                margin: "25px 0px"
+            }}><InputMenu/></div>
             <Canvas
                 css={{
-                    height: 600,
-                    width: 700,
+                    minHeight: 600,
+                    maxWidth: 900,
+                    margin: "auto auto"
                 }}
                 sweepObjectMesh={mesh}
             />
