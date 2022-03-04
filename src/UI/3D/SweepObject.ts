@@ -5,11 +5,12 @@ import {IMateriable} from "./_types/IMateriable";
 export class SweepObject extends THREE.Object3D implements IMateriable {
     protected mesh: THREE.Mesh;
 
+
     /**
      * Updates the mesh of the object
      * @param newMesh The new mesh to be set
      */
-    public updateMesh(newMesh: IMesh) {
+    public updateMesh(newMesh: IMesh, castShadow = true) {
         const geometry = new THREE.BufferGeometry();
         geometry.setAttribute(
             "position",
@@ -26,7 +27,7 @@ export class SweepObject extends THREE.Object3D implements IMateriable {
                 .flat()
         );
         geometry.computeVertexNormals();
-        const material = new THREE.MeshStandardMaterial({
+        const material = new THREE.MeshPhongMaterial({
             color: 0xff0000,
             // wireframe: true,
             // side: THREE.DoubleSide,
@@ -37,6 +38,7 @@ export class SweepObject extends THREE.Object3D implements IMateriable {
         } else {
             this.mesh.geometry = geometry;
         }
+        this.mesh.castShadow = castShadow;
     }
 
     public updateMaterial(material: THREE.Material): void {}

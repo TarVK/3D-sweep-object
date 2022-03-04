@@ -3,7 +3,7 @@ import OrbitControls from "three-orbitcontrols";
 
 export class Renderer {
     protected scene: THREE.Scene;
-    protected renderer: THREE.Renderer;
+    protected renderer: THREE.WebGLRenderer;
     protected camera: THREE.Camera;
 
     protected width: number;
@@ -23,7 +23,8 @@ export class Renderer {
         this.height = target.offsetHeight;
         this.container = target;
         this.scene = scene;
-        this.renderer = new THREE.WebGLRenderer();
+        this.renderer = new THREE.WebGLRenderer({antialias: true});
+        this.renderer.shadowMap.enabled = true;
         this.renderer.setSize(this.width, this.height);
         target.appendChild(this.renderer.domElement);
 
@@ -52,7 +53,7 @@ export class Renderer {
             0.1,
             10000
         );
-        this.camera.position.set(-6, 3, 5);
+        this.resetCameraPosition();
         // TODO: update orbit controls
     }
 
@@ -65,9 +66,13 @@ export class Renderer {
             0.1,
             10000
         );
-        this.camera.position.set(-6, 3, 5);
+        this.resetCameraPosition();
         //TODO: use previous camera's position.
         // TODO: update orbit controls
+    }
+
+    public resetCameraPosition(){
+        this.camera.position.set(-10, 6, 12);
     }
 
     private animate = () => {

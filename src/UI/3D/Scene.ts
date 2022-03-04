@@ -11,18 +11,78 @@ export class Scene extends THREE.Scene {
     public sweepLine: SweepLine;
     public objects: IMateriable[] = [];
 
+    readonly bgColor = 0xa0a0a0;
+    readonly lightColor = 0xffffff;
+    readonly groundColor = 0x999999;
+
     public constructor() {
         super();
+        this.addBackground(this.bgColor);
+        this.addFog(this.bgColor);
+        this.addDirectionalLight(this.lightColor);
+        this.addHemiLight(this.lightColor, this.groundColor);
+        this.addGround(this.groundColor);
+
         this.sweepObject = new SweepObject();
         this.sweepLine = new SweepLine();
         this.crossSection = new CrossSection();
+
         this.objects.push(this.sweepObject, this.sweepLine, this.crossSection);
         this.add(this.sweepObject, this.sweepLine, this.crossSection);
 
-        this.addGrid();
-        this.addPointLight();
+        this.addGrid(10000, 1000);
     }
 
+    public addGrid = (size = 1000, divisions = 100) => {
+        const grid = new THREE.GridHelper( size, divisions, 0x000000, 0x000000 );
+        // this is just to relax typescript.
+        if(!Array.isArray(grid.material)){
+            grid.material.opacity = 0.2;
+            grid.material.transparent = true;
+        }
+        this.add(grid);
+
+        this.add(new THREE.AxesHelper(5));
+    };
+
+    public addGround = (color = this.groundColor) => {
+        const ground = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: color, depthWrite: false } ) );
+        ground.rotation.x = - Math.PI / 2;
+        ground.receiveShadow = true;
+        this.add( ground );
+    }
+
+    public addBackground(color =  this.bgColor ){
+        this.background = new THREE.Color(color);
+    }
+
+    public addFog(color = this.bgColor, near=10, far=100){        
+        this.fog = new THREE.Fog(color , near, far );
+    }
+
+    public addDirectionalLight = (color = this.lightColor) => {
+        const directionalLight = new THREE.DirectionalLight( color );
+        directionalLight.position.set( 0, 200, 100 );
+        directionalLight.castShadow = true;
+        this.add( directionalLight );
+
+        // const directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight);
+        // this.add(directionalLightHelper);
+    }
+
+    public addHemiLight(skyColor = this.lightColor, groundColor = this.groundColor){
+        const hemiLight = new THREE.HemisphereLight( skyColor, groundColor);
+        hemiLight.position.set( 0, 200, 0 );    
+        this.add( hemiLight );
+    }
+
+    public removeFog(){        
+        this.fog = new THREE.Fog(0x000000, Number.MAX_VALUE, Number.MAX_VALUE);
+    }
+
+
+    // TODO: Remove these functions from here till the end
+    /*
     public addPointLight = (color = 0xffffff) => {
         const light = new THREE.PointLight(color, 3, 1000, 0.01);
         light.position.set(-3, 6, -3);
@@ -34,12 +94,7 @@ export class Scene extends THREE.Scene {
         const pointLightHelper = new THREE.PointLightHelper(light, sphereSize);
         this.add(pointLightHelper);
     };
-
-    public addGrid = (size = 100, divisions = 100) => {
-        this.add(new THREE.GridHelper(size, divisions));
-        this.add(new THREE.AxesHelper(5));
-    };
-
+    
     public addCube = (color = 0x00ff00) => {
         const geometry = new THREE.BoxGeometry(1, 1, 1);
         const material = new THREE.MeshBasicMaterial({
@@ -52,7 +107,6 @@ export class Scene extends THREE.Scene {
         this.add(cube);
     };
 
-    // TODO: Remove these functions from here till the end
     public polygonToPositionCoordinates = (polygon: [number, number][], posZ = 1) => {
         const vecArr = polygon.map(point => new THREE.Vector2(point[0], point[1]), []);
         const triangles = THREE.ShapeUtils.triangulateShape(vecArr, []);
@@ -100,4 +154,5 @@ export class Scene extends THREE.Scene {
         console.log(line.geometry.index);
         this.add(line);
     };
+    */
 }
