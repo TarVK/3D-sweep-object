@@ -6,6 +6,8 @@ export type IJSONValidator<D = IJSON, R = unknown> = {
     id: IValidatorID;
     /** The default data in case that validation fails */
     default: D;
+    /** The data to return if the validator had no data to run against */
+    absentResult: R;
     /**
      * Checks whether the given data follows the exact structure/requirements
      * @param data
@@ -30,11 +32,23 @@ export type IJSONErrorChange = {
     path: string[];
     error: IJSONValidationError | undefined;
 };
-export type IJSONValueChange = {
-    type: "insert" | "update" | "delete";
-    path: string[];
-    value: IJSON | undefined;
-};
+export type IJSONValueChange =
+    | {
+          type: "insert";
+          /** The index to insert the field at */
+          index?: number;
+          path: string[];
+          value: IJSON;
+      }
+    | {
+          type: "update";
+          path: string[];
+          value: IJSON;
+      }
+    | {
+          type: "delete";
+          path: string[];
+      };
 
 export type IJSONDescendentError = {
     path: string[];
