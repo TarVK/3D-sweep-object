@@ -6,6 +6,7 @@ import {IMesh} from "../sweepObject/_types/IMesh";
 import {Vec2} from "../util/Vec2";
 import {Vec3} from "../util/Vec3";
 import {Canvas} from "./3D/Canvas";
+import {CrossSectionCanvas} from "./3D/CrossSectionCanvas";
 import {InputMenu} from "./InputMenu";
 
 export const App: FC<{state: AppState}> = ({state}) => {
@@ -80,18 +81,34 @@ export const App: FC<{state: AppState}> = ({state}) => {
                 value={state.getText(h)}
                 onChange={event => state.setText(event.target.value)}
             /> */}
-            <div className="input-menu-holder" css={{
-                width: "100%",
-                margin: "25px 0px"
-            }}><InputMenu/></div>
-            <Canvas
+            <div
+                className="input-menu-holder"
                 css={{
-                    minHeight: 600,
-                    maxWidth: 900,
-                    margin: "auto auto"
-                }}
-                sweepObjectMesh={mesh}
-            />
+                    width: "100%",
+                    margin: "25px 0px",
+                }}>
+                <InputMenu />
+            </div>
+            <div css={{display: "flex", justifyContent: "space-around", margin: "auto auto"}}>
+                <Canvas
+                    css={{
+                        minHeight: 450,
+                        maxWidth: 700,
+                        margin: "auto auto",
+                        flex: 1,
+                    }}
+                    sweepObjectMesh={mesh}
+                />
+                <CrossSectionCanvas
+                    css={{
+                        minHeight: 450,
+                        maxWidth: 700,
+                        margin: "auto auto",
+                        flex: 1,
+                    }}
+                    sweepObjectMesh={mesh}
+                />
+            </div>
         </>
     );
 };
