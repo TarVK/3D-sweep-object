@@ -1,7 +1,7 @@
 import {Vec3} from "../util/Vec3";
-import {approximateBezier} from "./bezier/approximateBezier";
-import {sampleBezier} from "./bezier/sampleBezier";
-import {IBezierNode} from "./bezier/_types/IBezierNode";
+import {approximateBezier} from "../util/bezier/approximateBezier";
+import {sampleBezier} from "../util/bezier/sampleBezier";
+import {IBezierNode} from "../util/bezier/_types/IBezierNode";
 import {ISweepLine} from "./_types/ISweepLine";
 
 /**

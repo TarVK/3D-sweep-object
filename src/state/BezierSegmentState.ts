@@ -1,11 +1,12 @@
 import {DataCacher, Field, IDataHook} from "model-react";
-import {approximateBezier} from "../sweepObject/bezier/approximateBezier";
-import {getPointOnBezier} from "../sweepObject/bezier/getPointOnBezier";
-import {getTangentOnBezier} from "../sweepObject/bezier/getTangentOnBezier";
-import {sampleBezier} from "../sweepObject/bezier/sampleBezier";
-import {IBezier} from "../sweepObject/bezier/_types/IBezier";
-import {IBezierApproximationConfig} from "../sweepObject/bezier/_types/IBezierApproximationConfig";
-import {IBezierNode} from "../sweepObject/bezier/_types/IBezierNode";
+import {approximateBezier} from "../util/bezier/approximateBezier";
+import {getPointOnBezier} from "../util/bezier/getPointOnBezier";
+import {getTangentOnBezier} from "../util/bezier/getTangentOnBezier";
+import {projectOnBezier} from "../util/bezier/projectOnBezier";
+import {sampleBezier} from "../util/bezier/sampleBezier";
+import {IBezier} from "../util/bezier/_types/IBezier";
+import {IBezierApproximationConfig} from "../util/bezier/_types/IBezierApproximationConfig";
+import {IBezierNode} from "../util/bezier/_types/IBezierNode";
 import {Vec2} from "../util/Vec2";
 import {Vec3} from "../util/Vec3";
 import {ISegment} from "./_types/ISegment";
@@ -189,16 +190,10 @@ export class BezierSegmentState<D extends Vec2 | Vec3> implements ISegment<D> {
     }
 
     public getStartDirection(hook?: IDataHook): D {
-        return this.startControl
-            .get(hook)
-            .sub(this.start.get(hook) as Vec3)
-            .normalize() as D;
+        return this.startControl.get(hook).sub(this.start.get(hook) as Vec3) as D;
     }
     public getEndDirection(hook?: IDataHook): D {
-        return this.endControl
-            .get(hook)
-            .sub(this.end.get(hook) as Vec3)
-            .normalize() as D;
+        return this.endControl.get(hook).sub(this.end.get(hook) as Vec3) as D;
     }
 
     /**
@@ -287,14 +282,16 @@ export class BezierSegmentState<D extends Vec2 | Vec3> implements ISegment<D> {
         this.endControl.set(vec.sub(this.end.get() as Vec3) as D);
     }
 
-    public setStartDirection(direction: D): void {
+    public setStartDirection(direction: D): boolean {
         const length = this.getStartControlDelta().length();
         this.setStartControlDelta(direction.normalize().mul(length) as D);
+        return true;
     }
 
-    public setEndDirection(direction: D): void {
+    public setEndDirection(direction: D): boolean {
         const length = this.getEndControlDelta().length();
         this.setEndControlDelta(direction.normalize().mul(length) as D);
+        return true;
     }
 
     /**
@@ -318,13 +315,48 @@ export class BezierSegmentState<D extends Vec2 | Vec3> implements ISegment<D> {
     }
 
     // Segment approximation
-    public getRecommendedApproximationPointCount(precision: number): number {
-        return precision;
-    }
-
     public approximate(points: number, skipLast: boolean): D[] {
         const nodes = sampleBezier(this.getPlain(), points);
         const out = skipLast ? nodes.slice(0, -1) : nodes;
         return out.map(({point}) => point) as D[];
+    }
+
+    // Interaction
+    public getDistance(point: D): number {
+        return projectOnBezier(this.getPlain(), point)
+            .point.sub(point as Vec3)
+            .length();
+    }
+
+    public split(point: D): [ISegment<D>, ISegment<D>] {
+        const direction = getTangentOnBezier(
+            this.getPlain(),
+            projectOnBezier(this.getPlain(), point).position
+        ) as Vec3;
+
+        return [
+            new BezierSegmentState(
+                this.start.get(),
+                this.startControl.get(),
+                point.sub(direction) as D,
+                point
+            ),
+            new BezierSegmentState(
+                point,
+                point.add(direction) as D,
+                this.endControl.get(),
+                this.end.get()
+            ),
+        ];
+    }
+
+    public combineNext(): ISegment<D> {
+        const next = this.next.get() ?? this;
+        return new BezierSegmentState(
+            this.start.get(),
+            this.startControl.get(),
+            next.getEndDirection().add(next.getEnd() as Vec3) as D,
+            next.getEnd()
+        );
     }
 }

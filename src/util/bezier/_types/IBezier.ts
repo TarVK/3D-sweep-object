@@ -1,5 +1,5 @@
-import {Vec2} from "../../../util/Vec2";
-import {Vec3} from "../../../util/Vec3";
+import {Vec2} from "../../Vec2";
+import {Vec3} from "../../Vec3";
 
 export type IBezier<D extends Vec2 | Vec3> = {
     /** The start point */

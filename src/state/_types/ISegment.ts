@@ -46,13 +46,15 @@ export type ISegment<D extends Vec2 | Vec3> = {
     /**
      * Sets the start direction if possible
      * @param direction The direction to be set
+     * @returns Whether the segment allowed for updating of the direction
      */
-    setStartDirection(direction: D): void;
+    setStartDirection(direction: D): boolean;
     /**
      * Sets the end direction if possible
      * @param direction The direction to be set
+     * @returns Whether the segment allowed for updating of the direction
      */
-    setEndDirection(direction: D): void;
+    setEndDirection(direction: D): boolean;
 
     // Control connected segments
     /**
@@ -70,17 +72,31 @@ export type ISegment<D extends Vec2 | Vec3> = {
 
     // Approximating the segment
     /**
-     * Retrieves the recommended amount of points to use for approximating this segment
-     * @param precision The curvature precision for the recommendation
-     * @returns The number of points to use
-     */
-    getRecommendedApproximationPointCount(precision: number): number;
-
-    /**
      * Approximates this segment by a list of points that can be linearly interpolated
      * @param points The number of points to approximate the segment by
      * @param skipLast Whether the last point should not be excluded of the result
      * @returns The list of points that approximate the segment
      */
     approximate(points: number, skipLast: boolean): D[];
+
+    // Interaction
+    /**
+     * Splits this segment into two new segments with the given point as commonly shared start/endpoint
+     * @param point The point to split this segment at
+     * @returns The resulting end point
+     */
+    split(point: D): [ISegment<D>, ISegment<D>];
+
+    /**
+     * Combines this segment and its specified next segment into a new segment, such that the next segment can be removed
+     * @returns The combined segment
+     */
+    combineNext(): ISegment<D>;
+
+    /**
+     * Retrieves the approximate distance between the given point and this segment
+     * @param point The point to get the distance to
+     * @returns The approximate distance to this curve
+     */
+    getDistance(point: D): number;
 };

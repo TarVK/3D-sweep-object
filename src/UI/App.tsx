@@ -1,13 +1,12 @@
 import {useDataHook} from "model-react";
 import {FC, useMemo} from "react";
-import {AppState} from "../state/AppState";
 import {createSweepObject} from "../sweepObject/createSweepObject";
 import {IMesh} from "../sweepObject/_types/IMesh";
 import {Vec2} from "../util/Vec2";
 import {Vec3} from "../util/Vec3";
 import {Canvas} from "./3D/Canvas";
 
-export const App: FC<{state: AppState}> = ({state}) => {
+export const App: FC = () => {
     const [h] = useDataHook();
     const mesh = useMemo<IMesh>(() => {
         // return {
@@ -71,14 +70,6 @@ export const App: FC<{state: AppState}> = ({state}) => {
 
     return (
         <>
-            <div css={{color: "purple", ":hover": {color: "red"}}}>
-                {state.getText(h)}
-            </div>
-            <input
-                type="text"
-                value={state.getText(h)}
-                onChange={event => state.setText(event.target.value)}
-            />
             <Canvas
                 css={{
                     height: 600,

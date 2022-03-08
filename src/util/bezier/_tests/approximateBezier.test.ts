@@ -1,4 +1,4 @@
-import {Vec2} from "../../../util/Vec2";
+import {Vec2} from "../../Vec2";
 import {approximateBezier} from "../approximateBezier";
 
 describe("approximateBezier", () => {
