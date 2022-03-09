@@ -1,13 +1,36 @@
 import {useDataHook} from "model-react";
 import {FC, useMemo} from "react";
+import {BezierSegmentState} from "../state/BezierSegmentState";
+import {CrossSectionState} from "../state/CrossSectionState";
+import {StraightSegmentState} from "../state/StraightSegmentState";
+import {SweepLineState} from "../state/SweepLineState";
+import {SweepObjectState} from "../state/SweepObjectState";
 import {createSweepObject} from "../sweepObject/createSweepObject";
 import {IMesh} from "../sweepObject/_types/IMesh";
 import {Vec2} from "../util/Vec2";
 import {Vec3} from "../util/Vec3";
 import {Canvas} from "./3D/Canvas";
+import {CrossSectionEditor} from "./crossSection/CrossSectionEditor";
+import {useRefLazy} from "./hooks/useRefLazy";
 
 export const App: FC = () => {
     const [h] = useDataHook();
+    const sweepObjectState = useRefLazy(
+        () =>
+            new SweepObjectState(
+                new SweepLineState([
+                    new BezierSegmentState(new Vec3(0, 0, 0), new Vec3(1, 1, 0)),
+                ]),
+                [
+                    new CrossSectionState([
+                        new StraightSegmentState(new Vec2(0, 0), new Vec2(0, 1)),
+                        new StraightSegmentState(new Vec2(0, 1), new Vec2(1, 0.5)),
+                        new StraightSegmentState(new Vec2(0.5, 1), new Vec2(0, 0)),
+                    ]),
+                ]
+            )
+    );
+
     const mesh = useMemo<IMesh>(() => {
         // return {
         //     faces: [
@@ -72,10 +95,15 @@ export const App: FC = () => {
         <>
             <Canvas
                 css={{
-                    height: 600,
+                    height: 400,
                     width: 700,
                 }}
                 sweepObjectMesh={mesh}
+            />
+            <CrossSectionEditor
+                sweepObjectState={sweepObjectState.current}
+                width={500}
+                height={500}
             />
         </>
     );
