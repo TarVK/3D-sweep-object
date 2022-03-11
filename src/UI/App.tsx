@@ -10,8 +10,9 @@ import {IMesh} from "../sweepObject/_types/IMesh";
 import {Vec2} from "../util/Vec2";
 import {Vec3} from "../util/Vec3";
 import {Canvas} from "./3D/Canvas";
-import {CrossSectionEditor} from "./crossSection/CrossSectionEditor";
 import {useRefLazy} from "./hooks/useRefLazy";
+import {CrossSectionCanvas} from "./3D/CrossSectionCanvas";
+import {InputMenu} from "./InputMenu";
 
 export const App: FC = () => {
     const [h] = useDataHook();
@@ -92,19 +93,48 @@ export const App: FC = () => {
     }, []);
 
     return (
-        <>
-            <Canvas
+        <div css={{
+            background: "#C3E0E5",
+            minHeight: "100vh"
+        }}>
+            {/* <div css={{color: "purple", ":hover": {color: "red"}}}>
+                {state.getText(h)}
+            </div>
+            <input
+                type="text"
+                value={state.getText(h)}
+                onChange={event => state.setText(event.target.value)}
+            /> */}
+            <div
+                className="input-menu-holder"
                 css={{
-                    height: 400,
-                    width: 700,
-                }}
-                sweepObjectMesh={mesh}
-            />
-            <CrossSectionEditor
-                sweepObjectState={sweepObjectState.current}
-                width={500}
-                height={500}
-            />
-        </>
+                    width: "100%",
+                    margin: "0px 0px 25px",
+                    background: "#145DA0",
+                    color: "#FFF"
+                }}>
+                <InputMenu />
+            </div>
+            <div css={{display: "flex", justifyContent: "space-around", margin: "auto auto"}}>
+                <Canvas
+                    css={{
+                        minHeight: 450,
+                        maxWidth: 700,
+                        margin: "auto auto",
+                        flex: 1,
+                    }}
+                    sweepObjectMesh={mesh}
+                />
+                <CrossSectionCanvas
+                    css={{
+                        minHeight: 450,
+                        maxWidth: 700,
+                        margin: "auto auto",
+                        flex: 1,
+                    }}
+                    sweepObjectMesh={mesh}
+                />
+            </div>
+        </div>
     );
 };
