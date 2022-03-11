@@ -26,7 +26,7 @@ export const CrossSectionsMenu: FC<ICrossSectionsMenu> = ({...props}) => {
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "flex-start",
-                    overflow: "scroll",
+                    overflowY: "auto",
                     minHeight: "90px"
                 }}>
                 {props.crossSections.map((crossSection, index) => (

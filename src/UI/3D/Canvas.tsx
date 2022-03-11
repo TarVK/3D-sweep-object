@@ -14,6 +14,7 @@ import {
     ZoomOutMapOutlined,
 } from "@mui/icons-material";
 import {Menu} from "./Menu";
+import { BufferGeometry, Float32BufferAttribute, Points, PointsMaterial, Vector3 } from "three";
 
 export const Canvas: FC<ICanvasProps> = ({sweepObjectMesh, ...props}) => {
     const rendererRef = useRef<Renderer | undefined>();
@@ -21,11 +22,20 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectMesh, ...props}) => {
     const elementRef = useRef<HTMLDivElement>(null);
     const [selectedPoint] = useState({x: 100, y: 211, z: 5});
 
+    // Just to simulate a button click (testing purposes)
+    function addPoint() {
+        const dotGeometry = new BufferGeometry();
+        dotGeometry.setAttribute( 'position', new Float32BufferAttribute( new Vector3(2, 2, 2).toArray(), 3 ) );
+        const dotMaterial = new PointsMaterial( { size: 0.1 } );
+        const dot = new Points( dotGeometry, dotMaterial );
+        sceneRef.current.add( dot );
+    }
+
     const pointMenuItems = [
         {
             icon: AddCircleOutlineSharp,
             hoverText: "Add point",
-            iconOnClick: () => {},
+            iconOnClick: addPoint,
         },
         {
             icon: MouseOutlined,
@@ -85,6 +95,8 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectMesh, ...props}) => {
             {...props}
             css={{
                 position: "relative",
+                borderRadius: "4px",
+                overflow: "hidden"
             }}>
             <Menu props={{items: pointMenuItems, position: {top: 0, left: 0}}} />
             <Menu props={{items: cameraMenuItems, position: {top: 0, right: 0}}} />

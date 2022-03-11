@@ -72,7 +72,10 @@ export const App: FC<{state: AppState}> = ({state}) => {
     }, []);
 
     return (
-        <>
+        <div css={{
+            background: "#C3E0E5",
+            minHeight: "100vh"
+        }}>
             {/* <div css={{color: "purple", ":hover": {color: "red"}}}>
                 {state.getText(h)}
             </div>
@@ -85,7 +88,9 @@ export const App: FC<{state: AppState}> = ({state}) => {
                 className="input-menu-holder"
                 css={{
                     width: "100%",
-                    margin: "25px 0px",
+                    margin: "0px 0px 25px",
+                    background: "#145DA0",
+                    color: "#FFF"
                 }}>
                 <InputMenu />
             </div>
@@ -109,6 +114,6 @@ export const App: FC<{state: AppState}> = ({state}) => {
                     sweepObjectMesh={mesh}
                 />
             </div>
-        </>
+        </div>
     );
 };

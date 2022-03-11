@@ -63,6 +63,8 @@ export const CrossSectionCanvas: FC<ICanvasProps> = ({sweepObjectMesh, ...props}
             {...props}
             css={{
                 position: "relative",
+                borderRadius: "4px",
+                overflow: "hidden"
             }}>
             <Menu props={{items: pointMenuItems, position: {top: 0, left: 0}}} />
             <Menu props={{items: exportImportMenu, position: {top: 0, right: 0}}} />
