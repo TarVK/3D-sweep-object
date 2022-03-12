@@ -1,6 +1,6 @@
-import {IMesh} from "../../../sweepObject/_types/IMesh";
+import {SweepObjectState} from "../../../state/SweepObjectState";
 
 export type ICanvasProps = {
-    sweepObjectMesh: IMesh;
+    sweepObjectState: SweepObjectState;
     className?: string;
 };

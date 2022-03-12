@@ -1,5 +1,5 @@
 import {Mat4} from "../util/Mat4";
-import {Rotate} from "../util/Point3D";
+import {Rotate, Translate} from "../util/Point3D";
 import {Vec3} from "../util/Vec3";
 import {Vec4} from "../util/Vec4";
 
@@ -17,7 +17,9 @@ export function transformRotationMatrix(
 ): Mat4 {
     oldDirection = oldDirection.normalize();
     newDirection = newDirection.normalize();
-    const perpendicular = oldDirection.cross(newDirection).normalize();
+    const cross = oldDirection.cross(newDirection);
+    if (cross.length() == 0) return rotationMatrix;
+    const perpendicular = cross.normalize();
     const cosAngle = oldDirection.dot(newDirection);
     const angle = Math.acos(cosAngle);
     const sinAngleHalf = Math.sin(angle / 2);

@@ -1,7 +1,8 @@
 import {useDataHook} from "model-react";
 import {FC, useState} from "react";
 import {SweepObjectState} from "../../state/SweepObjectState";
-import {EditorPlane} from "./plane/CrossSectionPlane";
+import {CrossSection} from "./crossSection/CrossSection";
+import {CrossSectionPlane} from "./plane/CrossSectionPlane";
 import {ICrossSectionEditorProps} from "./_types/ICrossSectionEditorProps";
 
 export const CrossSectionEditor: FC<ICrossSectionEditorProps> = ({
@@ -15,5 +16,9 @@ export const CrossSectionEditor: FC<ICrossSectionEditorProps> = ({
     const selectedCrossSection =
         crossSections[Math.min(selectedCrossSectionIndex, crossSections.length - 1)];
 
-    return <EditorPlane width={width} height={height}></EditorPlane>;
+    return (
+        <CrossSectionPlane width={width} height={height}>
+            <CrossSection crossSection={selectedCrossSection} />
+        </CrossSectionPlane>
+    );
 };

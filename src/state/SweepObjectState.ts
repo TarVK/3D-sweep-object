@@ -71,7 +71,10 @@ export class SweepObjectState {
      * Builds the spec defined by this state into a mesh
      */
     public buildMesh(): void {
-        this.object.set(createSweepObject(this.sweepSpec.get()));
+        console.time("create mesh");
+        const mesh = createSweepObject(this.sweepSpec.get());
+        this.object.set(mesh);
+        console.timeEnd("create mesh");
     }
 
     // Some data caches in order to only recompute relevant parts of the mesh when necessary

@@ -14,9 +14,17 @@ import {
     ZoomOutMapOutlined,
 } from "@mui/icons-material";
 import {Menu} from "./Menu";
-import { BufferGeometry, Float32BufferAttribute, Points, PointsMaterial, Vector3 } from "three";
+import {
+    BufferGeometry,
+    Float32BufferAttribute,
+    Points,
+    PointsMaterial,
+    Vector3,
+} from "three";
+import {useDataHook} from "model-react";
 
-export const Canvas: FC<ICanvasProps> = ({sweepObjectMesh, ...props}) => {
+export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
+    const [h] = useDataHook();
     const rendererRef = useRef<Renderer | undefined>();
     const sceneRef = useRefLazy<Scene>(() => new Scene());
     const elementRef = useRef<HTMLDivElement>(null);
@@ -25,10 +33,13 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectMesh, ...props}) => {
     // Just to simulate a button click (testing purposes)
     function addPoint() {
         const dotGeometry = new BufferGeometry();
-        dotGeometry.setAttribute( 'position', new Float32BufferAttribute( new Vector3(2, 2, 2).toArray(), 3 ) );
-        const dotMaterial = new PointsMaterial( { size: 0.1 } );
-        const dot = new Points( dotGeometry, dotMaterial );
-        sceneRef.current.add( dot );
+        dotGeometry.setAttribute(
+            "position",
+            new Float32BufferAttribute(new Vector3(2, 2, 2).toArray(), 3)
+        );
+        const dotMaterial = new PointsMaterial({size: 0.1});
+        const dot = new Points(dotGeometry, dotMaterial);
+        sceneRef.current.add(dot);
     }
 
     const pointMenuItems = [
@@ -83,9 +94,10 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectMesh, ...props}) => {
         }
     }, []);
 
+    const sweepObjectMesh = sweepObjectState.getMesh(h);
     useEffect(() => {
         const scene = sceneRef.current;
-        scene.sweepObject.updateMesh(sweepObjectMesh);
+        if (sweepObjectMesh) scene.sweepObject.updateMesh(sweepObjectMesh);
     }, [sweepObjectMesh]);
 
     // this div decides the size of the canvas
@@ -96,7 +108,7 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectMesh, ...props}) => {
             css={{
                 position: "relative",
                 borderRadius: "4px",
-                overflow: "hidden"
+                overflow: "hidden",
             }}>
             <Menu props={{items: pointMenuItems, position: {top: 0, left: 0}}} />
             <Menu props={{items: cameraMenuItems, position: {top: 0, right: 0}}} />

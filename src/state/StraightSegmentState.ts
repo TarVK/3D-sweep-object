@@ -77,7 +77,7 @@ export class StraightSegmentState<D extends Vec2 | Vec3> implements ISegment<D> 
             this.next.set(segment);
 
             const newEnd = segment.getStart();
-            this.start.set(newEnd);
+            this.end.set(newEnd);
 
             if (sync) segment.setPreviousSegment(this, false);
         } else {

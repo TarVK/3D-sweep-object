@@ -20,13 +20,13 @@ export const App: FC = () => {
         () =>
             new SweepObjectState(
                 new SweepLineState([
-                    new BezierSegmentState(new Vec3(0, 0, 0), new Vec3(1, 1, 0)),
+                    new BezierSegmentState(new Vec3(0, 0, 0), new Vec3(8, 8, 0)),
                 ]),
                 [
                     new CrossSectionState([
-                        new StraightSegmentState(new Vec2(0, 0), new Vec2(0, 1)),
-                        new StraightSegmentState(new Vec2(0, 1), new Vec2(1, 0.5)),
-                        new StraightSegmentState(new Vec2(0.5, 1), new Vec2(0, 0)),
+                        new StraightSegmentState(new Vec2(0, 0), new Vec2(0, 10)),
+                        new StraightSegmentState(new Vec2(0, 10), new Vec2(10, 5)),
+                        new StraightSegmentState(new Vec2(10, 5), new Vec2(0, 0)),
                     ]),
                 ]
             )
@@ -92,30 +92,29 @@ export const App: FC = () => {
         });
     }, []);
 
+    const sweepObject = sweepObjectState.current;
     return (
-        <div css={{
-            background: "#C3E0E5",
-            minHeight: "100vh"
-        }}>
-            {/* <div css={{color: "purple", ":hover": {color: "red"}}}>
-                {state.getText(h)}
-            </div>
-            <input
-                type="text"
-                value={state.getText(h)}
-                onChange={event => state.setText(event.target.value)}
-            /> */}
+        <div
+            css={{
+                background: "#C3E0E5",
+                minHeight: "100vh",
+            }}>
             <div
                 className="input-menu-holder"
                 css={{
                     width: "100%",
                     margin: "0px 0px 25px",
                     background: "#145DA0",
-                    color: "#FFF"
+                    color: "#FFF",
                 }}>
-                <InputMenu />
+                <InputMenu sweepObjectState={sweepObject} />
             </div>
-            <div css={{display: "flex", justifyContent: "space-around", margin: "auto auto"}}>
+            <div
+                css={{
+                    display: "flex",
+                    justifyContent: "space-around",
+                    margin: "auto auto",
+                }}>
                 <Canvas
                     css={{
                         minHeight: 450,
@@ -123,16 +122,17 @@ export const App: FC = () => {
                         margin: "auto auto",
                         flex: 1,
                     }}
-                    sweepObjectMesh={mesh}
+                    sweepObjectState={sweepObject}
                 />
                 <CrossSectionCanvas
                     css={{
-                        minHeight: 450,
+                        height: 450,
                         maxWidth: 700,
                         margin: "auto auto",
                         flex: 1,
+                        backgroundColor: "white",
                     }}
-                    sweepObjectMesh={mesh}
+                    sweepObjectState={sweepObject}
                 />
             </div>
         </div>

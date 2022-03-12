@@ -8,7 +8,7 @@ import {XAxis, YAxis} from "./Axes";
 import {Grid} from "./Grid";
 import {ICrossSectionPlaneProps} from "./_types/ICrossSectionPlaneProps";
 
-export const EditorPlane: FC<ICrossSectionPlaneProps> = ({
+export const CrossSectionPlane: FC<ICrossSectionPlaneProps> = ({
     children,
     width = "100%",
     height = "100%",

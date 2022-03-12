@@ -7,7 +7,7 @@ import {ITransformation} from "./_types/ITransformation";
 export class CrossSectionEditorState {
     protected transformation = new Field<ITransformation>({
         offset: new Vec2(0, 0),
-        scale: 1,
+        scale: 20,
     });
     protected config = new Field<ICrossSectionEditorConfig>({
         grid: "minor",

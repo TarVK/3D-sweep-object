@@ -1,18 +1,21 @@
 import {FC, useEffect, useRef} from "react";
 import {Renderer} from "./Renderer";
-import { useRefLazy } from "../hooks/useRefLazy";
-import { Menu } from "./Menu";
-import { Scene } from "./Scene";
+import {useRefLazy} from "../hooks/useRefLazy";
+import {Menu} from "./Menu";
+import {Scene} from "./Scene";
 import {ICanvasProps} from "./_types/ICanvasProps";
-import { AddCircleOutlineSharp, ClearOutlined, FileDownloadOutlined, FileUploadOutlined, MouseOutlined } from "@mui/icons-material";
-import { CrossSectionsMenu } from "./CrossSectionsMenu";
-import { RotationScaleMenu } from "./RotationScaleMenu";
+import {
+    AddCircleOutlineSharp,
+    ClearOutlined,
+    FileDownloadOutlined,
+    FileUploadOutlined,
+    MouseOutlined,
+} from "@mui/icons-material";
+import {CrossSectionsMenu} from "./CrossSectionsMenu";
+import {RotationScaleMenu} from "./RotationScaleMenu";
+import {CrossSectionEditor} from "../crossSections/CrossSectionEditor";
 
-export const CrossSectionCanvas: FC<ICanvasProps> = ({sweepObjectMesh, ...props}) => {
-    const rendererRef = useRef<Renderer | undefined>();
-    const sceneRef = useRefLazy<Scene>(() => new Scene());
-    const elementRef = useRef<HTMLDivElement>(null);
-
+export const CrossSectionCanvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
     const pointMenuItems = [
         {
             icon: AddCircleOutlineSharp,
@@ -28,7 +31,7 @@ export const CrossSectionCanvas: FC<ICanvasProps> = ({sweepObjectMesh, ...props}
             icon: ClearOutlined,
             hoverText: "Delete point",
             iconOnClick: () => {},
-        }
+        },
     ];
 
     const exportImportMenu = [
@@ -41,31 +44,22 @@ export const CrossSectionCanvas: FC<ICanvasProps> = ({sweepObjectMesh, ...props}
             icon: FileDownloadOutlined,
             hoverText: "Export",
             iconOnClick: () => {},
-        }
+        },
     ];
-
-    useEffect(() => {
-        const el = elementRef.current;
-        if (el) {
-            const renderer = (rendererRef.current = new Renderer(el, sceneRef.current));
-            return () => renderer.destroy();
-        }
-    }, []);
-
-    useEffect(() => {
-        const scene = sceneRef.current;
-        scene.sweepObject.updateMesh(sweepObjectMesh);
-    }, [sweepObjectMesh]);
 
     return (
         <div
-            ref={elementRef}
             {...props}
             css={{
                 position: "relative",
                 borderRadius: "4px",
-                overflow: "hidden"
+                overflow: "hidden",
             }}>
+            <CrossSectionEditor
+                sweepObjectState={sweepObjectState}
+                width="100%"
+                height="100%"
+            />
             <Menu props={{items: pointMenuItems, position: {top: 0, left: 0}}} />
             <Menu props={{items: exportImportMenu, position: {top: 0, right: 0}}} />
             <CrossSectionsMenu crossSections={["Cross section 1", "Cross section 2"]} />

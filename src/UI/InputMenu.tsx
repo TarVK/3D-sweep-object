@@ -1,7 +1,8 @@
 import {Button, TextField} from "@mui/material";
 import {FC} from "react";
+import {IInputMenuProps} from "./_types/IInputMenuProps";
 
-export const InputMenu: FC = () => {
+export const InputMenu: FC<IInputMenuProps> = ({sweepObjectState}) => {
     return (
         <div
             css={{
@@ -19,7 +20,10 @@ export const InputMenu: FC = () => {
             <Button variant="contained" size="small">
                 Export model
             </Button>
-            <Button variant="contained" size="small">
+            <Button
+                variant="contained"
+                size="small"
+                onClick={() => sweepObjectState.buildMesh()}>
                 Start shape
             </Button>
             <TextField
@@ -28,13 +32,13 @@ export const InputMenu: FC = () => {
                 size="small"
                 InputLabelProps={{
                     style: {
-                        color: "#FFF"
-                    }
+                        color: "#FFF",
+                    },
                 }}
                 InputProps={{
                     style: {
-                        border: "4px solid #FFF !important"
-                    }
+                        border: "4px solid #FFF !important",
+                    },
                 }}
                 sx={{
                     input: {

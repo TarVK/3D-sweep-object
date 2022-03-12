@@ -153,7 +153,7 @@ export class BezierSegmentState<D extends Vec2 | Vec3> implements ISegment<D> {
             this.next.set(segment);
 
             const newEnd = segment.getStart();
-            this.start.set(newEnd);
+            this.end.set(newEnd);
 
             if (copyDirection)
                 this.setEndDirection(segment.getStartDirection().mul(-1) as D);
