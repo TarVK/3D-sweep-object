@@ -17,15 +17,29 @@ export const App: FC = () => {
     const [h] = useDataHook();
     const sweepObjectState = useRefLazy(
         () =>
+            // new SweepObjectState(
+            //     new SweepLineState([
+            //         new BezierSegmentState(new Vec3(0, 0, 0), new Vec3(1, 1, 0)),
+            //     ]),
+            //     [
+            //         new CrossSectionState([
+            //             new StraightSegmentState(new Vec2(0, 0), new Vec2(0, 1)),
+            //             new StraightSegmentState(new Vec2(0, 1), new Vec2(1, 0.5)),
+            //             new StraightSegmentState(new Vec2(0.5, 1), new Vec2(0, 0)),
+            //         ]),
+            //     ]
+            // )
             new SweepObjectState(
                 new SweepLineState([
-                    new BezierSegmentState(new Vec3(0, 0, 0), new Vec3(1, 1, 0)),
+                    new BezierSegmentState(new Vec3(0, 0, 0), new Vec3(0, 2, 0), new Vec3(2, 4, 0), new Vec3(4, 4, 0)),
+                    new BezierSegmentState(new Vec3(4, 4, 0), new Vec3(6, 4, 0), new Vec3(8, 4, 2), new Vec3(8, 8, 4)),
                 ]),
                 [
                     new CrossSectionState([
-                        new StraightSegmentState(new Vec2(0, 0), new Vec2(0, 1)),
-                        new StraightSegmentState(new Vec2(0, 1), new Vec2(1, 0.5)),
-                        new StraightSegmentState(new Vec2(0.5, 1), new Vec2(0, 0)),
+                        new StraightSegmentState(new Vec2(-1, -2), new Vec2(1, -2)),
+                        new StraightSegmentState(new Vec2(1, -2), new Vec2(1, 2)),
+                        new StraightSegmentState(new Vec2(1, 2), new Vec2(-1, 2)),
+                        new StraightSegmentState(new Vec2(-1, 2), new Vec2(-1, -2))
                     ]),
                 ]
             )

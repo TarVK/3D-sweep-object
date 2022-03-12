@@ -121,6 +121,7 @@ export class ViewCube{
                 const xMoved = Math.abs(moveEvent.clientX - downEvent.clientX) < dragDelta ;
                 const yMoved =  Math.abs(moveEvent.clientY - downEvent.clientY) < dragDelta
                 if(xMoved || yMoved) drag=true;
+                // TODO: make this call to setRotation of rend in only 1 place!!!
                 this.rend.current!.setRotation(this.getRotation());
             }
             window.addEventListener('mousemove', copyMovement, false);

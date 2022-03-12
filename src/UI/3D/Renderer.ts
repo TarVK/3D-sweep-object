@@ -47,6 +47,8 @@ export class Renderer {
         this.animate();
         window.addEventListener("resize", this.updateSize);
 
+        
+        // TODO: Do this with orthCamera as well 
         this.perControls.orbitControls.addEventListener("change", ()=>{this.viewCube?.current!.setRotation(this.getRotation())});
     }
     
