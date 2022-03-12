@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import {SweepObject} from "./SweepObject";
-import {Vec3} from "../../util/Vec3";
 import {CrossSection} from "./CrossSection";
 import {SweepLine} from "./SweepLine";
 import {IMateriable} from "./_types/IMateriable";

@@ -1,3 +1,7 @@
+
+
+// TODO: remove this file at some point.
+/*
 import React, {Component} from "react";
 import * as THREE from "three";
 import OrbitControls from "three-orbitcontrols";
@@ -8,8 +12,6 @@ import flameFT from "../../public/flame/flame_ft.jpg";
 import flameLF from "../../public/flame/flame_lf.jpg";
 import flameRT from "../../public/flame/flame_rt.jpg";
 import flameUP from "../../public/flame/flame_up.jpg";
-
-// TODO: remove this file at some point.
 
 const polygonToPositionCoordinates = (polygon: [number, number][], posZ = 1) => {
     const vecArr = polygon.map(point => new THREE.Vector2(point[0], point[1]), []);
@@ -365,3 +367,5 @@ class ThreeScene extends Component {
 }
 
 export default ThreeScene;
+
+*/

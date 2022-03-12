@@ -1,5 +1,7 @@
+import { MutableRefObject } from "react";
 import * as THREE from "three";
-import OrbitControls from "three-orbitcontrols";
+import { OrbitDragControls, OrbitTransformControls } from "./controllers/OrbitDragControls";
+import { ViewCube } from "./ViewCube/ViewCube";
 
 
 export class Renderer {
@@ -7,6 +9,9 @@ export class Renderer {
 
     protected scene: THREE.Scene;
     protected renderer: THREE.WebGLRenderer;
+
+    
+    // TODO: Make a camera controller class (maybe together with controlls)
     protected perCamera: THREE.PerspectiveCamera;
     protected orthCamera: THREE.OrthographicCamera;
 
@@ -16,8 +21,10 @@ export class Renderer {
     protected container: HTMLElement;
     protected destroyed = false;
 
-    protected perControls: OrbitControls;
-    protected orthControls: OrbitControls;
+    protected perControls: OrbitTransformControls;
+    protected orthControls: OrbitTransformControls;
+
+    protected viewCube: MutableRefObject<ViewCube | undefined>;
     /**
      * Creates a new scene in which the sweep object is rendered
      * @param target The target container to render the scene in
@@ -36,16 +43,19 @@ export class Renderer {
         this.setOrthographicCamera();
         this.setPerspectiveCamera();
         this.resetCameraPosition();
-        this.setOrbitControls();
 
         this.animate();
         window.addEventListener("resize", this.updateSize);
+
+        this.perControls.orbitControls.addEventListener("change", ()=>{this.viewCube?.current!.setRotation(this.getRotation())});
+    }
+    
+    public attachViewCube = (viewCube: MutableRefObject<ViewCube | undefined>) => {
+        this.viewCube = viewCube;
+        this.viewCube.current!.setRotation(this.getRotation());
     }
 
-    /**
-     * Makes sure that the renderer's size corresponds to the container's
-     */
-    public updateSize = () => {
+    private updateSize = () => {
         this.width = this.container.offsetWidth;
         this.height = this.container.offsetHeight;
         this.renderer.setSize(this.width, this.height);
@@ -67,7 +77,7 @@ export class Renderer {
      * @returns {size_x: Number, size_y: Number}
      */
     private calculateOrthograhicProjection(){
-        //TODO: look into how to make this better, this might help
+        //TODO: look into how to make this better, this might help (Also could remove it cuz might be better )
         // https://stackoverflow.com/questions/48758959/what-is-required-to-convert-threejs-perspective-camera-to-orthographic
         let fov_y   = 90;
         let depht_s = Math.tan(fov_y/2.0 * Math.PI/180.0) * 2.0;
@@ -109,8 +119,10 @@ export class Renderer {
         if(this.orthControls) this.orthControls.dispose();
         if(this.perControls) this.perControls.dispose();
         
-        this.orthControls = new OrbitControls(this.orthCamera, this.renderer.domElement);
-        this.perControls = new OrbitControls(this.perCamera, this.renderer.domElement);
+        // TODO: do not hardcode this children[3] but pass the points that can be edited instead
+        this.orthControls = new OrbitTransformControls(this.scene, [this.scene.children[3]], this.orthCamera, this.renderer.domElement);
+        this.orthControls.disableTransform();
+        this.perControls = new OrbitTransformControls(this.scene, [this.scene.children[3]], this.perCamera, this.renderer.domElement);
     };
 
     public destroy() {
@@ -120,19 +132,54 @@ export class Renderer {
     
     public resetCameraPosition(){
         this.perCamera.position.set(-10, 6, 12);
+        // TODO: remove it or something
         // a little offset of the position to make it look more correct
         this.orthCamera.position.set(-8, 11, 10);
         this.perCamera.zoom = 1;
         this.orthCamera.zoom = 1;
         this.perCamera.rotation.set(0,0,0);
         this.orthCamera.rotation.set(0,0,0);
+        this.setOrbitControls();
+
+        this.viewCube?.current?.setRotation(this.getRotation());
     }
+
+    public setRotation(matrix: THREE.Matrix4){
+        const fwd = new THREE.Vector3(0,0,-1);
+        fwd.applyMatrix4(matrix).normalize();
+
+        //find distance to the object for the multiplication
+        // TODO: do not hardcode this children[3] but pass sweepobject instead
+        // TODO: apply same shit in the view cube
+        // TODO: do same for orthogonal
+        // TODO: 
+        const dist = this.perCamera.position.distanceTo( this.scene.children[3].position )
+        const offset = fwd.multiplyScalar(dist);
+
+        this.perCamera.position.copy(this.perControls.getTarget()).sub(offset);
+        this.perControls.update();
+    }
+
+    public getRotation(){
+        return new THREE.Matrix4().makeRotationFromEuler(this.perCamera.rotation);
+    }
+    
 
     public useOrthographicCamera(){
         this.isOrthographic = true;
+        this.orthControls.enableTransform();
+        this.perControls.disableTransform();
     }
 
     public usePerspectiveCamera(){
         this.isOrthographic = false;
+        this.orthControls.disableTransform();
+        this.perControls.enableTransform();
+    }
+    
+    public toggleCamera(){
+        this.isOrthographic = !this.isOrthographic;
+        this.isOrthographic ? this.orthControls.enableTransform() : this.orthControls.disableTransform();
+        !this.isOrthographic ? this.perControls.enableTransform() : this.perControls.disableTransform();
     }
 }
