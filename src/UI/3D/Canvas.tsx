@@ -3,6 +3,7 @@ import {ICanvasProps} from "./_types/ICanvasProps";
 import {Scene} from "./Scene";
 import {Renderer} from "./Renderer";
 import {useRefLazy} from "../hooks/useRefLazy";
+import { ViewCube } from "./ViewCube/ViewCube";
 import {SelectedPoint} from "./SelectedPoint";
 import {
     AddCircleOutlineSharp,
@@ -28,6 +29,10 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
     const rendererRef = useRef<Renderer | undefined>();
     const sceneRef = useRefLazy<Scene>(() => new Scene());
     const elementRef = useRef<HTMLDivElement>(null);
+
+    const viewCubeRef = useRef<ViewCube | undefined>();
+    const cubeRef = useRef<HTMLDivElement>(null);
+    
     const [selectedPoint] = useState({x: 100, y: 211, z: 5});
 
     // Just to simulate a button click (testing purposes)
@@ -87,11 +92,19 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
     ];
 
     useEffect(() => {
+        const cubeEl = cubeRef.current;
+        if(cubeEl){
+            viewCubeRef.current = new ViewCube();
+            viewCubeRef.current?.initScene(cubeEl);
+            viewCubeRef.current?.attachRenderer(rendererRef);
+        }
+
         const el = elementRef.current;
         if (el) {
             const renderer = (rendererRef.current = new Renderer(el, sceneRef.current));
+            rendererRef.current.attachViewCube(viewCubeRef);
             return () => renderer.destroy();
-        }
+        }  
     }, []);
 
     const sweepObjectMesh = sweepObjectState.getMesh(h);
@@ -110,6 +123,7 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
                 borderRadius: "4px",
                 overflow: "hidden",
             }}>
+            <div ref={cubeRef} {...props} css={{width: 100+"px !important", height: 100+"px !important", position: "absolute", top: 0, left: 0}} />
             <Menu props={{items: pointMenuItems, position: {top: 0, left: 0}}} />
             <Menu props={{items: cameraMenuItems, position: {top: 0, right: 0}}} />
             <Menu

@@ -1,9 +1,9 @@
 import * as THREE from "three";
 import {SweepObject} from "./SweepObject";
-import {Vec3} from "../../util/Vec3";
 import {CrossSection} from "./CrossSection";
 import {SweepLine} from "./SweepLine";
 import {IMateriable} from "./_types/IMateriable";
+import { Vec3 } from "../../util/Vec3";
 
 export class Scene extends THREE.Scene {
     public sweepObject: SweepObject;
@@ -79,6 +79,15 @@ export class Scene extends THREE.Scene {
     public removeFog(){        
         this.fog = new THREE.Fog(0x000000, Number.MAX_VALUE, Number.MAX_VALUE);
     }
+
+    private createSphere(radius: number, position: Vec3, color=0x000000, widthSegments = 16, heightSegments = 16){
+        const geometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments);
+        const material = new THREE.MeshBasicMaterial( { color: color } );
+        const sphere = new THREE.Mesh( geometry, material );
+        sphere.position.set(position.x, position.y, position.z);
+        return sphere;
+    }
+
 
 
     // TODO: Remove these functions from here till the end
