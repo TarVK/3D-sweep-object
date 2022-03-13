@@ -46,10 +46,6 @@ export class Renderer {
 
         this.animate();
         window.addEventListener("resize", this.updateSize);
-
-        
-        // TODO: Do this with orthCamera as well 
-        this.perControls.orbitControls.addEventListener("change", ()=>{this.viewCube?.current!.setRotation(this.getRotation())});
     }
     
     public attachViewCube = (viewCube: MutableRefObject<ViewCube | undefined>) => {
@@ -122,9 +118,14 @@ export class Renderer {
         if(this.perControls) this.perControls.dispose();
         
         // TODO: do not hardcode this children[3] but pass the points that can be edited instead
-        this.orthControls = new OrbitTransformControls(this.scene, [this.scene.children[3]], this.orthCamera, this.renderer.domElement);
-        this.orthControls.disableTransform();
-        this.perControls = new OrbitTransformControls(this.scene, [this.scene.children[3]], this.perCamera, this.renderer.domElement);
+        // NOTE: in the empty array it used to be `[this.scene.children[3]]` but was removed for the demo 
+        this.orthControls = new OrbitTransformControls(this.scene, [], this.orthCamera, this.renderer.domElement);
+        this.perControls = new OrbitTransformControls(this.scene, [], this.perCamera, this.renderer.domElement);
+        // TODO: handle this more clearly
+        this.isOrthographic ? this.perControls.disableTransform() : this.orthControls.disableTransform();
+
+        // TODO: Do this with orthCamera as well 
+        this.perControls.orbitControls.addEventListener("change", ()=>{this.viewCube?.current!.setRotation(this.getRotation())});
     };
 
     public destroy() {

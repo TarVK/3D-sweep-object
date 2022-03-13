@@ -74,7 +74,7 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
         {
             icon: RestartAltOutlined,
             hoverText: "Reset camera",
-            iconOnClick: () => {},
+            iconOnClick: () => {rendererRef.current?.resetCameraPosition()},
         },
         {
             icon: CameraAltOutlined,
@@ -82,14 +82,7 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
             iconOnClick: () => {},
         },
     ];
-
-    const rotationMenuItems = [
-        {
-            icon: ViewInArOutlined,
-            hoverText: "Rotate",
-            iconOnClick: () => {},
-        },
-    ];
+    const cubeSize = 100; //px
 
     useEffect(() => {
         const cubeEl = cubeRef.current;
@@ -123,16 +116,20 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
                 borderRadius: "4px",
                 overflow: "hidden",
             }}>
-            <div ref={cubeRef} {...props} css={{width: 100+"px !important", height: 100+"px !important", position: "absolute", top: 0, left: 0}} />
             <Menu props={{items: pointMenuItems, position: {top: 0, left: 0}}} />
             <Menu props={{items: cameraMenuItems, position: {top: 0, right: 0}}} />
-            <Menu
-                props={{
-                    items: rotationMenuItems,
-                    position: {top: 50, right: 0, margin: "0px 10px 0px"},
-                }}
-            />
             {selectedPoint ? <SelectedPoint props={selectedPoint} /> : null}
+            <div ref={cubeRef} {...props} css={{
+                width: cubeSize+"px !important", 
+                maxWidth: cubeSize+"px !important", 
+                minWidth: cubeSize+"px !important", 
+                height: cubeSize+"px !important", 
+                maxHeight: cubeSize+"px !important", 
+                minHeight: cubeSize+"px !important", 
+                position: "absolute", 
+                top: 50, 
+                right: 20
+            }} />
         </div>
     );
 };
