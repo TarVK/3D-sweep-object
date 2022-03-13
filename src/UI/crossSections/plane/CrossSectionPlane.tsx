@@ -68,12 +68,12 @@ export const CrossSectionPlane: FC<ICrossSectionPlaneProps> = ({
             setSize(new Vec2(rect.width, rect.height));
             containerRef.current = container;
 
-            // Move the plane to foxus on the top right quadrant
-            const {scale} = state.getTransformation();
-            state.setTransformation({
-                offset: new Vec2((-rect.width / 2) * 0.8, (-rect.height / 2) * 0.8),
-                scale: scale,
-            });
+            // // Move the plane to focus on the top right quadrant
+            // const {scale} = state.getTransformation();
+            // state.setTransformation({
+            //     offset: new Vec2((-rect.width / 2) * 0.8, (-rect.height / 2) * 0.8),
+            //     scale: scale,
+            // });
         }
     }, []);
 

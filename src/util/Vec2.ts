@@ -148,6 +148,15 @@ export class Vec2 {
     }
 
     /**
+     * Checks whether the given vector is equivalent to this vector
+     * @param vec The vector to be checked
+     * @returns Whether the given vector is equivalent
+     */
+    public equals(vec: Vec2 | Vec3 | Vec4): boolean {
+        return vec.x == this.x && vec.y == this.y;
+    }
+
+    /**
      * Retrieves the length of this vector
      * @returns The length of this vector
      */

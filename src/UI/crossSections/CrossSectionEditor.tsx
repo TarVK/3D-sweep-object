@@ -1,7 +1,8 @@
 import {useDataHook} from "model-react";
-import {FC, useState} from "react";
-import {SweepObjectState} from "../../state/SweepObjectState";
+import {FC, useEffect, useState} from "react";
 import {CrossSection} from "./crossSection/CrossSection";
+import {useCrossSectionInteractionHandlers} from "./useCrossSectionInteractionHandlers";
+import {useCrossSectionEditorState} from "./CrossSectionEditorStateContext";
 import {CrossSectionPlane} from "./plane/CrossSectionPlane";
 import {ICrossSectionEditorProps} from "./_types/ICrossSectionEditorProps";
 
@@ -11,14 +12,21 @@ export const CrossSectionEditor: FC<ICrossSectionEditorProps> = ({
     height,
 }) => {
     const [h] = useDataHook();
-    const [selectedCrossSectionIndex, setSelectedCrossSectionIndex] = useState(0);
-    const crossSections = sweepObjectState.getCrossSections(h);
-    const selectedCrossSection =
-        crossSections[Math.min(selectedCrossSectionIndex, crossSections.length - 1)];
+    const crossSectionEditorState = useCrossSectionEditorState();
+    useEffect(() => {
+        crossSectionEditorState.setSweepObject(sweepObjectState);
+    }, [sweepObjectState]);
+
+    const {onMouseDown, onMouseDrag, onMouseUp} = useCrossSectionInteractionHandlers();
 
     return (
-        <CrossSectionPlane width={width} height={height}>
-            <CrossSection crossSection={selectedCrossSection} />
+        <CrossSectionPlane
+            width={width}
+            height={height}
+            onMouseDown={onMouseDown}
+            onMouseMove={onMouseDrag}
+            onMouseUp={onMouseUp}>
+            <CrossSection />
         </CrossSectionPlane>
     );
 };

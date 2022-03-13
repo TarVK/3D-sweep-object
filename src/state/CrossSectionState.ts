@@ -154,7 +154,7 @@ export class CrossSectionState {
         for (let i = 0; i < segments.length; i++) {
             const segment = segments[i];
             // TODO: Use overall distance in circumference
-            const per = i / (segments.length - 1);
+            const per = (i + 1) / segments.length;
             const targetPoints = per * pointCount;
             const addPoints = targetPoints - out.length;
 
@@ -162,7 +162,8 @@ export class CrossSectionState {
                 out.push(
                     ...segment.approximate(
                         addPoints + 1, // +1 since we drop the last point
-                        true
+                        true,
+                        hook
                     )
                 );
         }

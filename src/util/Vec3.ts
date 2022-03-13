@@ -1,4 +1,5 @@
 import {Point3D} from "./Point3D";
+import {Vec2} from "./Vec2";
 import {Vec4} from "./Vec4";
 
 /** A 3d vector with immutable operations */
@@ -176,6 +177,15 @@ export class Vec3 {
             if (x instanceof Point3D) x = x.toCartesian();
             return this.x * x.x + this.y * x.y + this.z * x.z;
         }
+    }
+
+    /**
+     * Checks whether the given vector is equivalent to this vector
+     * @param vec The vector to be checked
+     * @returns Whether the given vector is equivalent
+     */
+    public equals(vec: Vec2 | Vec3 | Vec4): boolean {
+        return "z" in vec && vec.x == this.x && vec.y == this.y && vec.z == this.z;
     }
 
     /**
