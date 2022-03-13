@@ -8,7 +8,7 @@ import {XAxis, YAxis} from "./Axes";
 import {Grid} from "./Grid";
 import {ICrossSectionPlaneProps} from "./_types/ICrossSectionPlaneProps";
 
-export const EditorPlane: FC<ICrossSectionPlaneProps> = ({
+export const CrossSectionPlane: FC<ICrossSectionPlaneProps> = ({
     children,
     width = "100%",
     height = "100%",
@@ -68,12 +68,12 @@ export const EditorPlane: FC<ICrossSectionPlaneProps> = ({
             setSize(new Vec2(rect.width, rect.height));
             containerRef.current = container;
 
-            // Move the plane to foxus on the top right quadrant
-            const {scale} = state.getTransformation();
-            state.setTransformation({
-                offset: new Vec2((-rect.width / 2) * 0.8, (-rect.height / 2) * 0.8),
-                scale: scale,
-            });
+            // // Move the plane to focus on the top right quadrant
+            // const {scale} = state.getTransformation();
+            // state.setTransformation({
+            //     offset: new Vec2((-rect.width / 2) * 0.8, (-rect.height / 2) * 0.8),
+            //     scale: scale,
+            // });
         }
     }, []);
 

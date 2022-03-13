@@ -1,5 +1,6 @@
 import {Field, IDataHook} from "model-react";
 import {ICrossSection} from "../sweepObject/_types/ICrossSection";
+import {makePolygonCCW} from "../util/geometry/makePolygonCCW";
 import {Vec2} from "../util/Vec2";
 import {ISegment} from "./_types/ISegment";
 
@@ -153,21 +154,20 @@ export class CrossSectionState {
         for (let i = 0; i < segments.length; i++) {
             const segment = segments[i];
             // TODO: Use overall distance in circumference
-            const per = i / (segments.length - 1);
+            const per = (i + 1) / segments.length;
             const targetPoints = per * pointCount;
-            const addPoints = out.length - targetPoints;
+            const addPoints = targetPoints - out.length;
 
             if (addPoints > 0)
                 out.push(
                     ...segment.approximate(
                         addPoints + 1, // +1 since we drop the last point
-                        true
+                        true,
+                        hook
                     )
                 );
         }
 
-        // TODO: fix clockwise point orders
-
-        return out;
+        return makePolygonCCW(out);
     }
 }

@@ -14,7 +14,7 @@
         "noImplicitAny": true,
         "esModuleInterop": true
     },
-    "include": ["src/**/*", "src/_types/*", "index.d.ts"],
+    "include": ["src/**/*", "src/_types/*", "./index.d.ts"],
     "types": ["node", "@emotion/core"],
     "exclude": ["node_modules", "**/node_modules/*", "build"]
 }

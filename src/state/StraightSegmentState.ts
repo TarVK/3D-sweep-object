@@ -77,7 +77,7 @@ export class StraightSegmentState<D extends Vec2 | Vec3> implements ISegment<D> 
             this.next.set(segment);
 
             const newEnd = segment.getStart();
-            this.start.set(newEnd);
+            this.end.set(newEnd);
 
             if (sync) segment.setPreviousSegment(this, false);
         } else {
@@ -151,18 +151,25 @@ export class StraightSegmentState<D extends Vec2 | Vec3> implements ISegment<D> 
     }
 
     // Segment approximation
-    public approximate(pointCount: number, skipLast: boolean): D[] {
+    public approximate(pointCount: number, skipLast: boolean, hook?: IDataHook): D[] {
         const steps = pointCount - 1;
         const points = new Array(pointCount)
             .fill(0)
-            .map((_, i) => this.getPoint(i / steps));
+            .map((_, i) => this.getPoint(i / steps, hook));
         return skipLast ? points.slice(0, -1) : points;
     }
 
     // Interaction
     public getDistance(point: D): number {
-        // TODO:
-        return 0;
+        const start = this.getStart();
+        const end = this.getEnd();
+        const dEnd = end.sub(start as Vec3);
+        const dPoint = point.sub(start as Vec3);
+
+        const per = dEnd.dot(dPoint as Vec3) / (dEnd.length() * dPoint.length());
+        if (per < 0) return start.sub(point as Vec3).length();
+        if (per > 1) return end.sub(point as Vec3).length();
+        return dPoint.sub(dEnd.mul(per) as Vec3).length();
     }
 
     public combineNext(): ISegment<D> {
@@ -176,5 +183,27 @@ export class StraightSegmentState<D extends Vec2 | Vec3> implements ISegment<D> 
             new StraightSegmentState(this.start.get(), point),
             new StraightSegmentState(point, this.end.get()),
         ];
+    }
+
+    public moveHandle(handle: string, to: D): void {
+        if (handle == "end") this.setEnd(to);
+        else this.setStart(to);
+    }
+
+    public getHandle(
+        point: D,
+        includeLast: boolean = false
+    ): {distance: number; point: D; handle: string} {
+        const start = this.getStart();
+        const startDistance = start.sub(point as Vec3).length();
+
+        if (includeLast) {
+            const end = this.getEnd();
+            const endDistance = end.sub(point as Vec3).length();
+
+            if (endDistance < startDistance)
+                return {distance: endDistance, point: end, handle: "end"};
+        }
+        return {distance: startDistance, point: start, handle: "start"};
     }
 }

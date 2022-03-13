@@ -75,9 +75,10 @@ export type ISegment<D extends Vec2 | Vec3> = {
      * Approximates this segment by a list of points that can be linearly interpolated
      * @param points The number of points to approximate the segment by
      * @param skipLast Whether the last point should not be excluded of the result
+     * @param hook The hook to subscribe to changes
      * @returns The list of points that approximate the segment
      */
-    approximate(points: number, skipLast: boolean): D[];
+    approximate(points: number, skipLast: boolean, hook?: IDataHook): D[];
 
     // Interaction
     /**
@@ -92,6 +93,24 @@ export type ISegment<D extends Vec2 | Vec3> = {
      * @returns The combined segment
      */
     combineNext(): ISegment<D>;
+
+    /**
+     * Moves the given handle to the given location
+     * @param handle The id of the handle to move
+     * @param to The location to move the handle to
+     */
+    moveHandle(handle: string, to: D): void;
+
+    /**
+     * Retrieves the handle of this segment closest to the given point
+     * @param point The point for which to get the closest handle
+     * @param includeLast Whether to include the last handle (could be set to false if the next segment starts at the end of this segment), defaults to false
+     * @returns The distance to the closest handle and the handle itself
+     */
+    getHandle(
+        point: D,
+        includeLast?: boolean
+    ): {distance: number; point: D; handle: string};
 
     /**
      * Retrieves the approximate distance between the given point and this segment

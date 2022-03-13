@@ -1,3 +1,6 @@
+import {Vec2} from "./Vec2";
+import {Vec3} from "./Vec3";
+
 /** A 4d vector with immutable operations */
 export class Vec4 {
     public x: number;
@@ -172,6 +175,22 @@ export class Vec4 {
         if (typeof x == "number")
             return this.x * x + this.y * y! + this.z * z! + this.w * w!;
         else return this.x * x.x + this.y * x.y + this.z * x.z + this.w * x.w;
+    }
+
+    /**
+     * Checks whether the given vector is equivalent to this vector
+     * @param vec The vector to be checked
+     * @returns Whether the given vector is equivalent
+     */
+    public equals(vec: Vec2 | Vec3 | Vec4): boolean {
+        return (
+            "z" in vec &&
+            "w" in vec &&
+            vec.x == this.x &&
+            vec.y == this.y &&
+            vec.z == this.z &&
+            vec.w == this.w
+        );
     }
 
     /**

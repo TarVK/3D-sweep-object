@@ -1,13 +1,17 @@
 import {Field, IDataHook} from "model-react";
 import {Vec2} from "../util/Vec2";
+import {CrossSectionState} from "./CrossSectionState";
+import {SweepObjectState} from "./SweepObjectState";
 import {ICrossSectionEditorConfig} from "./_types/ICrossSectionEditorConfig";
+import {ICrossSectionEditorTool} from "./_types/ICrossSectionEditorTool";
+import {ICrossSectionHandleSelection} from "./_types/ICrossSectionHandleSelection";
 import {ITransformation} from "./_types/ITransformation";
 
 /** All the state data for the editor */
 export class CrossSectionEditorState {
     protected transformation = new Field<ITransformation>({
         offset: new Vec2(0, 0),
-        scale: 1,
+        scale: 20,
     });
     protected config = new Field<ICrossSectionEditorConfig>({
         grid: "minor",
@@ -25,6 +29,19 @@ export class CrossSectionEditorState {
         selectPointDistance: 15,
     });
 
+    protected sweepObject: Field<SweepObjectState>;
+    protected selectedCrossSectionIndex = new Field(0);
+    protected selectedHandle = new Field<ICrossSectionHandleSelection | null>(null);
+    protected tool = new Field<ICrossSectionEditorTool>("edit");
+
+    /**
+     * Creates a new cross section editor state
+     * @param sweepObject The sweep object whose cross section is to be altered
+     */
+    public constructor(sweepObject: SweepObjectState) {
+        this.sweepObject = new Field(sweepObject);
+    }
+
     // Configuration
     /**
      * Sets the configuration of the editor
@@ -41,6 +58,78 @@ export class CrossSectionEditorState {
      */
     public getConfig(hook?: IDataHook): ICrossSectionEditorConfig {
         return this.config.get(hook);
+    }
+
+    // Tool/selection
+    /**
+     * Selects the specified tool
+     * @param tool The tool to be selected
+     */
+    public selectTool(tool: ICrossSectionEditorTool): void {
+        this.tool.set(tool);
+    }
+
+    /**
+     * Retrieves the currently selected tool
+     * @param hook The hook to subscribe to changes
+     * @returns The currently selected tool
+     */
+    public getSelectedTool(hook?: IDataHook): ICrossSectionEditorTool {
+        return this.tool.get(hook);
+    }
+
+    /**
+     * Updates the currently selected handle
+     * @param selection The new selection to be set
+     */
+    public selectHandle(selection: ICrossSectionHandleSelection | null): void {
+        this.selectedHandle.set(selection);
+    }
+
+    /**
+     * Retrieves the currently selected handle
+     * @param hook The hook to subscribe to changes
+     * @returns The currently selected handle
+     */
+    public getSelectedHandle(hook?: IDataHook): ICrossSectionHandleSelection | null {
+        return this.selectedHandle.get(hook);
+    }
+
+    // Cross section
+    /**
+     * Sets the sweep object to be altered by this editor
+     * @param sweepObject The sweep object
+     */
+    public setSweepObject(sweepObject: SweepObjectState): void {
+        this.sweepObject.set(sweepObject);
+    }
+
+    /**
+     * Retrieves the sweep object for which this is the editor state
+     * @param hook The hook to subscribe to changes
+     * @returns The sweep object's state
+     */
+    public getSweepObject(hook?: IDataHook): SweepObjectState {
+        return this.sweepObject.get(hook);
+    }
+
+    /**
+     * Selects the cross section with the given index
+     * @param index The index to be selected
+     */
+    public selectCrossSection(index: number): void {
+        this.selectedCrossSectionIndex.set(index);
+    }
+
+    /**
+     * Retrieves the currently selected cross section
+     * @param hook The hook to subscribe to changes
+     * @returns The currently selected cross section
+     */
+    public getSelectedCrossSection(hook?: IDataHook): CrossSectionState {
+        const crossSections = this.sweepObject.get(hook).getCrossSections(hook);
+        const index = this.selectedCrossSectionIndex.get(hook);
+        return crossSections[Math.min(index, crossSections.length - 1)];
     }
 
     // Visual settings

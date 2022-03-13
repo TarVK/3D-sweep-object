@@ -49,8 +49,8 @@ export class BezierSegmentState<D extends Vec2 | Vec3> implements ISegment<D> {
     public constructor(start: D, startControl: D, endControl?: D, end?: D) {
         if (end && endControl) {
             this.start = new Field(start);
-            this.startControl = new Field(startControl.sub(start as Vec3) as D);
-            this.endControl = new Field(endControl.sub(end as Vec3) as D);
+            this.startControl = new Field(startControl);
+            this.endControl = new Field(endControl);
             this.end = new Field(end);
         } else {
             end = startControl;
@@ -153,7 +153,7 @@ export class BezierSegmentState<D extends Vec2 | Vec3> implements ISegment<D> {
             this.next.set(segment);
 
             const newEnd = segment.getStart();
-            this.start.set(newEnd);
+            this.end.set(newEnd);
 
             if (copyDirection)
                 this.setEndDirection(segment.getStartDirection().mul(-1) as D);
@@ -315,8 +315,8 @@ export class BezierSegmentState<D extends Vec2 | Vec3> implements ISegment<D> {
     }
 
     // Segment approximation
-    public approximate(points: number, skipLast: boolean): D[] {
-        const nodes = sampleBezier(this.getPlain(), points);
+    public approximate(points: number, skipLast: boolean, hook?: IDataHook): D[] {
+        const nodes = sampleBezier(this.getPlain(hook), points);
         const out = skipLast ? nodes.slice(0, -1) : nodes;
         return out.map(({point}) => point) as D[];
     }
@@ -357,6 +357,50 @@ export class BezierSegmentState<D extends Vec2 | Vec3> implements ISegment<D> {
             this.startControl.get(),
             next.getEndDirection().add(next.getEnd() as Vec3) as D,
             next.getEnd()
+        );
+    }
+
+    public moveHandle(handle: string, to: D): void {
+        if (handle == "end") this.setEnd(to);
+        else if (handle == "startControl") this.setStartControl(to);
+        else if (handle == "endControl") this.setEndControl(to);
+        else this.setStart(to);
+    }
+
+    public getHandle(
+        point: D,
+        includeLast: boolean = false
+    ): {distance: number; point: D; handle: string} {
+        const start = this.getStart();
+        const startControl = this.getStartControl();
+        const endControl = this.getEndControl();
+
+        const options = [
+            {point: start, distance: start.sub(point as Vec3).length(), handle: "start"},
+            {
+                point: startControl,
+                distance: startControl.sub(point as Vec3).length(),
+                handle: "startControl",
+            },
+            {
+                point: endControl,
+                distance: endControl.sub(point as Vec3).length(),
+                handle: "endControl",
+            },
+        ];
+
+        if (includeLast) {
+            const end = this.getEnd();
+            options.push({
+                point: end,
+                distance: end.sub(point as Vec3).length(),
+                handle: "end",
+            });
+        }
+
+        return options.reduce(
+            (best, option) => (option.distance < best.distance ? option : best),
+            {point: start, distance: Infinity, handle: "start"}
         );
     }
 }
