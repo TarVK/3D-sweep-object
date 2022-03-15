@@ -1,7 +1,6 @@
-import {useDataHook} from "model-react";
 import {FC, useEffect, useState} from "react";
 import {CrossSection} from "./crossSection/CrossSection";
-import {useCrossSectionInteractionHandlers} from "./useCrossSectionInteractionHandlers";
+import {useCrossSectionInteractionHandlers} from "./interaction/useCrossSectionInteractionHandlers";
 import {useCrossSectionEditorState} from "./CrossSectionEditorStateContext";
 import {CrossSectionPlane} from "./plane/CrossSectionPlane";
 import {ICrossSectionEditorProps} from "./_types/ICrossSectionEditorProps";
@@ -11,21 +10,32 @@ export const CrossSectionEditor: FC<ICrossSectionEditorProps> = ({
     width,
     height,
 }) => {
-    const [h] = useDataHook();
     const crossSectionEditorState = useCrossSectionEditorState();
     useEffect(() => {
         crossSectionEditorState.setSweepObject(sweepObjectState);
     }, [sweepObjectState]);
 
-    const {onMouseDown, onMouseDrag, onMouseUp} = useCrossSectionInteractionHandlers();
+    const {
+        onMouseDown,
+        onMouseMove,
+        onMouseUp,
+        onKeyDown,
+        onKeyUp,
+        onMouseEnter,
+        onMouseLeave,
+    } = useCrossSectionInteractionHandlers();
 
     return (
         <CrossSectionPlane
             width={width}
             height={height}
             onMouseDown={onMouseDown}
-            onMouseMove={onMouseDrag}
-            onMouseUp={onMouseUp}>
+            onMouseMove={onMouseMove}
+            onMouseUp={onMouseUp}
+            onKeyDown={onKeyDown}
+            onKeyUp={onKeyUp}
+            onMouseEnter={onMouseEnter}
+            onMouseLeave={onMouseLeave}>
             <CrossSection />
         </CrossSectionPlane>
     );
