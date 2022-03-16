@@ -61,14 +61,24 @@ export type ISegment<D extends Vec2 | Vec3> = {
      * Sets the next neighboring segment which should have shared points
      * @param segment The segment to be set
      * @param sync Whether to synchronize with the set neighbor
+     * @param copyDirection Whether to make sure the curves' directions should be linked
      */
-    setNextSegment(segment: ISegment<D> | null, sync?: boolean): void;
+    setNextSegment(
+        segment: ISegment<D> | null,
+        sync?: boolean,
+        copyDirection?: boolean
+    ): void;
     /**
      * Sets the previous neighboring segment which should have shared points
      * @param segment The segment to be set
      * @param sync Whether to synchronize with the set neighbor
+     * @param copyDirection Whether to make sure the curves' directions should be linked
      */
-    setPreviousSegment(segment: ISegment<D> | null, sync?: boolean): void;
+    setPreviousSegment(
+        segment: ISegment<D> | null,
+        sync?: boolean,
+        copyDirection?: boolean
+    ): void;
 
     // Approximating the segment
     /**
@@ -89,10 +99,10 @@ export type ISegment<D extends Vec2 | Vec3> = {
     split(point: D): [ISegment<D>, ISegment<D>];
 
     /**
-     * Combines this segment and its specified next segment into a new segment, such that the next segment can be removed
+     * Combines this segment and its specified previous segment into a new segment, such that the previous segment can be removed
      * @returns The combined segment
      */
-    combineNext(): ISegment<D>;
+    combinePrevious(): ISegment<D>;
 
     /**
      * Moves the given handle to the given location

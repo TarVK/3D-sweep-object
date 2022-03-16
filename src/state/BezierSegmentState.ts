@@ -114,11 +114,11 @@ export class BezierSegmentState<D extends Vec2 | Vec3> implements ISegment<D> {
     public setPreviousSegment(
         segment: ISegment<D> | null,
         sync: boolean = true,
-        copyDirection: boolean = true
+        copyDirection: boolean = false
     ): void {
         const current = this.previous.get();
         if (segment == current) return;
-        if (sync && current) current.setNextSegment(null, false);
+        if (sync && current) current.setNextSegment(null, false, false);
 
         if (segment) {
             this.previous.set(segment);
@@ -128,7 +128,7 @@ export class BezierSegmentState<D extends Vec2 | Vec3> implements ISegment<D> {
 
             if (copyDirection)
                 this.setStartDirection(segment.getEndDirection().mul(-1) as D);
-            if (sync) segment.setNextSegment(this, false);
+            if (sync) segment.setNextSegment(this, false, false);
         } else {
             this.previous.set(null);
         }
@@ -143,11 +143,11 @@ export class BezierSegmentState<D extends Vec2 | Vec3> implements ISegment<D> {
     public setNextSegment(
         segment: ISegment<D> | null,
         sync: boolean = true,
-        copyDirection?: boolean
+        copyDirection: boolean = false
     ): void {
         const current = this.next.get();
         if (segment == current) return;
-        if (sync && current) current.setPreviousSegment(null, false);
+        if (sync && current) current.setPreviousSegment(null, false, false);
 
         if (segment) {
             this.next.set(segment);
@@ -157,7 +157,7 @@ export class BezierSegmentState<D extends Vec2 | Vec3> implements ISegment<D> {
 
             if (copyDirection)
                 this.setEndDirection(segment.getStartDirection().mul(-1) as D);
-            if (sync) segment.setPreviousSegment(this, false);
+            if (sync) segment.setPreviousSegment(this, false, false);
         } else {
             this.next.set(null);
         }
@@ -332,31 +332,39 @@ export class BezierSegmentState<D extends Vec2 | Vec3> implements ISegment<D> {
         const direction = getTangentOnBezier(
             this.getPlain(),
             projectOnBezier(this.getPlain(), point).position
-        ) as Vec3;
+        ).normalize() as Vec3;
+        const dStart = this.start
+            .get()
+            .sub(point as Vec3)
+            .length();
+        const dEnd = this.end
+            .get()
+            .sub(point as Vec3)
+            .length();
 
         return [
             new BezierSegmentState(
                 this.start.get(),
                 this.startControl.get(),
-                point.sub(direction) as D,
+                point.sub(direction.mul(dStart / 2)) as D,
                 point
             ),
             new BezierSegmentState(
                 point,
-                point.add(direction) as D,
+                point.add(direction.mul(dEnd / 2)) as D,
                 this.endControl.get(),
                 this.end.get()
             ),
         ];
     }
 
-    public combineNext(): ISegment<D> {
-        const next = this.next.get() ?? this;
+    public combinePrevious(): ISegment<D> {
+        const previous = this.previous.get() ?? this;
         return new BezierSegmentState(
-            this.start.get(),
-            this.startControl.get(),
-            next.getEndDirection().add(next.getEnd() as Vec3) as D,
-            next.getEnd()
+            previous.getStart(),
+            previous.getStartDirection().add(previous.getStart() as Vec3) as D,
+            this.endControl.get(),
+            this.end.get()
         );
     }
 

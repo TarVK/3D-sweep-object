@@ -60,7 +60,7 @@ export class CrossSectionState {
             for (let i = 0; i < segments.length; i++) {
                 const segment = segments[i];
                 const next = segments[(i + 1) % segments.length];
-                segment.setNextSegment(next);
+                segment.setNextSegment(next, true, false);
             }
     }
 
@@ -102,9 +102,9 @@ export class CrossSectionState {
         const nextSegment = segments[(closestSegment.index + 1) % segments.length];
 
         // Chain the new segments together
-        prevSegment.setNextSegment(replacement1);
-        replacement1.setNextSegment(replacement2);
-        replacement2.setNextSegment(nextSegment);
+        prevSegment.setNextSegment(replacement1, true, false);
+        replacement1.setNextSegment(replacement2, true, false);
+        replacement2.setNextSegment(nextSegment, true, false);
 
         // Store the new list of segments
         this.segments.set([
@@ -126,15 +126,24 @@ export class CrossSectionState {
 
         const index = segments.indexOf(segment);
         if (index != -1) {
-            const prevSegment = segments[(index + segments.length - 1) % segments.length];
+            const prevSegment = segments[(index + segments.length - 2) % segments.length];
             const nextSegment = segments[(index + 1) % segments.length];
 
-            // Chain the new segments together and store the new list of segment
-            prevSegment.setNextSegment(nextSegment);
-            this.segments.set([
-                ...segments.slice(0, index),
-                ...segments.slice(index + 1),
-            ]);
+            // Chain the new segments together
+            const combined = segment.combinePrevious();
+            prevSegment.setNextSegment(combined, true, false);
+            combined.setNextSegment(nextSegment, true, false);
+
+            // Store the new list of segments
+            if (index == 0) {
+                this.segments.set([...segments.slice(1, index), combined]);
+            } else {
+                this.segments.set([
+                    ...segments.slice(0, index - 1),
+                    combined,
+                    ...segments.slice(index + 1),
+                ]);
+            }
 
             return true;
         }

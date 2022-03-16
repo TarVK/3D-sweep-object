@@ -5,8 +5,6 @@ import {CrossSectionState} from "../state/CrossSectionState";
 import {StraightSegmentState} from "../state/StraightSegmentState";
 import {SweepLineState} from "../state/SweepLineState";
 import {SweepObjectState} from "../state/SweepObjectState";
-import {createSweepObject} from "../sweepObject/createSweepObject";
-import {IMesh} from "../sweepObject/_types/IMesh";
 import {Vec2} from "../util/Vec2";
 import {Vec3} from "../util/Vec3";
 import {Canvas} from "./3D/Canvas";
@@ -41,7 +39,7 @@ export const App: FC = () => {
                 ]),
                 [
                     new CrossSectionState([
-                        new StraightSegmentState(new Vec2(0, 0), new Vec2(0, 6)),
+                        new BezierSegmentState(new Vec2(0, 0), new Vec2(0, 6)),
                         new StraightSegmentState(new Vec2(0, 6), new Vec2(6, 3)),
                         new StraightSegmentState(new Vec2(6, 3), new Vec2(0, 0)),
                     ]),

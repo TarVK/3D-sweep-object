@@ -172,10 +172,10 @@ export class StraightSegmentState<D extends Vec2 | Vec3> implements ISegment<D> 
         return dPoint.sub(dEnd.mul(per) as Vec3).length();
     }
 
-    public combineNext(): ISegment<D> {
+    public combinePrevious(): ISegment<D> {
         return new StraightSegmentState(
-            this.start.get(),
-            (this.next.get() ?? this).getEnd()
+            (this.previous.get() ?? this).getStart(),
+            this.end.get()
         );
     }
     public split(point: D): [ISegment<D>, ISegment<D>] {
