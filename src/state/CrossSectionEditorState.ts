@@ -32,7 +32,7 @@ export class CrossSectionEditorState {
     protected sweepObject: Field<SweepObjectState>;
     protected selectedCrossSectionIndex = new Field(0);
     protected selectedHandle = new Field<ICrossSectionHandleSelection | null>(null);
-    protected tool = new Field<ICrossSectionEditorTool>("edit");
+    protected tool = new Field<ICrossSectionEditorTool>("add");
 
     /**
      * Creates a new cross section editor state

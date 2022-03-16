@@ -14,23 +14,25 @@ import {
 import {CrossSectionsMenu} from "./CrossSectionsMenu";
 import {RotationScaleMenu} from "./RotationScaleMenu";
 import {CrossSectionEditor} from "../crossSections/CrossSectionEditor";
+import {useCrossSectionEditorState} from "../crossSections/CrossSectionEditorStateContext";
 
 export const CrossSectionCanvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
+    const editorState = useCrossSectionEditorState();
     const pointMenuItems = [
         {
             icon: AddCircleOutlineSharp,
             hoverText: "Add point",
-            iconOnClick: () => {},
+            iconOnClick: () => editorState.selectTool("add"),
         },
         {
             icon: MouseOutlined,
             hoverText: "Select point",
-            iconOnClick: () => {},
+            iconOnClick: () => editorState.selectTool("edit"),
         },
         {
             icon: ClearOutlined,
             hoverText: "Delete point",
-            iconOnClick: () => {},
+            iconOnClick: () => editorState.selectTool("delete"),
         },
     ];
 

@@ -41,7 +41,8 @@ export function createEditHandler(
             if (!selected) return;
 
             const {segment, handle} = selected;
-            segment.moveHandle(handle, p);
+            const target = state.snap(p);
+            segment.moveHandle(handle, target);
         },
         onMouseUp: (s, p) => {
             state.selectHandle(null);

@@ -155,7 +155,7 @@ export class CrossSectionState {
             const segment = segments[i];
             // TODO: Use overall distance in circumference
             const per = (i + 1) / segments.length;
-            const targetPoints = per * pointCount;
+            const targetPoints = Math.round(per * pointCount);
             const addPoints = targetPoints - out.length;
 
             if (addPoints > 0)

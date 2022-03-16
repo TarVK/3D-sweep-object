@@ -1,5 +1,7 @@
 import {useDataHook} from "model-react";
 import {useCrossSectionEditorState} from "../CrossSectionEditorStateContext";
+import {createAddHandler} from "./toolHandlers/createAddHandler";
+import {createDeleteHandler} from "./toolHandlers/createDeleteHandler";
 import {createEditHandler} from "./toolHandlers/createEditHandler";
 import {useCombinedHandlers} from "./useCombinedHandlers";
 
@@ -12,6 +14,8 @@ export const useCrossSectionInteractionHandlers = () => {
     const [h] = useDataHook();
     const handlers = useCombinedHandlers(state, state.getSelectedTool(h), [
         createEditHandler,
+        createAddHandler,
+        createDeleteHandler,
     ]);
     return handlers;
 };

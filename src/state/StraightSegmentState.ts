@@ -166,7 +166,7 @@ export class StraightSegmentState<D extends Vec2 | Vec3> implements ISegment<D> 
         const dEnd = end.sub(start as Vec3);
         const dPoint = point.sub(start as Vec3);
 
-        const per = dEnd.dot(dPoint as Vec3) / (dEnd.length() * dPoint.length());
+        const per = dEnd.dot(dPoint as Vec3) / (dEnd.length() * dEnd.length());
         if (per < 0) return start.sub(point as Vec3).length();
         if (per > 1) return end.sub(point as Vec3).length();
         return dPoint.sub(dEnd.mul(per) as Vec3).length();
