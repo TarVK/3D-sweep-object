@@ -32,8 +32,27 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
 
     const viewCubeRef = useRef<ViewCube | undefined>();
     const cubeRef = useRef<HTMLDivElement>(null);
+    const cubeSize = 100; //px
     
     const [selectedPoint] = useState({x: 100, y: 211, z: 5});
+
+
+    function toggleMeshDisplaying(){
+        sceneRef.current.sweepPoints.visible = !sceneRef.current.sweepPoints.visible;
+        sceneRef.current.sweepLine.visible = !sceneRef.current.sweepLine.visible;
+        sceneRef.current.sweepObject.visible = !sceneRef.current.sweepObject.visible;
+        
+        sceneRef.current.sweepPoints.visible ? rendererRef.current?.perControls.enableTransform() : rendererRef.current?.perControls.disableTransform();
+        // TODO: do same for orth camera
+    }
+
+    function updateSweepLine(){
+        const segments = sceneRef.current.sweepPoints.getPointsAsBezierSegments();
+        sweepObjectState.getSweepLine().setSegments( segments );
+        sweepObjectState.buildMesh();
+    }
+    // TODO: do this with orthControls as well
+    rendererRef.current?.perControls.onTransform(updateSweepLine)
 
     // Just to simulate a button click (testing purposes)
     function addPoint() {
@@ -66,7 +85,8 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
         {
             icon: ZoomOutMapOutlined,
             hoverText: "Change camera position",
-            iconOnClick: () => {},
+            // TODO: remove the toggling from here
+            iconOnClick: () => {toggleMeshDisplaying()},
         },
     ];
 
@@ -82,7 +102,6 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
             iconOnClick: () => {},
         },
     ];
-    const cubeSize = 100; //px
 
     useEffect(() => {
         const cubeEl = cubeRef.current;
@@ -96,14 +115,27 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
         if (el) {
             const renderer = (rendererRef.current = new Renderer(el, sceneRef.current));
             rendererRef.current.attachViewCube(viewCubeRef);
-            return () => renderer.destroy();
-        }  
+            // return () => renderer.destroy();
+        }
     }, []);
 
     const sweepObjectMesh = sweepObjectState.getMesh(h);
+    
     useEffect(() => {
         const scene = sceneRef.current;
-        if (sweepObjectMesh) scene.sweepObject.updateMesh(sweepObjectMesh);
+        if (sweepObjectMesh) {
+            scene.sweepObject.updateMesh(sweepObjectMesh);
+            const sweepLine = sweepObjectState.getSweepLine().getSegments(h);
+            scene.sweepLine.updateLine(sweepLine);
+            scene.sweepPoints.updatePoints(sweepLine);
+            
+            // update controls, so that sweep line points are editable
+            rendererRef.current?.perControls.updateObjects(
+                sceneRef.current.sweepPoints.points
+            )
+            // TODO: make this work as well when reseting the camera
+            // TODO: make this work for orth camera as well
+        }
     }, [sweepObjectMesh]);
 
     // this div decides the size of the canvas

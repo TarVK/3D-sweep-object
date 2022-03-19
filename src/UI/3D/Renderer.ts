@@ -21,8 +21,8 @@ export class Renderer {
     protected container: HTMLElement;
     protected destroyed = false;
 
-    protected perControls: OrbitTransformControls;
-    protected orthControls: OrbitTransformControls;
+    public perControls: OrbitTransformControls;
+    public orthControls: OrbitTransformControls;
 
     protected viewCube: MutableRefObject<ViewCube | undefined>;
     /**
@@ -118,7 +118,6 @@ export class Renderer {
         if(this.perControls) this.perControls.dispose();
         
         // TODO: do not hardcode this children[3] but pass the points that can be edited instead
-        // NOTE: in the empty array it used to be `[this.scene.children[3]]` but was removed for the demo 
         this.orthControls = new OrbitTransformControls(this.scene, [], this.orthCamera, this.renderer.domElement);
         this.perControls = new OrbitTransformControls(this.scene, [], this.perCamera, this.renderer.domElement);
         // TODO: handle this more clearly

@@ -51,6 +51,7 @@ export class OrbitTransformControls{
     public domElem: HTMLElement;
 
     private transformEnabled = true;
+    private transformEvents: Function[] = []
     
     public currObj: THREE.Object3D | undefined;
 
@@ -62,6 +63,10 @@ export class OrbitTransformControls{
         this.camera = camera;
         this.domElem = domElem;
         domElem.addEventListener( 'mousedown', this.useRayCaster );
+    }
+
+    public onTransform(cb: Function){
+        this.transformEvents.push(cb);
     }
 
     private useRayCaster = ( event: MouseEvent ) => {
@@ -84,6 +89,7 @@ export class OrbitTransformControls{
         
         if(intersects && intersects.length>0){
             if(this.currObj == intersects[0].object) return;
+            if(!intersects[0].object.visible) return;
             this.disposeTransform();
             this.currObj = intersects[0].object;
 
@@ -92,14 +98,17 @@ export class OrbitTransformControls{
             this.transformControls.setMode('translate');
             this.scene.add(this.transformControls);
             this.transformControls.addEventListener('dragging-changed', (event) => {
-                this.orbitControls.enabled = !event.value
+                this.orbitControls.enabled = !event.value;
             });
+            this.transformControls.addEventListener('objectChange', () => {
+                this.transformEvents.forEach(cb => cb());
+            })
         }
     }
 
     public dispose(){
-        this.orbitControls.dispose();
         this.disposeTransform();
+        this.orbitControls.dispose();
     }
 
     private disposeTransform(){
@@ -109,6 +118,12 @@ export class OrbitTransformControls{
             this.transformControls.dispose();
             this.transformControls.removeFromParent();
         }
+    }
+
+    public updateObjects(objects: THREE.Object3D[]){
+        if(objects == this.objects) return;
+        this.disposeTransform();
+        this.objects = objects;
     }
 
     public getTarget(){
