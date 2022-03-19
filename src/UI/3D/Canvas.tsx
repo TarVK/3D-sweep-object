@@ -11,7 +11,6 @@ import {
     ClearOutlined,
     MouseOutlined,
     RestartAltOutlined,
-    ViewInArOutlined,
     ZoomOutMapOutlined,
 } from "@mui/icons-material";
 import {Menu} from "./Menu";
@@ -24,7 +23,7 @@ import {
 } from "three";
 import {useDataHook} from "model-react";
 
-export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
+export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...props}) => {
     const [h] = useDataHook();
     const rendererRef = useRef<Renderer | undefined>();
     const sceneRef = useRefLazy<Scene>(() => new Scene());
@@ -34,6 +33,10 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
     const cubeRef = useRef<HTMLDivElement>(null);
     
     const [selectedPoint] = useState({x: 100, y: 211, z: 5});
+
+    useEffect(() => {
+        updateScene!(sceneRef);
+    }, [sceneRef]);
 
     // Just to simulate a button click (testing purposes)
     function addPoint() {

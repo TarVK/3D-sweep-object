@@ -75,7 +75,6 @@ export class SweepObjectState {
         const mesh = createSweepObject(this.sweepSpec.get());
         this.object.set(mesh);
         console.timeEnd("created mesh");
-        console.log(mesh);
     }
 
     // Some data caches in order to only recompute relevant parts of the mesh when necessary

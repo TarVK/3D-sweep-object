@@ -1,8 +1,9 @@
 import {Button, TextField} from "@mui/material";
 import {FC} from "react";
+import { ExportModel } from "./3D/ExportModel";
 import {IInputMenuProps} from "./_types/IInputMenuProps";
 
-export const InputMenu: FC<IInputMenuProps> = ({sweepObjectState}) => {
+export const InputMenu: FC<IInputMenuProps> = ({sweepObjectState, openExportModel, open, exportToFile}) => {
     return (
         <div
             css={{
@@ -17,9 +18,10 @@ export const InputMenu: FC<IInputMenuProps> = ({sweepObjectState}) => {
             <Button variant="contained" size="small">
                 Import model
             </Button>
-            <Button variant="contained" size="small">
+            <ExportModel open={open} exportToFile={exportToFile} />
+            {/* <Button variant="contained" size="small" onClick={() => openExportModel()}>
                 Export model
-            </Button>
+            </Button> */}
             <Button
                 variant="contained"
                 size="small"
