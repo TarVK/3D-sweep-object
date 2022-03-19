@@ -1,6 +1,6 @@
 import {ICrossSection} from "./_types/ICrossSection";
 import earcut from "earcut";
-import {IFace} from "./_types/IMesh";
+import {IFace} from "../_types/IMesh";
 
 /**
  * Calculates the indices of all triangles that form a triangulation of the cross section

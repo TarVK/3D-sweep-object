@@ -1,9 +1,9 @@
 import {DataCacher, Field, IDataHook} from "model-react";
-import {ISweepLine} from "../sweepObject/_types/ISweepLine";
-import {Vec2} from "../util/Vec2";
+import {ISweepLineNode} from "../sweepOperation/_types/spec/ISweepLineNode";
+import {sampleBezier} from "../util/bezier/sampleBezier";
+import {IBezierNode} from "../util/bezier/_types/IBezierNode";
 import {Vec3} from "../util/Vec3";
 import {BezierSegmentState} from "./BezierSegmentState";
-import {ISegment} from "./_types/ISegment";
 
 /**
  * A class to represent sweep line state
@@ -53,17 +53,38 @@ export class SweepLineState {
     }
 
     // Utils
-    /** The normalized form of this sweep line*/
-    protected normalized = new DataCacher(hook =>
-        this.segments.get(hook).map(segment => segment.getPlain(hook))
-    );
-
     /**
-     * Normalizes this sweep line to a plain object
+     * Samples the given sweep line
+     * @param pointCount The number of points to be samples
      * @param hook The hook to subscribe to changes
-     * @returns The normalized cross section
+     * @returns The sweep line samples with the requested number of elements
      */
-    public normalize(hook?: IDataHook): ISweepLine {
-        return this.normalized.get(hook);
+    public sample(pointCount: number, hook?: IDataHook): ISweepLineNode[] {
+        const out: ISweepLineNode[] = [];
+
+        const segments = this.segments.get(hook);
+        for (let i = 0; i < segments.length; i++) {
+            const segment = segments[i];
+            // TODO: Use overall distance in circumference
+            const per = (i + 1) / segments.length;
+            const targetPoints = Math.round(per * pointCount);
+            const addPoints = targetPoints - out.length;
+
+            if (addPoints > 0) {
+                let points: IBezierNode<Vec3>[] = [];
+                const dropFirstPoint = i != 0;
+                if (dropFirstPoint)
+                    points = sampleBezier(segment.getPlain(hook), addPoints + 1).slice(1);
+                else points = sampleBezier(segment.getPlain(hook), addPoints);
+                out.push(
+                    ...points.map(({point, dir}) => ({
+                        direction: dir,
+                        position: point,
+                    }))
+                );
+            }
+        }
+
+        return out;
     }
 }

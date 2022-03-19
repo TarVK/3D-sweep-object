@@ -1,10 +1,9 @@
 import * as THREE from "three";
-import {IMesh} from "../../sweepObject/_types/IMesh";
+import {IMesh} from "../../sweepOperation/_types/IMesh";
 import {IMateriable} from "./_types/IMateriable";
 
 export class SweepObject extends THREE.Object3D implements IMateriable {
     protected mesh: THREE.Mesh;
-
 
     /**
      * Updates the mesh of the object

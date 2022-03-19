@@ -1,5 +1,5 @@
 import {Field, IDataHook} from "model-react";
-import {ICrossSection} from "../sweepObject/_types/ICrossSection";
+import {ICrossSection} from "../sweepOperation/core/_types/ICrossSection";
 import {makePolygonCCW} from "../util/geometry/makePolygonCCW";
 import {Vec2} from "../util/Vec2";
 import {ISegment} from "./_types/ISegment";
@@ -11,6 +11,7 @@ export class CrossSectionState {
     protected segments = new Field<ISegment<Vec2>[]>([]);
     protected rotation = new Field(0);
     protected scale = new Field(1);
+    protected position = new Field(0);
 
     /**
      * Creates a new cross section
@@ -48,6 +49,15 @@ export class CrossSectionState {
         return this.scale.get(hook);
     }
 
+    /**
+     * Retrieves the position of this cross section along the sweep line
+     * @param hook The hook to subscribe to changes
+     * @returns The fractual position (between 0 and 1) along the sweep line
+     */
+    public getPosition(hook?: IDataHook): number {
+        return this.position.get(hook);
+    }
+
     // Setters
     /**
      * Sets the segments that make up this cross section
@@ -78,6 +88,14 @@ export class CrossSectionState {
      */
     public setScale(scale: number): void {
         this.scale.set(scale);
+    }
+
+    /**
+     * Sets the fractual position of this cross section along the sweep line
+     * @param position The position between 0 and 1
+     */
+    public setPosition(position: number): void {
+        this.position.set(position);
     }
 
     // Utils
@@ -136,7 +154,7 @@ export class CrossSectionState {
 
             // Store the new list of segments
             if (index == 0) {
-                this.segments.set([...segments.slice(1, index), combined]);
+                this.segments.set([...segments.slice(1, -1), combined]);
             } else {
                 this.segments.set([
                     ...segments.slice(0, index - 1),

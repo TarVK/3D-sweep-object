@@ -1,4 +1,4 @@
-import {ICrossSection} from "../../sweepObject/_types/ICrossSection";
+import {ICrossSection} from "../../sweepOperation/core/_types/ICrossSection";
 import {Vec2} from "../Vec2";
 import {getSideOfLine} from "./getSideOfLine";
 
