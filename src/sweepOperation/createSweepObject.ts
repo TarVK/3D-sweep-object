@@ -52,7 +52,7 @@ export function performObjectSweep({
 
         const lPer = lastCrossSectionSample.position;
         const nPer = nextCrossSectionSample.position;
-        const interpolatePer = nPer - lPer <= 0 ? 0 : per - lPer / nPer - lPer;
+        const interpolatePer = nPer - lPer <= 0 ? 0 : (per - lPer) / (nPer - lPer);
         const interpolatedSample =
             interpolatePer >= 1
                 ? nextCrossSectionSample

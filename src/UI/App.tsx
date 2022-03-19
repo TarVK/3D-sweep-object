@@ -14,21 +14,42 @@ import {InputMenu} from "./InputMenu";
 
 export const App: FC = () => {
     const [h] = useDataHook();
-    const sweepObjectState = useRefLazy(
-        () =>
-            // new SweepObjectState(
-            //     new SweepLineState([
-            //         new BezierSegmentState(new Vec3(0, 0, 0), new Vec3(1, 1, 0)),
-            //     ]),
-            //     [
-            //         new CrossSectionState([
-            //             new StraightSegmentState(new Vec2(0, 0), new Vec2(0, 1)),
-            //             new StraightSegmentState(new Vec2(0, 1), new Vec2(1, 0.5)),
-            //             new StraightSegmentState(new Vec2(0.5, 1), new Vec2(0, 0)),
-            //         ]),
-            //     ]
-            // )
-            new SweepObjectState(
+    const sweepObjectState = useRefLazy(() =>
+        // new SweepObjectState(
+        //     new SweepLineState([
+        //         new BezierSegmentState(new Vec3(0, 0, 0), new Vec3(1, 1, 0)),
+        //     ]),
+        //     [
+        //         new CrossSectionState([
+        //             new StraightSegmentState(new Vec2(0, 0), new Vec2(0, 1)),
+        //             new StraightSegmentState(new Vec2(0, 1), new Vec2(1, 0.5)),
+        //             new StraightSegmentState(new Vec2(0.5, 1), new Vec2(0, 0)),
+        //         ]),
+        //     ]
+        // )
+        {
+            const crossSection1 = new CrossSectionState([
+                new StraightSegmentState(new Vec2(-3, 0), new Vec2(3, -3)),
+                new BezierSegmentState(new Vec2(3, -3), new Vec2(3, 3)),
+                new StraightSegmentState(new Vec2(3, 3), new Vec2(-3, 0)),
+            ]);
+            // const crossSection2 = new CrossSectionState([
+            //     new StraightSegmentState(new Vec2(-3, 3), new Vec2(3, 3)),
+            //     new StraightSegmentState(new Vec2(3, 3), new Vec2(3, -3)),
+            //     new StraightSegmentState(new Vec2(3, -3), new Vec2(-3, -3)),
+            //     new StraightSegmentState(new Vec2(-3, -3), new Vec2(-3, 3)),
+            // ]);
+            // crossSection2.setPosition(1);
+
+            const crossSection2 = new CrossSectionState([
+                new StraightSegmentState(new Vec2(-3, 0), new Vec2(3, -3)),
+                new BezierSegmentState(new Vec2(3, -3), new Vec2(3, 3)),
+                new StraightSegmentState(new Vec2(3, 3), new Vec2(-3, 0)),
+            ]);
+            crossSection2.setRotation(2 * Math.PI);
+            crossSection2.setPosition(1);
+
+            return new SweepObjectState(
                 new SweepLineState([
                     new BezierSegmentState(
                         new Vec3(0, 0, 0),
@@ -37,14 +58,9 @@ export const App: FC = () => {
                         new Vec3(20, 20, 0)
                     ),
                 ]),
-                [
-                    new CrossSectionState([
-                        new BezierSegmentState(new Vec2(0, 0), new Vec2(0, 6)),
-                        new StraightSegmentState(new Vec2(0, 6), new Vec2(6, 3)),
-                        new StraightSegmentState(new Vec2(6, 3), new Vec2(0, 0)),
-                    ]),
-                ]
-            )
+                [crossSection1, crossSection2]
+            );
+        }
     );
 
     const sweepObject = sweepObjectState.current;
