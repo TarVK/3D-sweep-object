@@ -11,7 +11,6 @@ import {
     ClearOutlined,
     MouseOutlined,
     RestartAltOutlined,
-    ViewInArOutlined,
     ZoomOutMapOutlined,
 } from "@mui/icons-material";
 import {Menu} from "./Menu";
@@ -38,11 +37,12 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
 
 
     function toggleMeshDisplaying(){
-        sceneRef.current.sweepPoints.visible = !sceneRef.current.sweepPoints.visible;
-        sceneRef.current.sweepLine.visible = !sceneRef.current.sweepLine.visible;
-        sceneRef.current.sweepObject.visible = !sceneRef.current.sweepObject.visible;
+        const scene = sceneRef.current;
+        scene.sweepPoints.visible = !scene.sweepPoints.visible;
+        scene.sweepLine.visible = !scene.sweepLine.visible;
+        scene.sweepObject.visible = !scene.sweepObject.visible;
         
-        sceneRef.current.sweepPoints.visible ? rendererRef.current?.perControls.enableTransform() : rendererRef.current?.perControls.disableTransform();
+        scene.sweepPoints.visible ? rendererRef.current?.controls.enableTransform() : rendererRef.current?.controls.disableTransform();
         // TODO: do same for orth camera
     }
 
@@ -52,7 +52,7 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
         sweepObjectState.buildMesh();
     }
     // TODO: do this with orthControls as well
-    rendererRef.current?.perControls.onTransform(updateSweepLine)
+    rendererRef.current?.controls.onTransform(updateSweepLine)
 
     // Just to simulate a button click (testing purposes)
     function addPoint() {
@@ -99,7 +99,7 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
         {
             icon: CameraAltOutlined,
             hoverText: "Camera mode",
-            iconOnClick: () => {},
+            iconOnClick: () => {rendererRef.current?.toggleCamera()},
         },
     ];
 
@@ -130,7 +130,7 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
             scene.sweepPoints.updatePoints(sweepLine);
             
             // update controls, so that sweep line points are editable
-            rendererRef.current?.perControls.updateObjects(
+            rendererRef.current?.controls.updateObjects(
                 sceneRef.current.sweepPoints.points
             )
             // TODO: make this work as well when reseting the camera

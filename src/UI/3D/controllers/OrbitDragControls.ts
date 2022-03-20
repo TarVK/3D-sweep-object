@@ -142,4 +142,14 @@ export class OrbitTransformControls{
         this.transformEnabled = false;
         this.disposeTransform();
     }
+
+    public changeCamera(camera: Camera){
+        this.camera = camera;
+        this.orbitControls.object = camera;
+        this.orbitControls.update();
+        if(this.transformControls){
+            this.transformControls.camera = camera;
+            this.transformControls.updateMatrix();
+        }
+    }
 }
