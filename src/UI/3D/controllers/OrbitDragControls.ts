@@ -120,12 +120,6 @@ export class OrbitTransformControls{
         }
     }
 
-    public updateObjects(objects: THREE.Object3D[]){
-        if(objects == this.objects) return;
-        this.disposeTransform();
-        this.objects = objects;
-    }
-
     public getTarget(){
         return this.orbitControls.target;
     }
@@ -152,4 +146,11 @@ export class OrbitTransformControls{
             this.transformControls.updateMatrix();
         }
     }
+
+    public changeObjects(objects: THREE.Object3D[]){
+        if(objects == this.objects) return;
+        this.disposeTransform();
+        this.objects = objects;
+    }
+
 }

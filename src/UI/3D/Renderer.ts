@@ -37,6 +37,7 @@ export class Renderer {
         target.appendChild(this.renderer.domElement);
 
         this.setPerspectiveCamera();
+        this.setOrbitControls();
         this.resetCameraPosition();
 
         this.animate();
@@ -126,7 +127,8 @@ export class Renderer {
         this.camera.position.set(-10, 6, 12);
         this.camera.rotation.set(0,0,0);
         this.camera.zoom = 1;
-        this.setOrbitControls();
+        this.camera.updateProjectionMatrix();
+        this.controls?.update()
 
         this.viewCube?.current?.setRotation(this.getRotation());
     }

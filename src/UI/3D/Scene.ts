@@ -19,7 +19,7 @@ export class Scene extends THREE.Scene {
     public constructor() {
         super();
         this.addBackground(this.bgColor);
-        this.addFog(this.bgColor);
+        this.addFog(this.bgColor, 100, 300);
         this.addDirectionalLight(this.lightColor);
         this.addHemiLight(this.lightColor, this.groundColor);
         this.addGround(this.groundColor);
