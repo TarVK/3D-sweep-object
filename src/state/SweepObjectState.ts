@@ -145,14 +145,13 @@ export class SweepObjectState {
     });
     /** A cache for the sweep object specification */
     protected sweepSpec = new DataCacher(hook => {
-        const sweepLine = this.sweepLine;
 
         const crossSections = this.crossSectionsCaches
             .get(hook)
             .map(crossSection => crossSection.get(hook));
 
         const spec: ISweepObjectSpecification = {
-            sweepLine,
+            sweepLine: this.sweepLineCache.get(hook),
             crossSections,
             sampleCount: {
                 sweepLine: this.sweepLineInterpolationPoints.get(hook),

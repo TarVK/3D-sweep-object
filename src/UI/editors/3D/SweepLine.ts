@@ -1,6 +1,6 @@
 import * as THREE from "three";
-import { BezierSegmentState } from "../../state/BezierSegmentState";
-import { Vec3 } from "../../util/Vec3";
+import { BezierSegmentState } from "../../../state/BezierSegmentState";
+import { Vec3 } from "../../../util/Vec3";
 import {IMateriable} from "./_types/IMateriable";
 
 export class SweepLine extends THREE.Object3D implements IMateriable {
