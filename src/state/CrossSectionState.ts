@@ -21,6 +21,33 @@ export class CrossSectionState {
         this.setSegments(initial, true);
     }
 
+    // Utils
+    /**
+     * Copies the list of segments of this cross section
+     * @returns The deep copied list of segments (new segments that form the same shape as this cross section)
+     */
+    public copySegments(): ISegment<Vec2>[] {
+        const copies = this.segments.get().map(segment => segment.copy());
+        for (let i = 0; i < copies.length; i++) {
+            const segment = copies[i];
+            const next = copies[(i + 1) % copies.length];
+            segment.setNextSegment(next, true, false);
+        }
+        return copies;
+    }
+
+    /**
+     * Creates a copy of this cross section state
+     * @returns The deep copy of this state, which is completely independent of this state
+     */
+    public copy(): CrossSectionState {
+        const state = new CrossSectionState(this.copySegments());
+        state.setRotation(this.getRotation());
+        state.setScale(this.getScale());
+        state.setPosition(this.getPosition());
+        return state;
+    }
+
     // Getters
     /**
      * Retrieves a list of segments that make up this cross section

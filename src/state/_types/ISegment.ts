@@ -3,6 +3,12 @@ import {Vec2} from "../../util/Vec2";
 import {Vec3} from "../../util/Vec3";
 
 export type ISegment<D extends Vec2 | Vec3> = {
+    /**
+     * Copies the data of this segment into a new segment
+     * @returns The copied segment
+     */
+    copy(): ISegment<D>;
+
     // Control the start/end points
     /**
      * Retrieves the start point of the bezier

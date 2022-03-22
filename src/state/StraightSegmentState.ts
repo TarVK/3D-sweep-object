@@ -25,6 +25,10 @@ export class StraightSegmentState<D extends Vec2 | Vec3> implements ISegment<D> 
     }
 
     // Utils
+    public copy(): StraightSegmentState<D> {
+        return new StraightSegmentState(this.start.get(), this.end.get());
+    }
+
     /**
      * Retrieves a point on the segment, given a position on the segment
      * @param t The position between 0 and 1

@@ -61,7 +61,7 @@ export const CrossSectionCanvas: FC<ICanvasProps> = ({sweepObjectState, ...props
             />
             <Menu props={{items: pointMenuItems, position: {top: 0, left: 0}}} />
             <Menu props={{items: exportImportMenu, position: {top: 0, right: 0}}} />
-            <CrossSectionsMenu crossSections={["Cross section 1", "Cross section 2"]} />
+            <CrossSectionsMenu />
             <RotationScaleMenu />
         </div>
     );

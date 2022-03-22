@@ -118,7 +118,17 @@ export class CrossSectionEditorState {
      * @param index The index to be selected
      */
     public selectCrossSection(index: number): void {
-        this.selectedCrossSectionIndex.set(index);
+        this.selectedCrossSectionIndex.set(Math.max(0, index));
+    }
+
+    /**
+     * Retrieves the currently selected cross section index
+     * @param hook The hook to subscribe to changes
+     * @returns The index of the currently selected cross section
+     */
+    public getSelectCrossSectionIndex(hook?: IDataHook): number {
+        const crossSections = this.sweepObject.get(hook).getCrossSections(hook);
+        return Math.min(crossSections.length, this.selectedCrossSectionIndex.get(hook));
     }
 
     /**
