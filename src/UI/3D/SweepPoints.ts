@@ -33,7 +33,6 @@ export class SweepPoints extends THREE.Object3D implements IMateriable {
                 segment.getEndControl(),
                 0x00ff00
             );
-
             this.add(startPoint, startControlPoint, endControlPoint);
             this.points.push(startPoint, startControlPoint, endControlPoint);
         });
@@ -60,7 +59,7 @@ export class SweepPoints extends THREE.Object3D implements IMateriable {
 
     public getPointsAsBezierSegments() {
         const segments: BezierSegmentState<Vec3>[] = [];
-        for(let i=0; i<this.points.length; i+=4){
+        for(let i=0; i<this.points.length-1; i+=3){
             segments.push(new BezierSegmentState<Vec3>(
                 this.threeVectorToVec3(this.points[i].position),
                 this.threeVectorToVec3(this.points[i+1].position),
