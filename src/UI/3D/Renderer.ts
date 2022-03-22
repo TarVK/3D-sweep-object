@@ -102,6 +102,7 @@ export class Renderer {
             camera.zoom = this.camera.zoom;
         }
         this.camera = camera;
+        this.camera.updateProjectionMatrix();
         if(this.controls){
             this.controls.changeCamera(this.camera);
         }
@@ -124,11 +125,12 @@ export class Renderer {
     }
     
     public resetCameraPosition(){
+        // TODO: fix reset when moving (not rotating)
         this.camera.position.set(-10, 6, 12);
         this.camera.rotation.set(0,0,0);
         this.camera.zoom = 1;
         this.camera.updateProjectionMatrix();
-        this.controls?.update()
+        this.controls?.update();
 
         this.viewCube?.current?.setRotation(this.getRotation());
     }
