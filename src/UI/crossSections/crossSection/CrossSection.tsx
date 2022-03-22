@@ -4,6 +4,7 @@ import {BezierSegmentState} from "../../../state/BezierSegmentState";
 import {StraightSegmentState} from "../../../state/StraightSegmentState";
 import {Vec2} from "../../../util/Vec2";
 import {useCrossSectionEditorState} from "../CrossSectionEditorStateContext";
+import {CrossSectionApproximationPoints} from "./CrossSectionApproximationPoints";
 import {CrossSectionPolygon} from "./CrossSectionPolygon";
 import {BezierLineSegment} from "./segments/BezierLineSegment";
 import {StraightLineSegment} from "./segments/StraightLineSegment";
@@ -39,6 +40,7 @@ export const CrossSection: FC = () => {
         },
         [state]
     );
+
     return (
         <svg
             style={{position: "absolute"}}
@@ -49,6 +51,7 @@ export const CrossSection: FC = () => {
                 offset.y / scale - size.y / scale / 2
             } ${size.x / scale} ${size.y / scale}`}>
             <CrossSectionPolygon />
+            <CrossSectionApproximationPoints />
             {segments}
         </svg>
     );

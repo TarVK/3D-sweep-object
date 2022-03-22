@@ -59,6 +59,24 @@ export class SweepObjectState {
         return this.object.get(hook);
     }
 
+    /**
+     * Retrieves the number of points to sample the sweep line with
+     * @param hook The hook to subscribe to changes
+     * @returns The number of points to approximate the sweep line by
+     */
+    public getSweepLineInterpolationPointCount(hook?: IDataHook): number {
+        return this.sweepLineInterpolationPoints.get(hook);
+    }
+
+    /**
+     * Retrieves the number of points to sample each cross section with
+     * @param hook The hook too subscribe to changes
+     * @returns The number of points to approximate the cross sections by
+     */
+    public getCrossSectionInterpolationPointCount(hook?: IDataHook): number {
+        return this.crossSectionInterpolationPoints.get(hook);
+    }
+
     // Setters
     /**
      * Sets the cross sections of this object
