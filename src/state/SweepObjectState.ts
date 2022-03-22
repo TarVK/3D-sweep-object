@@ -1,7 +1,11 @@
 import {DataCacher, Field, IDataHook} from "model-react";
-import {createSweepObject} from "../sweepObject/createSweepObject";
-import {IMesh} from "../sweepObject/_types/IMesh";
-import {ISweepObjectSpecification} from "../sweepObject/_types/ISweepObjectSpecification";
+import {performObjectSweep} from "../sweepOperation/createSweepObject";
+import {IMesh} from "../sweepOperation/_types/IMesh";
+import {ICrossSectionSpecification} from "../sweepOperation/_types/spec/ICrossSectionSpecification";
+import {ISweepLineNode} from "../sweepOperation/_types/spec/ISweepLineNode";
+import {ISweepLineSpecification} from "../sweepOperation/_types/spec/ISweepLineSpecification";
+import {ISweepObjectSpecification} from "../sweepOperation/_types/spec/ISweepObjectSpecification";
+import {Vec2} from "../util/Vec2";
 import {CrossSectionState} from "./CrossSectionState";
 import {SweepLineState} from "./SweepLineState";
 
@@ -11,8 +15,6 @@ import {SweepLineState} from "./SweepLineState";
 export class SweepObjectState {
     protected crossSections = new Field<CrossSectionState[]>([]);
     protected sweepLine: SweepLineState;
-    protected object = new Field<IMesh | null>(null);
-
     // TODO: add getter/setters
     protected sweepLineInterpolationPoints = new Field(20);
     protected crossSectionInterpolationPoints = new Field(30);
@@ -57,6 +59,24 @@ export class SweepObjectState {
         return this.object.get(hook);
     }
 
+    /**
+     * Retrieves the number of points to sample the sweep line with
+     * @param hook The hook to subscribe to changes
+     * @returns The number of points to approximate the sweep line by
+     */
+    public getSweepLineInterpolationPointCount(hook?: IDataHook): number {
+        return this.sweepLineInterpolationPoints.get(hook);
+    }
+
+    /**
+     * Retrieves the number of points to sample each cross section with
+     * @param hook The hook too subscribe to changes
+     * @returns The number of points to approximate the cross sections by
+     */
+    public getCrossSectionInterpolationPointCount(hook?: IDataHook): number {
+        return this.crossSectionInterpolationPoints.get(hook);
+    }
+
     // Setters
     /**
      * Sets the cross sections of this object
@@ -67,43 +87,78 @@ export class SweepObjectState {
     }
 
     // Utils
-    /**
-     * Builds the spec defined by this state into a mesh
-     */
-    public buildMesh(): void {
-        console.time("created mesh");
-        const mesh = createSweepObject(this.sweepSpec.get());
-        this.object.set(mesh);
-        console.timeEnd("created mesh");
-        console.log(mesh);
-    }
+    /** A cache for the sweep object itself */
+    protected object = new DataCacher(hook =>
+        performObjectSweep(this.sweepSpec.get(hook))
+    );
 
     // Some data caches in order to only recompute relevant parts of the mesh when necessary
     /** A cache of caches for each of the cross sections that store the cross section's normalized form */
-    protected crossSectionsCaches = new DataCacher(hook => {
+    protected crossSectionsCaches = new DataCacher<
+        DataCacher<ICrossSectionSpecification>[]
+    >(hook => {
         const points = this.crossSectionInterpolationPoints.get(hook);
-        return this.crossSections
-            .get(hook)
-            .map(crossSection => new DataCacher(h => crossSection.normalize(points, h)));
+        return this.crossSections.get(hook).map(
+            crossSection =>
+                new DataCacher(h => {
+                    let cached: null | {
+                        count: number;
+                        result: Vec2[];
+                    } = null;
+
+                    return {
+                        position: crossSection.getPosition(h),
+                        scale: crossSection.getScale(h),
+                        angle: crossSection.getRotation(h),
+                        sample: pointCount => {
+                            if (cached?.count == pointCount) return cached.result;
+                            const sampled = crossSection.normalize(pointCount, h);
+                            cached = {
+                                count: pointCount,
+                                result: sampled,
+                            };
+                            return sampled;
+                        },
+                    };
+                })
+        );
+    });
+
+    /** Create a sweep line specification that caches the result to reduce recomputation */
+    protected sweepLineCache = new DataCacher<ISweepLineSpecification>(hook => {
+        let cached: null | {
+            count: number;
+            result: ISweepLineNode[];
+        } = null;
+
+        return {
+            sample: samples => {
+                if (cached?.count == samples) return cached.result;
+                const sample = this.sweepLine.sample(samples, hook);
+                cached = {
+                    count: samples,
+                    result: sample,
+                };
+                return sample;
+            },
+        };
     });
     /** A cache for the sweep object specification */
     protected sweepSpec = new DataCacher(hook => {
-        const sweepLine = this.sweepLine.normalize(hook);
+        const sweepLine = this.sweepLine;
 
         const crossSections = this.crossSectionsCaches
             .get(hook)
             .map(crossSection => crossSection.get(hook));
 
-        // TODO: change spec to support multiple cross sections
         const spec: ISweepObjectSpecification = {
             sweepLine,
-            crossSection: crossSections[0],
-            sampleCount: this.sweepLineInterpolationPoints.get(hook),
+            crossSections,
+            sampleCount: {
+                sweepLine: this.sweepLineInterpolationPoints.get(hook),
+                crossSection: this.crossSectionInterpolationPoints.get(hook),
+            },
         };
         return spec;
     });
-    // /** A cache for the sweep object itself */
-    // protected object = new DataCacher(hook =>
-    //     createSweepObject(this.sweepSpec.get(hook))
-    // );
 }

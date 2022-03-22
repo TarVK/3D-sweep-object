@@ -1,5 +1,5 @@
 import {Field, IDataHook} from "model-react";
-import {ICrossSection} from "../sweepObject/_types/ICrossSection";
+import {ICrossSection} from "../sweepOperation/core/_types/ICrossSection";
 import {makePolygonCCW} from "../util/geometry/makePolygonCCW";
 import {Vec2} from "../util/Vec2";
 import {ISegment} from "./_types/ISegment";
@@ -11,6 +11,7 @@ export class CrossSectionState {
     protected segments = new Field<ISegment<Vec2>[]>([]);
     protected rotation = new Field(0);
     protected scale = new Field(1);
+    protected position = new Field(0);
 
     /**
      * Creates a new cross section
@@ -18,6 +19,33 @@ export class CrossSectionState {
      */
     public constructor(initial: ISegment<Vec2>[]) {
         this.setSegments(initial, true);
+    }
+
+    // Utils
+    /**
+     * Copies the list of segments of this cross section
+     * @returns The deep copied list of segments (new segments that form the same shape as this cross section)
+     */
+    public copySegments(): ISegment<Vec2>[] {
+        const copies = this.segments.get().map(segment => segment.copy());
+        for (let i = 0; i < copies.length; i++) {
+            const segment = copies[i];
+            const next = copies[(i + 1) % copies.length];
+            segment.setNextSegment(next, true, false);
+        }
+        return copies;
+    }
+
+    /**
+     * Creates a copy of this cross section state
+     * @returns The deep copy of this state, which is completely independent of this state
+     */
+    public copy(): CrossSectionState {
+        const state = new CrossSectionState(this.copySegments());
+        state.setRotation(this.getRotation());
+        state.setScale(this.getScale());
+        state.setPosition(this.getPosition());
+        return state;
     }
 
     // Getters
@@ -46,6 +74,15 @@ export class CrossSectionState {
      */
     public getScale(hook?: IDataHook): number {
         return this.scale.get(hook);
+    }
+
+    /**
+     * Retrieves the position of this cross section along the sweep line
+     * @param hook The hook to subscribe to changes
+     * @returns The fractual position (between 0 and 1) along the sweep line
+     */
+    public getPosition(hook?: IDataHook): number {
+        return this.position.get(hook);
     }
 
     // Setters
@@ -77,7 +114,16 @@ export class CrossSectionState {
      * @param scale The new scale of this cross section
      */
     public setScale(scale: number): void {
-        this.scale.set(scale);
+        const normalized = Math.max(0, scale);
+        this.scale.set(normalized);
+    }
+
+    /**
+     * Sets the fractual position of this cross section along the sweep line
+     * @param position The position between 0 and 1
+     */
+    public setPosition(position: number): void {
+        this.position.set(position);
     }
 
     // Utils
@@ -136,7 +182,7 @@ export class CrossSectionState {
 
             // Store the new list of segments
             if (index == 0) {
-                this.segments.set([...segments.slice(1, index), combined]);
+                this.segments.set([...segments.slice(1, -1), combined]);
             } else {
                 this.segments.set([
                     ...segments.slice(0, index - 1),

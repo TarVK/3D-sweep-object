@@ -20,12 +20,6 @@ export const InputMenu: FC<IInputMenuProps> = ({sweepObjectState}) => {
             <Button variant="contained" size="small">
                 Export model
             </Button>
-            <Button
-                variant="contained"
-                size="small"
-                onClick={() => sweepObjectState.buildMesh()}>
-                Start shape
-            </Button>
             <TextField
                 label="Intersections"
                 type="number"

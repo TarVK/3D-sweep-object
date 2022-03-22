@@ -63,6 +63,15 @@ export class BezierSegmentState<D extends Vec2 | Vec3> implements ISegment<D> {
     }
 
     // Utils
+    public copy(): BezierSegmentState<D> {
+        return new BezierSegmentState(
+            this.start.get(),
+            this.startControl.get(),
+            this.endControl.get(),
+            this.end.get()
+        );
+    }
+
     /**
      * Retrieves a point on the curve, given a position on the curve
      * @param t The position between 0 and 1
