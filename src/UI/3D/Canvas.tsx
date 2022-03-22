@@ -50,7 +50,6 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
         sweepObjectState.getSweepLine().setSegments( segments );
         sweepObjectState.buildMesh();
     }
-    rendererRef.current?.controls.onTransform(updateSweepLine)
 
     // Just to simulate a button click (testing purposes)
     function addPoint() {
@@ -113,6 +112,7 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
         if (el) {
             const renderer = (rendererRef.current = new Renderer(el, sceneRef.current));
             rendererRef.current.attachViewCube(viewCubeRef);
+            rendererRef.current.controls.onTransform(updateSweepLine);
             // return () => renderer.destroy();
         }
     }, []);

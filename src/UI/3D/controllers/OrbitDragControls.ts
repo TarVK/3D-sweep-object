@@ -63,10 +63,21 @@ export class OrbitTransformControls{
         this.camera = camera;
         this.domElem = domElem;
         domElem.addEventListener( 'mousedown', this.useRayCaster );
+        domElem.addEventListener( 'dblclick', this.deselectOnDoubleClick );
     }
 
     public onTransform(cb: Function){
         this.transformEvents.push(cb);
+    }
+
+    private deselectOnDoubleClick = (event: MouseEvent) => {
+        console.log(event);
+        const {x, y} = this.getMouseXandY(event);
+        this.raycaster.setFromCamera( new THREE.Vector2(x, y), this.camera );
+        const intersects = this.raycaster.intersectObjects(this.objects);
+        if(intersects.length == 0){
+            this.disposeTransform();
+        }
     }
 
     private useRayCaster = ( event: MouseEvent ) => {
@@ -74,19 +85,11 @@ export class OrbitTransformControls{
             this.orbitControls.enabled = true;
             return;
         };
-
-        const canvasBounds = this.domElem.getBoundingClientRect()!;
-        const x = ( ( event.clientX - canvasBounds.left ) / ( canvasBounds.right - canvasBounds.left ) ) * 2 - 1;
-        const y = - ( ( event.clientY - canvasBounds.top ) / ( canvasBounds.bottom - canvasBounds.top) ) * 2 + 1;
-
+        
+        const {x, y} = this.getMouseXandY(event);
         this.raycaster.setFromCamera( new THREE.Vector2(x, y), this.camera );
         
-        //TODO: remove this map, we do it only cause the mesh of the sweep obj is inside the sweepObj itself
-        //@ts-ignore
-        const tempObjects = this.objects.map(o => o.mesh ?? o);
-        const intersects = this.raycaster.intersectObjects( tempObjects, true  );
-        
-        
+        const intersects = this.raycaster.intersectObjects(this.objects);
         if(intersects && intersects.length>0){
             if(this.currObj == intersects[0].object) return;
             if(!intersects[0].object.visible) return;
@@ -104,6 +107,13 @@ export class OrbitTransformControls{
                 this.transformEvents.forEach(cb => cb());
             })
         }
+    }
+
+    private getMouseXandY(event: MouseEvent){
+        const canvasBounds = this.domElem.getBoundingClientRect()!;
+        const x = ( ( event.clientX - canvasBounds.left ) / ( canvasBounds.right - canvasBounds.left ) ) * 2 - 1;
+        const y = - ( ( event.clientY - canvasBounds.top ) / ( canvasBounds.bottom - canvasBounds.top) ) * 2 + 1;
+        return {x, y};
     }
 
     public dispose(){
@@ -152,5 +162,14 @@ export class OrbitTransformControls{
         this.disposeTransform();
         this.objects = objects;
     }
+
+    // public createCopyAndDispose(){
+    //     const copy = new OrbitTransformControls(this.scene, this.objects, this.camera, this.domElem);
+    //     this.transformEvents.forEach(cb => {
+    //         copy.onTransform(cb);
+    //     })
+    //     this.dispose();
+    //     return copy;
+    // }
 
 }

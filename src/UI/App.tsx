@@ -69,6 +69,7 @@ export const App: FC = () => {
                     display: "flex",
                     justifyContent: "space-around",
                     margin: "auto auto",
+                    userSelect: "none"
                 }}>
                 <Canvas
                     css={{
