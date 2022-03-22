@@ -7,9 +7,9 @@ import {SweepLineState} from "../state/SweepLineState";
 import {SweepObjectState} from "../state/SweepObjectState";
 import {Vec2} from "../util/Vec2";
 import {Vec3} from "../util/Vec3";
-import {Canvas} from "./3D/Canvas";
+import {Canvas} from "./editors/3D/Canvas";
 import {useRefLazy} from "./hooks/useRefLazy";
-import {CrossSectionCanvas} from "./3D/CrossSectionCanvas";
+import {CrossSectionCanvas} from "./editors/CrossSectionCanvas";
 import {InputMenu} from "./InputMenu";
 
 export const App: FC = () => {

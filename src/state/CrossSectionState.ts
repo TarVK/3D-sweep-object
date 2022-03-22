@@ -87,7 +87,8 @@ export class CrossSectionState {
      * @param scale The new scale of this cross section
      */
     public setScale(scale: number): void {
-        this.scale.set(scale);
+        const normalized = Math.max(0, scale);
+        this.scale.set(normalized);
     }
 
     /**
