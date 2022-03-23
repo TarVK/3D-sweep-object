@@ -79,6 +79,22 @@ export class SweepObjectState {
 
     // Setters
     /**
+     * Sets the number of points to sample the sweep line with
+     * @param points The number of points to approximate the sweep line by
+     */
+    public setSweepLineInterpolationPointCount(points: number): void {
+        return this.sweepLineInterpolationPoints.set(points);
+    }
+
+    /**
+     * Sets the number of points to sample each cross section with
+     * @param points The number of points to approximate the cross sections by
+     */
+    public setCrossSectionInterpolationPointCount(points: number): void {
+        return this.crossSectionInterpolationPoints.set(points);
+    }
+
+    /**
      * Sets the cross sections of this object
      * @param crossSections The cross sections for this object
      */
@@ -145,14 +161,12 @@ export class SweepObjectState {
     });
     /** A cache for the sweep object specification */
     protected sweepSpec = new DataCacher(hook => {
-        const sweepLine = this.sweepLine;
-
         const crossSections = this.crossSectionsCaches
             .get(hook)
             .map(crossSection => crossSection.get(hook));
 
         const spec: ISweepObjectSpecification = {
-            sweepLine,
+            sweepLine: this.sweepLineCache.get(hook),
             crossSections,
             sampleCount: {
                 sweepLine: this.sweepLineInterpolationPoints.get(hook),
