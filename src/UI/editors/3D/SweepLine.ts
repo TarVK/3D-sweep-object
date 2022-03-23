@@ -11,7 +11,12 @@ export class SweepLine extends THREE.Object3D implements IMateriable {
 
     public updateMaterial(material: THREE.Material): void {}
 
-    public updateLine(segments: BezierSegmentState<Vec3>[], updatePoints = true){
+    public constructor(visible = true){
+        super();
+        this.visible = visible;
+    }
+
+    public updateLine(segments: BezierSegmentState<Vec3>[]){
         if(this.lines && this.lines.length>0){
             this.lines.forEach(line => this.remove(line));
             this.lines = [];
@@ -31,7 +36,7 @@ export class SweepLine extends THREE.Object3D implements IMateriable {
             );
             const points = curve.getPoints( this.nrOfDivisions );
             const geometry = new THREE.BufferGeometry().setFromPoints( points );
-            const material = new THREE.LineBasicMaterial( { color: this.lineColor } );
+            const material = new THREE.LineBasicMaterial({ color: this.lineColor, depthTest: true });
             const curveLine = new THREE.Line( geometry, material );
 
             this.add(curveLine);
@@ -49,12 +54,12 @@ export class SweepLine extends THREE.Object3D implements IMateriable {
         });
     }
 
-    private createHelperLine(start: Vec3, end: Vec3, color: number){
+    private createHelperLine(start: Vec3, end: Vec3, color: number, depthTest=true){
         var geometry = new THREE.BufferGeometry();
         const points = [start.x, start.y, start.z, end.x, end.y, end.z];
         geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( points, 3 ) );
         geometry.setDrawRange(0, 2);
-        var material = new THREE.LineBasicMaterial( { color: color } );
+        var material = new THREE.LineBasicMaterial({ color: color, depthTest: depthTest });
         return new THREE.Line( geometry,  material );
     }
 }

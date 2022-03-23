@@ -25,9 +25,9 @@ export class Scene extends THREE.Scene {
         this.addGround(this.groundColor);
 
         this.sweepObject = new SweepObject();
-        this.sweepLine = new SweepLine();
         this.crossSection = new CrossSection();
-        this.sweepPoints = new SweepPoints();
+        this.sweepLine = new SweepLine(true);
+        this.sweepPoints = new SweepPoints(true);
 
         this.objects.push(this.sweepObject, this.sweepLine, this.crossSection, this.sweepPoints);
         this.add(this.sweepObject, this.sweepLine, this.crossSection, this.sweepPoints);

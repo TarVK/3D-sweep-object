@@ -14,13 +14,6 @@ import {
     ZoomOutMapOutlined,
 } from "@mui/icons-material";
 import {Menu} from "../Menu";
-import {
-    BufferGeometry,
-    Float32BufferAttribute,
-    Points,
-    PointsMaterial,
-    Vector3,
-} from "three";
 import {useDataHook} from "model-react";
 
 export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
@@ -34,55 +27,48 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
     const cubeSize = 100; //px
     
     const [selectedPoint] = useState({x: 100, y: 211, z: 5});
-
+    const scene = sceneRef.current;
 
     function toggleMeshDisplaying(){
-        const scene = sceneRef.current;
-        scene.sweepPoints.visible = !scene.sweepPoints.visible;
-        scene.sweepLine.visible = !scene.sweepLine.visible;
         scene.sweepObject.visible = !scene.sweepObject.visible;
-        
-        scene.sweepPoints.visible ? rendererRef.current?.controls.enableTransform() : rendererRef.current?.controls.disableTransform();
     }
 
-    function updateSweepLine(){
-        const segments = sceneRef.current.sweepPoints.getPointsAsBezierSegments();
-        sweepObjectState.getSweepLine().setSegments( segments );
-    }
-
-    // Just to simulate a button click (testing purposes)
-    function addPoint() {
-        const dotGeometry = new BufferGeometry();
-        dotGeometry.setAttribute(
-            "position",
-            new Float32BufferAttribute(new Vector3(2, 2, 2).toArray(), 3)
-        );
-        const dotMaterial = new PointsMaterial({size: 0.1});
-        const dot = new Points(dotGeometry, dotMaterial);
-        sceneRef.current.add(dot);
-    }
 
     const pointMenuItems = [
         {
             icon: AddCircleOutlineSharp,
             hoverText: "Add point",
-            iconOnClick: addPoint,
+            iconOnClick: () => {
+                rendererRef.current!.controls.setMode("add");
+                scene.sweepPoints.visible = true;
+                scene.sweepLine.visible = true;
+            },
         },
         {
             icon: MouseOutlined,
             hoverText: "Select point",
-            iconOnClick: () => {},
+            iconOnClick: () => {
+                rendererRef.current!.controls.setMode("transform");
+                scene.sweepPoints.visible = true;
+                scene.sweepLine.visible = true;
+            },
         },
         {
             icon: ClearOutlined,
             hoverText: "Delete point",
-            iconOnClick: () => {},
+            iconOnClick: () => {
+                rendererRef.current!.controls.setMode("delete");
+                scene.sweepPoints.visible = true;
+                scene.sweepLine.visible = true;
+            },
         },
         {
             icon: ZoomOutMapOutlined,
             hoverText: "Change camera position",
             // TODO: remove the toggling from here
-            iconOnClick: () => {toggleMeshDisplaying()},
+            iconOnClick: () => {
+                toggleMeshDisplaying();
+            },
         },
     ];
 
@@ -109,9 +95,20 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
 
         const el = elementRef.current;
         if (el) {
-            const renderer = (rendererRef.current = new Renderer(el, sceneRef.current));
+            const renderer = (rendererRef.current = new Renderer(el, scene));
             rendererRef.current.attachViewCube(viewCubeRef);
-            rendererRef.current.controls.onTransform(updateSweepLine);
+            rendererRef.current.controls.onTransform(()=>{
+                const segments = scene.sweepPoints.getPointsAsBezierSegments();
+                sweepObjectState.getSweepLine().setSegments( segments, true );
+            });
+            rendererRef.current.controls.onAdd((point) => {
+                const segments = scene.sweepPoints.edit.addPoint(point);
+                sweepObjectState.getSweepLine().setSegments( segments, true );
+            });
+            rendererRef.current.controls.onDelete((point) => {
+                const segments = scene.sweepPoints.edit.deletePoint(point);
+                sweepObjectState.getSweepLine().setSegments( segments, true );
+            });
             return () => renderer.destroy();
         }
     }, []);
@@ -119,7 +116,6 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
     const sweepObjectMesh = sweepObjectState.getMesh(h);
     
     useEffect(() => {
-        const scene = sceneRef.current;
         if (sweepObjectMesh) {
             scene.sweepObject.updateMesh(sweepObjectMesh);
             const sweepLine = sweepObjectState.getSweepLine().getSegments(h);
@@ -128,7 +124,7 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
             
             // update controls, so that sweep line points are editable
             rendererRef.current?.controls.changeObjects(
-                sceneRef.current.sweepPoints.points
+                scene.sweepPoints.points
             )
         }
     }, [sweepObjectMesh]);

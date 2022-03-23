@@ -4,6 +4,7 @@ import { DragControls } from 'three/examples/jsm/controls/DragControls'
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls'
 
 type Camera =  THREE.PerspectiveCamera | THREE.OrthographicCamera;
+type Modes = "add" | "delete" | "transform" | "move";
 
 //Thanks https://sbcode.net/threejs/multi-controls-example/#video-lecture
 export class OrbitDragControls{
@@ -44,16 +45,22 @@ export class OrbitDragControls{
 export class OrbitTransformControls{
     public transformControls: TransformControls;
     public orbitControls:  OrbitControls;
-    public raycaster:  THREE.Raycaster;
-    public objects: THREE.Object3D[];
-    public scene: THREE.Scene;
-    public camera: Camera;
-    public domElem: HTMLElement;
+
+    private raycaster:  THREE.Raycaster;
+    private objects: THREE.Object3D[];
+    private scene: THREE.Scene;
+    private camera: Camera;
+    private domElem: HTMLElement;
 
     private transformEnabled = true;
-    private transformEvents: Function[] = []
+    
+    private transformListeners: (()=>void)[] = [];
+    private addListeners: ((point: THREE.Vector3)=>void)[] = [];
+    private deleteListeners: ((point: THREE.Object3D)=>void)[] = [];
     
     public currObj: THREE.Object3D | undefined;
+    private mode: Modes = "transform";
+
 
     constructor(scene: THREE.Scene, objects: THREE.Object3D[], camera: Camera, domElem: HTMLElement){
         this.orbitControls = new OrbitControls(camera, domElem);
@@ -62,16 +69,43 @@ export class OrbitTransformControls{
         this.scene = scene;
         this.camera = camera;
         this.domElem = domElem;
-        domElem.addEventListener( 'mousedown', this.useRayCaster );
+        domElem.addEventListener( 'mousedown', this.onMouseDown );
         domElem.addEventListener( 'dblclick', this.deselectOnDoubleClick );
     }
 
-    public onTransform(cb: Function){
-        this.transformEvents.push(cb);
+    
+    public setMode(mode: Modes) {
+        this.mode = mode;
+        if(this.mode == "transform"){
+            this.enableTransform();
+            this.orbitControls.enabled = true;
+        }else if(this.mode == "add"){
+            this.disableTransform();
+            this.orbitControls.enabled = false;
+        }else if(this.mode == "delete"){
+            this.disableTransform();
+            this.orbitControls.enabled = true;
+        }else if(this.mode == "move"){
+
+        }
+    }
+    
+    private onMouseDown = (event: MouseEvent) => {
+        if(this.mode == "transform"){
+            this.selectPointForMovement(event);
+        }else if(this.mode == "add"){
+            this.createNewPointOnClick(event);
+        }else if(this.mode == "delete"){
+            this.deletePointOnClick(event);
+        }else if(this.mode == "move"){
+
+        }
     }
 
+
     private deselectOnDoubleClick = (event: MouseEvent) => {
-        console.log(event);
+        if (this.mode == "add" ) return;
+
         const {x, y} = this.getMouseXandY(event);
         this.raycaster.setFromCamera( new THREE.Vector2(x, y), this.camera );
         const intersects = this.raycaster.intersectObjects(this.objects);
@@ -80,7 +114,7 @@ export class OrbitTransformControls{
         }
     }
 
-    private useRayCaster = ( event: MouseEvent ) => {
+    private selectPointForMovement = ( event: MouseEvent ) => {
         if(!this.transformEnabled) {
             this.orbitControls.enabled = true;
             return;
@@ -88,11 +122,10 @@ export class OrbitTransformControls{
         
         const {x, y} = this.getMouseXandY(event);
         this.raycaster.setFromCamera( new THREE.Vector2(x, y), this.camera );
-        
         const intersects = this.raycaster.intersectObjects(this.objects);
-        if(intersects && intersects.length>0){
+
+        if(intersects.length>0){
             if(this.currObj == intersects[0].object) return;
-            if(!intersects[0].object.visible) return;
             this.disposeTransform();
             this.currObj = intersects[0].object;
 
@@ -104,8 +137,34 @@ export class OrbitTransformControls{
                 this.orbitControls.enabled = !event.value;
             });
             this.transformControls.addEventListener('objectChange', () => {
-                this.transformEvents.forEach(cb => cb());
+                this.transformListeners.forEach(cb => cb());
             })
+        }
+    }
+
+    private createNewPointOnClick(event: MouseEvent){
+        const target = this.getTarget().clone();
+        const plane = new THREE.Plane();
+        let normal = target.clone().normalize().sub( this.camera.position );
+        plane.setFromNormalAndCoplanarPoint( normal, target );
+        
+        const {x, y} = this.getMouseXandY(event);
+        this.raycaster.setFromCamera( new THREE.Vector2(x, y), this.camera );
+        const point = this.raycaster.ray.intersectPlane(plane, target);
+
+        if(point){
+            this.addListeners.forEach(cb => cb(point));
+        }
+    }
+
+    
+    private deletePointOnClick(event: MouseEvent){
+        const {x, y} = this.getMouseXandY(event);
+        this.raycaster.setFromCamera( new THREE.Vector2(x, y), this.camera );
+        const intersects = this.raycaster.intersectObjects(this.objects);
+
+        if(intersects.length>0){
+            this.deleteListeners.forEach(cb => cb(intersects[0].object));
         }
     }
 
@@ -123,11 +182,23 @@ export class OrbitTransformControls{
 
     private disposeTransform(){
         this.currObj = undefined;
-        this.orbitControls.enabled = true;
+        this.orbitControls.enabled = this.mode != "add";
         if(this.transformControls){
             this.transformControls.dispose();
             this.transformControls.removeFromParent();
         }
+    }
+
+    public onTransform(cb: (()=>void)){
+        this.transformListeners.push(cb);
+    }
+
+    public onAdd(cb: ((point: THREE.Vector3)=>void)){
+        this.addListeners.push(cb);
+    }
+
+    public onDelete(cb: ((point: THREE.Object3D)=>void)){
+        this.deleteListeners.push(cb);
     }
 
     public getTarget(){
@@ -165,7 +236,7 @@ export class OrbitTransformControls{
 
     // public createCopyAndDispose(){
     //     const copy = new OrbitTransformControls(this.scene, this.objects, this.camera, this.domElem);
-    //     this.transformEvents.forEach(cb => {
+    //     this.transformListeners.forEach(cb => {
     //         copy.onTransform(cb);
     //     })
     //     this.dispose();
