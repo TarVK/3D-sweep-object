@@ -14,16 +14,12 @@ export class SweepObject extends THREE.Object3D implements IMateriable {
         geometry.setAttribute(
             "position",
             new THREE.Float32BufferAttribute(
-                newMesh.points.flatMap(v => [v.x, v.y, -v.z]), // Note we negate z because positive z comes towards the camera instead of away from it, which is counter intuitive
+                newMesh.points.flatMap(v => [v.x, v.y, v.z]), // Note we negate z because positive z comes towards the camera instead of away from it, which is counter intuitive
                 3
             )
         );
         geometry.setIndex(
-            newMesh.faces
-                .map(
-                    ([i1, i2, i3]) => [i2, i1, i3] // To correct for the inversion of the z-axis
-                )
-                .flat()
+            newMesh.faces.flat()
         );
         geometry.computeVertexNormals();
         const material = new THREE.MeshPhongMaterial({
