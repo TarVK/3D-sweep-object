@@ -25,6 +25,9 @@ import {useDataHook} from "model-react";
 
 export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
     const [h] = useDataHook();
+    const sweepObjectRef = useRef(sweepObjectState);
+    sweepObjectRef.current = sweepObjectState; // Keep a reference to the latest state
+
     const rendererRef = useRef<Renderer | undefined>();
     const sceneRef = useRefLazy<Scene>(() => new Scene());
     const elementRef = useRef<HTMLDivElement>(null);
@@ -32,22 +35,24 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
     const viewCubeRef = useRef<ViewCube | undefined>();
     const cubeRef = useRef<HTMLDivElement>(null);
     const cubeSize = 100; //px
-    
+
     const [selectedPoint] = useState({x: 100, y: 211, z: 5});
 
-
-    function toggleMeshDisplaying(){
+    function toggleMeshDisplaying() {
         const scene = sceneRef.current;
         scene.sweepPoints.visible = !scene.sweepPoints.visible;
         scene.sweepLine.visible = !scene.sweepLine.visible;
         scene.sweepObject.visible = !scene.sweepObject.visible;
-        
-        scene.sweepPoints.visible ? rendererRef.current?.controls.enableTransform() : rendererRef.current?.controls.disableTransform();
+
+        scene.sweepPoints.visible
+            ? rendererRef.current?.controls.enableTransform()
+            : rendererRef.current?.controls.disableTransform();
     }
 
-    function updateSweepLine(){
+    function updateSweepLine() {
+        const sweepObject = sweepObjectRef.current;
         const segments = sceneRef.current.sweepPoints.getPointsAsBezierSegments();
-        sweepObjectState.getSweepLine().setSegments( segments );
+        sweepObject.getSweepLine().setSegments(segments);
     }
 
     // Just to simulate a button click (testing purposes)
@@ -82,7 +87,9 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
             icon: ZoomOutMapOutlined,
             hoverText: "Change camera position",
             // TODO: remove the toggling from here
-            iconOnClick: () => {toggleMeshDisplaying()},
+            iconOnClick: () => {
+                toggleMeshDisplaying();
+            },
         },
     ];
 
@@ -90,12 +97,16 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
         {
             icon: RestartAltOutlined,
             hoverText: "Reset camera",
-            iconOnClick: () => {rendererRef.current!.resetCameraPosition()},
+            iconOnClick: () => {
+                rendererRef.current!.resetCameraPosition();
+            },
         },
         {
             icon: CameraAltOutlined,
             hoverText: "Camera mode",
-            iconOnClick: () => {rendererRef.current!.toggleCamera()},
+            iconOnClick: () => {
+                rendererRef.current!.toggleCamera();
+            },
         },
     ];
 
@@ -117,7 +128,14 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
     }, []);
 
     const sweepObjectMesh = sweepObjectState.getMesh(h);
-    
+
+    useEffect(() => {
+        const scene = sceneRef.current;
+        const sweepLine = sweepObjectState.getSweepLine().getSegments(h);
+        scene.sweepLine.updateLine(sweepLine, false);
+        scene.sweepPoints.updatePoints(sweepLine, false);
+    }, [sweepObjectState]);
+
     useEffect(() => {
         const scene = sceneRef.current;
         if (sweepObjectMesh) {
@@ -125,11 +143,11 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
             const sweepLine = sweepObjectState.getSweepLine().getSegments(h);
             scene.sweepLine.updateLine(sweepLine);
             scene.sweepPoints.updatePoints(sweepLine);
-            
+
             // update controls, so that sweep line points are editable
             rendererRef.current?.controls.changeObjects(
                 sceneRef.current.sweepPoints.points
-            )
+            );
         }
     }, [sweepObjectMesh]);
 
