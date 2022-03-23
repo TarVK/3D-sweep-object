@@ -1,6 +1,7 @@
 import {Point3D} from "./Point3D";
 import {Vec2} from "./Vec2";
 import {Vec4} from "./Vec4";
+import * as THREE from "three";
 
 /** A 3d vector with immutable operations */
 export class Vec3 {
@@ -237,5 +238,9 @@ export class Vec3 {
     /** @override */
     public toString(): string {
         return `(${this.x}, ${this.y}, ${this.z})`;
+    }
+
+    public toThreeJsVector() {
+        return new THREE.Vector3(this.x, this.y, this.z);
     }
 }
