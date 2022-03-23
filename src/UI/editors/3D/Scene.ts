@@ -3,7 +3,7 @@ import {SweepObject} from "./SweepObject";
 import {CrossSection} from "./CrossSection";
 import {SweepLine} from "./SweepLine";
 import {IMateriable} from "./_types/IMateriable";
-import { SweepPoints } from "./SweepPoints";
+import {SweepPoints} from "./SweepPoints";
 
 export class Scene extends THREE.Scene {
     public sweepObject: SweepObject;
@@ -29,7 +29,12 @@ export class Scene extends THREE.Scene {
         this.crossSection = new CrossSection();
         this.sweepPoints = new SweepPoints();
 
-        this.objects.push(this.sweepObject, this.sweepLine, this.crossSection, this.sweepPoints);
+        this.objects.push(
+            this.sweepObject,
+            this.sweepLine,
+            this.crossSection,
+            this.sweepPoints
+        );
         this.add(this.sweepObject, this.sweepLine, this.crossSection, this.sweepPoints);
 
         this.addGrid(10000, 1000);

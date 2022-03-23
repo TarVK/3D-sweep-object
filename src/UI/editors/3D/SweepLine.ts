@@ -1,6 +1,6 @@
 import * as THREE from "three";
-import { BezierSegmentState } from "../../../state/BezierSegmentState";
-import { Vec3 } from "../../../util/Vec3";
+import {BezierSegmentState} from "../../../state/BezierSegmentState";
+import {Vec3} from "../../../util/Vec3";
 import {IMateriable} from "./_types/IMateriable";
 
 export class SweepLine extends THREE.Object3D implements IMateriable {
@@ -9,10 +9,15 @@ export class SweepLine extends THREE.Object3D implements IMateriable {
     readonly helperLineColor = 0x00cccc;
     protected lines: THREE.Line[] = [];
 
+    public constructor() {
+        super();
+        this.layers.set(1);
+    }
+
     public updateMaterial(material: THREE.Material): void {}
 
-    public updateLine(segments: BezierSegmentState<Vec3>[], updatePoints = true){
-        if(this.lines && this.lines.length>0){
+    public updateLine(segments: BezierSegmentState<Vec3>[], updatePoints = true) {
+        if (this.lines && this.lines.length > 0) {
             this.lines.forEach(line => this.remove(line));
             this.lines = [];
         }
@@ -29,32 +34,43 @@ export class SweepLine extends THREE.Object3D implements IMateriable {
                 endControl.toThreeJsVector(),
                 end.toThreeJsVector()
             );
-            const points = curve.getPoints( this.nrOfDivisions );
-            const geometry = new THREE.BufferGeometry().setFromPoints( points );
-            const material = new THREE.LineBasicMaterial( { color: this.lineColor } );
-            const curveLine = new THREE.Line( geometry, material );
+            const points = curve.getPoints(this.nrOfDivisions);
+            const geometry = new THREE.BufferGeometry().setFromPoints(points);
+            const material = new THREE.LineBasicMaterial({color: this.lineColor});
+            const curveLine = new THREE.Line(geometry, material);
+
+            curveLine.layers.set(1);
 
             this.add(curveLine);
-            this.lines.push(curveLine)
+            this.lines.push(curveLine);
 
+            const helperLine1 = this.createHelperLine(
+                start,
+                startControl,
+                this.helperLineColor
+            );
+            const helperLine2 = this.createHelperLine(
+                end,
+                endControl,
+                this.helperLineColor
+            );
 
-            const helperLine1 = this.createHelperLine(start, startControl, this.helperLineColor);
-            const helperLine2 = this.createHelperLine(end, endControl, this.helperLineColor);
-            
             this.add(helperLine1);
             this.lines.push(helperLine1);
-            
+
             this.add(helperLine2);
             this.lines.push(helperLine2);
         });
     }
 
-    private createHelperLine(start: Vec3, end: Vec3, color: number){
-        var geometry = new THREE.BufferGeometry();
+    private createHelperLine(start: Vec3, end: Vec3, color: number) {
+        const geometry = new THREE.BufferGeometry();
         const points = [start.x, start.y, start.z, end.x, end.y, end.z];
-        geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( points, 3 ) );
+        geometry.setAttribute("position", new THREE.Float32BufferAttribute(points, 3));
         geometry.setDrawRange(0, 2);
-        var material = new THREE.LineBasicMaterial( { color: color } );
-        return new THREE.Line( geometry,  material );
+        const material = new THREE.LineBasicMaterial({color: color});
+        const line = new THREE.Line(geometry, material);
+        line.layers.set(1);
+        return line;
     }
 }
