@@ -1,44 +1,9 @@
 import * as THREE from "three";
 import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
-import {DragControls} from "three/examples/jsm/controls/DragControls";
 import {TransformControls} from "three/examples/jsm/controls/TransformControls";
 
 type Camera = THREE.PerspectiveCamera | THREE.OrthographicCamera;
 type Modes = "add" | "delete" | "transform" | "move";
-
-//Thanks https://sbcode.net/threejs/multi-controls-example/#video-lecture
-export class OrbitDragControls {
-    public dragControls: DragControls;
-    public orbitControls: OrbitControls;
-
-    constructor(objects: THREE.Object3D[], camera: Camera, domElem: HTMLElement) {
-        this.dragControls = new DragControls(objects, camera, domElem);
-        this.orbitControls = new OrbitControls(camera, domElem);
-
-        this.dragControls.addEventListener("dragstart", event => {
-            this.orbitControls.enabled = false;
-            event.object.material.opacity = 0.33;
-            console.log(event);
-        });
-        this.dragControls.addEventListener("dragend", event => {
-            this.orbitControls.enabled = true;
-            event.object.material.opacity = 1;
-        });
-    }
-
-    public dispose() {
-        this.dragControls.dispose();
-        this.orbitControls.dispose();
-    }
-
-    public getTarget() {
-        return this.orbitControls.target;
-    }
-    public update() {
-        this.orbitControls.update();
-        // this.dragControls.update();
-    }
-}
 
 export class OrbitTransformControls {
     public transformControls: TransformControls;

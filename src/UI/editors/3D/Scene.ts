@@ -75,9 +75,6 @@ export class Scene extends THREE.Scene {
         directionalLight.position.set(0, 200, 100);
         directionalLight.castShadow = true;
         this.add(directionalLight);
-
-        // const directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight);
-        // this.add(directionalLightHelper);
     };
 
     public addHemiLight(skyColor = this.lightColor, groundColor = this.groundColor) {

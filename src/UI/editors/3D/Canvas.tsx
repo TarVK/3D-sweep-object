@@ -15,10 +15,13 @@ import {
 } from "@mui/icons-material";
 import {Menu} from "../Menu";
 import {useDataHook} from "model-react";
+import {OrbitTransformControls} from "./controllers/OrbitDragControls";
+import editSweepPoints from "./EditSweepPoints";
 
 export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
     const [h] = useDataHook();
     const rendererRef = useRef<Renderer | undefined>();
+    const controlsRef = useRef<OrbitTransformControls | undefined>();
     const sceneRef = useRefLazy<Scene>(() => new Scene());
     const elementRef = useRef<HTMLDivElement>(null);
 
@@ -38,7 +41,7 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
             icon: AddCircleOutlineSharp,
             hoverText: "Add point",
             iconOnClick: () => {
-                rendererRef.current!.controls.setMode("add");
+                controlsRef.current!.setMode("add");
                 scene.sweepPoints.visible = true;
                 scene.sweepLine.visible = true;
             },
@@ -47,7 +50,7 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
             icon: MouseOutlined,
             hoverText: "Select point",
             iconOnClick: () => {
-                rendererRef.current!.controls.setMode("transform");
+                controlsRef.current!.setMode("transform");
                 scene.sweepPoints.visible = true;
                 scene.sweepLine.visible = true;
             },
@@ -56,7 +59,7 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
             icon: ClearOutlined,
             hoverText: "Delete point",
             iconOnClick: () => {
-                rendererRef.current!.controls.setMode("delete");
+                controlsRef.current!.setMode("delete");
                 scene.sweepPoints.visible = true;
                 scene.sweepLine.visible = true;
             },
@@ -90,28 +93,47 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
 
     useEffect(() => {
         const cubeEl = cubeRef.current;
-        if (cubeEl) {
-            viewCubeRef.current = new ViewCube();
-            viewCubeRef.current.initScene(cubeEl);
-            viewCubeRef.current.attachRenderer(rendererRef);
-        }
-
         const el = elementRef.current;
-        if (el) {
+        if (el && cubeEl) {
+            viewCubeRef.current = new ViewCube(cubeEl);
+            viewCubeRef.current.attachRenderer(rendererRef);
+
             const renderer = (rendererRef.current = new Renderer(el, scene));
-            rendererRef.current.attachViewCube(viewCubeRef);
-            rendererRef.current.controls.onTransform(() => {
-                const segments = scene.sweepPoints.getPointsAsBezierSegments();
-                sweepObjectState.getSweepLine().setSegments(segments, true);
+            renderer.attachViewCube(viewCubeRef);
+            const controls = (controlsRef.current = new OrbitTransformControls(
+                scene,
+                scene.sweepPoints.points,
+                renderer.getCamera(),
+                renderer.getRendererDomElem()
+            ));
+            renderer.attachControls(controls);
+            controls.orbitControls.addEventListener("change", () => {
+                viewCubeRef.current!.setRotation(renderer.getRotation());
             });
-            rendererRef.current.controls.onAdd(point => {
-                const segments = scene.sweepPoints.edit.addPoint(point);
+            viewCubeRef.current!.setRotation(renderer.getRotation());
+
+            const {
+                getSweeplineAsBezierSegments: getBezierSegments,
+                addPointToSweepline: addPoint,
+                deletePointFromSweepline: deletePoint,
+            } = editSweepPoints(scene.sweepPoints);
+            controls.onTransform(() => {
+                const segments = getBezierSegments();
                 sweepObjectState.getSweepLine().setSegments(segments, true);
+                scene.sweepPoints.updatePoints(segments);
             });
-            rendererRef.current.controls.onDelete(point => {
-                const segments = scene.sweepPoints.edit.deletePoint(point);
+            controls.onAdd(pointVec => {
+                const segments = addPoint(pointVec);
                 sweepObjectState.getSweepLine().setSegments(segments, true);
+                scene.sweepPoints.updatePoints(segments, true);
             });
+            controls.onDelete(pointObj => {
+                // prettier-ignore
+                const segments = deletePoint(pointObj);
+                sweepObjectState.getSweepLine().setSegments(segments, true);
+                scene.sweepPoints.updatePoints(segments, true);
+            });
+
             return () => renderer.destroy();
         }
     }, []);
@@ -126,7 +148,7 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
             scene.sweepPoints.updatePoints(sweepLine);
 
             // update controls, so that sweep line points are editable
-            rendererRef.current?.controls.changeObjects(scene.sweepPoints.points);
+            controlsRef.current!.changeObjects(scene.sweepPoints.points);
         }
     }, [sweepObjectMesh]);
 

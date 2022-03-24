@@ -1,7 +1,6 @@
 import * as THREE from "three";
 import {BezierSegmentState} from "../../../state/BezierSegmentState";
 import {Vec3} from "../../../util/Vec3";
-import {EditSweepPoints} from "./EditSweepPoints";
 import {IMateriable} from "./_types/IMateriable";
 
 export class SweepPoints extends THREE.Object3D implements IMateriable {
@@ -9,12 +8,10 @@ export class SweepPoints extends THREE.Object3D implements IMateriable {
 
     public points: THREE.Mesh[] = [];
     readonly pointRadius = 0.7;
-    public edit: EditSweepPoints;
 
     public constructor(visible = true) {
         super();
         this.visible = visible;
-        this.edit = new EditSweepPoints(this);
     }
 
     public updatePoints(segments: BezierSegmentState<Vec3>[], force = false) {
@@ -69,25 +66,5 @@ export class SweepPoints extends THREE.Object3D implements IMateriable {
         const sphere = new THREE.Mesh(geometry, material);
         sphere.position.copy(position.toThreeJsVector());
         return sphere;
-    }
-
-    public getPointsAsBezierSegments() {
-        const segments: BezierSegmentState<Vec3>[] = [];
-        for (let i = 0; i < this.points.length - 1; i += 3) {
-            segments.push(
-                new BezierSegmentState<Vec3>(
-                    this.threeVectorToVec3(this.points[i].position),
-                    this.threeVectorToVec3(this.points[i + 1].position),
-                    this.threeVectorToVec3(this.points[i + 2].position),
-                    this.threeVectorToVec3(this.points[i + 3].position)
-                )
-            );
-        }
-
-        return segments;
-    }
-
-    private threeVectorToVec3(vec: THREE.Vector3) {
-        return new Vec3(vec.x, vec.y, vec.z);
     }
 }
