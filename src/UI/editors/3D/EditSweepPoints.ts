@@ -67,9 +67,8 @@ export default (sweepPointsContainer: {points: THREE.Object3D[]}) => {
             segments[0].getStart().toThreeJsVector()
         );
         const distToLastPoint = pointVec.distanceTo(
-            segments.at(-1)!.getStart().toThreeJsVector()
+            segments.at(-1)!.getEnd().toThreeJsVector()
         );
-
         if (distToFirstPoint <= min && distToFirstPoint < distToLastPoint) {
             // we are before the first point
 
