@@ -1,13 +1,10 @@
 import {Button, TextField} from "@mui/material";
 import {FC} from "react";
-import {sweepObjectToJSON} from "../../state/JSON/sweepObjectToJSON";
-import {IInputMenuProps} from "../_types/IInputMenuProps";
-import {ImportButton} from "./ImportButton";
+import { sweepObjectToJSON } from "../../state/JSON/sweepObjectToJSON";
+import { ExportModel } from "../editors/ExportModel";
+import { IInputMenuProps } from "../_types/IInputMenuProps";
 
-export const InputMenu: FC<IInputMenuProps> = ({
-    sweepObjectState,
-    onSweepObjectChange,
-}) => {
+export const InputMenu: FC<IInputMenuProps> = ({sweepObjectState, openExportModel, open, exportToFile, onSweepObjectChange}) => {
     return (
         <div
             css={{
@@ -21,9 +18,12 @@ export const InputMenu: FC<IInputMenuProps> = ({
             <h1>Logo</h1>
             <Button variant="contained" size="small">
                 Import model
-                <ImportButton onInput={onSweepObjectChange} />
             </Button>
-            <Button
+            <ExportModel open={open} exportToFile={exportToFile} />
+            {/* <Button variant="contained" size="small" onClick={() => openExportModel()}>
+                Export model
+            </Button> */}
+            {/* <Button
                 variant="contained"
                 size="small"
                 onClick={
@@ -35,7 +35,7 @@ export const InputMenu: FC<IInputMenuProps> = ({
                     }
                 }>
                 Export model
-            </Button>
+            </Button> */}
             <TextField
                 label="Intersections"
                 type="number"

@@ -3,6 +3,7 @@ import {MenuButton} from "./MenuButton";
 
 interface IMenuProps {
     items: Array<any>;
+    selectItem?: Function;
     position?: {
         top?: number;
         bottom?: number;
@@ -26,7 +27,7 @@ export const Menu: FC<{props: IMenuProps}> = ({props}) => {
                 ...props.position,
             }}>
             {props.items.map((item, index) => {
-                return <MenuButton props={item} key={index} />;
+                return <MenuButton props={{...item, selectItem: props.selectItem}} key={index}/>;
             })}
         </div>
     );

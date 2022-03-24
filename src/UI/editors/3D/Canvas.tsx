@@ -23,7 +23,7 @@ import {
 } from "three";
 import {useDataHook} from "model-react";
 
-export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
+export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...props}) => {
     const [h] = useDataHook();
     const sweepObjectRef = useRef(sweepObjectState);
     sweepObjectRef.current = sweepObjectState; // Keep a reference to the latest state
@@ -54,6 +54,9 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
         const segments = sceneRef.current.sweepPoints.getPointsAsBezierSegments();
         sweepObject.getSweepLine().setSegments(segments);
     }
+    useEffect(() => {
+        updateScene!(sceneRef);
+    }, [sceneRef]);
 
     // Just to simulate a button click (testing purposes)
     function addPoint() {

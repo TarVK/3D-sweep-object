@@ -1,5 +1,5 @@
 import {useDataHook} from "model-react";
-import {FC, useMemo} from "react";
+import {FC, useState} from "react";
 import {BezierSegmentState} from "../state/BezierSegmentState";
 import {CrossSectionState} from "../state/CrossSectionState";
 import {StraightSegmentState} from "../state/StraightSegmentState";
@@ -11,10 +11,18 @@ import {Canvas} from "./editors/3D/Canvas";
 import {useRefLazy} from "./hooks/useRefLazy";
 import {CrossSectionCanvas} from "./editors/CrossSectionCanvas";
 import {InputMenu} from "./header/InputMenu";
-import {useStateLazy} from "./hooks/useStateLazy";
+import {FileType} from "./editors/ExportModel";
+import {OBJExporter} from "../exporters/OBJExporter";
+import {IMesh} from "../sweepOperation/_types/IMesh";
+import {SweepObject} from "./editors/3D/SweepObject";
+import { STLExporter } from "../exporters/STLExporter";
+import { Scene } from "three";
+import { useStateLazy } from "./hooks/useStateLazy";
+import { sweepObjectToJSON } from "../state/JSON/sweepObjectToJSON";
 
 export const App: FC = () => {
     const [h] = useDataHook();
+    const [exportModelOpen, setExportModelOpen] = useState<boolean>(false);
     const [sweepObjectState, setSweepObjectState] = useStateLazy(() => {
         const crossSection1 = new CrossSectionState([
             new StraightSegmentState(new Vec2(-3, 0), new Vec2(3, -3)),
@@ -49,8 +57,50 @@ export const App: FC = () => {
             [crossSection1, crossSection2]
         );
     });
+    const [scene, setScene] = useState<Scene>();
+
+    const convertIMeshToThreeMesh = (iMesh: IMesh) => {
+        const sweepObj = new SweepObject();
+        sweepObj.updateMesh(iMesh);
+        return sweepObj.getMesh();
+    };
 
     const sweepObject = sweepObjectState;
+
+    const exportToFile = (fileType: FileType) => {
+        if (!sweepObjectState)
+            return;
+
+        if (fileType === FileType.OBJ) {
+            const mesh = convertIMeshToThreeMesh(sweepObjectState.getMesh()!);
+            const exporter = new OBJExporter();
+            const exportedString = exporter.parse(mesh);
+            download(exportedString, "3DSweepObject.obj", "obj");
+        } else if (fileType === FileType.STL) {
+            const exporter = new STLExporter();
+            const exportedString = exporter.parse((scene as any).current!, {});
+            download(exportedString, "3DSweepObject.stl", "stl");
+        } else if (fileType === FileType.JSON) {
+            const json = sweepObjectToJSON(sweepObjectState);
+            const jsonSting = JSON.stringify(json, null, 4);
+            download(jsonSting, "3DSweepObject.json", "json");
+        }
+    };
+
+    const download = (data: string, filename: string, type: string) => {
+        const file = new Blob([data], {type: type});
+
+        const a = document.createElement("a"),
+            url = URL.createObjectURL(file);
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function () {
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }, 0);
+    }
 
     return (
         <div
@@ -69,6 +119,8 @@ export const App: FC = () => {
                 <InputMenu
                     sweepObjectState={sweepObject}
                     onSweepObjectChange={setSweepObjectState}
+                    openExportModel={() => setExportModelOpen(true)}
+                    open exportToFile={exportToFile}
                 />
             </div>
             <div
@@ -81,16 +133,17 @@ export const App: FC = () => {
                 <Canvas
                     css={{
                         minHeight: 450,
-                        maxWidth: 700,
+                        maxWidth: "45%",
                         margin: "auto auto",
                         flex: 1,
                     }}
                     sweepObjectState={sweepObject}
+                    updateScene={(sceneRef: Scene) => setScene(sceneRef)}
                 />
                 <CrossSectionCanvas
                     css={{
                         height: 450,
-                        maxWidth: 700,
+                        maxWidth: "45%",
                         margin: "auto auto",
                         flex: 1,
                         backgroundColor: "white",
