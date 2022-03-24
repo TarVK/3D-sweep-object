@@ -36,7 +36,7 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
     const cubeRef = useRef<HTMLDivElement>(null);
     const cubeSize = 100; //px
 
-    const [selectedPoint] = useState({x: 100, y: 211, z: 5});
+    const [selectedObj, setSelectedObj] = useState();
 
     function toggleMeshDisplaying() {
         const scene = sceneRef.current;
@@ -54,9 +54,61 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
         const segments = sceneRef.current.sweepPoints.getPointsAsBezierSegments();
         sweepObject.getSweepLine().setSegments(segments);
     }
+
     useEffect(() => {
         updateScene!(sceneRef);
     }, [sceneRef]);
+
+    useEffect(() => {
+        setSelectedObj(rendererRef.current?.controls.currObj as any);
+    }, [rendererRef.current?.controls.currObj]);
+
+
+    useEffect(() => {
+        const cubeEl = cubeRef.current;
+        if (cubeEl) {
+            viewCubeRef.current = new ViewCube();
+            viewCubeRef.current.initScene(cubeEl);
+            viewCubeRef.current.attachRenderer(rendererRef);
+        }
+
+        const el = elementRef.current;
+        if (el) {
+            const renderer = (rendererRef.current = new Renderer(el, sceneRef.current));
+            rendererRef.current.attachViewCube(viewCubeRef);
+            rendererRef.current.controls.onTransform(updateSweepLine);
+            return () => renderer.destroy();
+        }
+    }, []);
+
+    const sweepObjectMesh = sweepObjectState.getMesh(h);
+
+    useEffect(() => {
+        const scene = sceneRef.current;
+        const sweepLine = sweepObjectState.getSweepLine().getSegments(h);
+        scene.sweepLine.updateLine(sweepLine, false);
+        scene.sweepPoints.updatePoints(sweepLine, false);
+    }, [sweepObjectState]);
+
+    useEffect(() => {
+        console.log("li")
+        const scene = sceneRef.current;
+        if (sweepObjectMesh) {
+            scene.sweepObject.updateMesh(sweepObjectMesh);
+            const sweepLine = sweepObjectState.getSweepLine().getSegments(h);
+            scene.sweepLine.updateLine(sweepLine);
+            scene.sweepPoints.updatePoints(sweepLine);
+
+            // update controls, so that sweep line points are editable
+            rendererRef.current?.controls.changeObjects(
+                sceneRef.current.sweepPoints.points
+            );
+        }
+    }, [sweepObjectMesh, rendererRef.current?.controls.currObj?.position]);
+
+    const setCurrentPointToUndefined = () => {
+        rendererRef.current!.controls.currObj = undefined;
+    }
 
     // Just to simulate a button click (testing purposes)
     function addPoint() {
@@ -113,47 +165,6 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
         },
     ];
 
-    useEffect(() => {
-        const cubeEl = cubeRef.current;
-        if (cubeEl) {
-            viewCubeRef.current = new ViewCube();
-            viewCubeRef.current.initScene(cubeEl);
-            viewCubeRef.current.attachRenderer(rendererRef);
-        }
-
-        const el = elementRef.current;
-        if (el) {
-            const renderer = (rendererRef.current = new Renderer(el, sceneRef.current));
-            rendererRef.current.attachViewCube(viewCubeRef);
-            rendererRef.current.controls.onTransform(updateSweepLine);
-            return () => renderer.destroy();
-        }
-    }, []);
-
-    const sweepObjectMesh = sweepObjectState.getMesh(h);
-
-    useEffect(() => {
-        const scene = sceneRef.current;
-        const sweepLine = sweepObjectState.getSweepLine().getSegments(h);
-        scene.sweepLine.updateLine(sweepLine, false);
-        scene.sweepPoints.updatePoints(sweepLine, false);
-    }, [sweepObjectState]);
-
-    useEffect(() => {
-        const scene = sceneRef.current;
-        if (sweepObjectMesh) {
-            scene.sweepObject.updateMesh(sweepObjectMesh);
-            const sweepLine = sweepObjectState.getSweepLine().getSegments(h);
-            scene.sweepLine.updateLine(sweepLine);
-            scene.sweepPoints.updatePoints(sweepLine);
-
-            // update controls, so that sweep line points are editable
-            rendererRef.current?.controls.changeObjects(
-                sceneRef.current.sweepPoints.points
-            );
-        }
-    }, [sweepObjectMesh]);
-
     // this div decides the size of the canvas
     return (
         <div
@@ -166,7 +177,7 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
             }}>
             <Menu props={{items: pointMenuItems, position: {top: 0, left: 0}}} />
             <Menu props={{items: cameraMenuItems, position: {top: 0, right: 0}}} />
-            {selectedPoint ? <SelectedPoint props={selectedPoint} /> : null}
+            {selectedObj ? <SelectedPoint point={selectedObj} /> : null}
             <div
                 ref={cubeRef}
                 {...props}
