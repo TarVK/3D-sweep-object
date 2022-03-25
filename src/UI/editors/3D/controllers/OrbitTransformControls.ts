@@ -33,6 +33,7 @@ export class OrbitTransformControls {
     ) {
         this.orbitControls = new OrbitControls(camera, domElem);
         this.raycaster = new THREE.Raycaster();
+        this.raycaster.layers.set(1);
         this.objects = objects;
         this.scene = scene;
         this.camera = camera;

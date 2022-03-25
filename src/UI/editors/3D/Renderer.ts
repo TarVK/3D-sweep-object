@@ -32,6 +32,9 @@ export class Renderer {
         this.renderer = new THREE.WebGLRenderer({antialias: true});
         this.renderer.shadowMap.enabled = true;
         this.renderer.setSize(this.width, this.height);
+        this.renderer.autoClear = false;
+        this.renderer.autoClearColor = false;
+
         target.appendChild(this.renderer.domElement);
 
         this.setPerspectiveCamera();
@@ -110,7 +113,14 @@ export class Renderer {
 
     private animate = () => {
         if (!this.destroyed) requestAnimationFrame(this.animate);
-        this.renderer?.render(this.scene, this.camera);
+        this.renderer.clear();
+        this.renderer.clearColor();
+
+        this.camera.layers.set(0);
+        this.renderer.render(this.scene, this.camera);
+
+        this.camera.layers.set(1);
+        this.renderer.render(this.scene, this.camera);
     };
 
     public destroy() {

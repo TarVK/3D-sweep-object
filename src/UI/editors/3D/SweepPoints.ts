@@ -12,6 +12,7 @@ export class SweepPoints extends THREE.Object3D implements IMateriable {
     public constructor(visible = true) {
         super();
         this.visible = visible;
+        this.layers.set(1);
     }
 
     public updatePoints(segments: BezierSegmentState<Vec3>[], force = false) {
@@ -52,19 +53,12 @@ export class SweepPoints extends THREE.Object3D implements IMateriable {
         }
     }
 
-    private createSphere(
-        radius: number,
-        position: Vec3,
-        color = 0x000000,
-        depthTest = true
-    ) {
+    private createSphere(radius: number, position: Vec3, color = 0x000000) {
         const geometry = new THREE.SphereGeometry(radius, 32, 32);
-        const material = new THREE.MeshBasicMaterial({
-            color: color,
-            depthTest: depthTest,
-        });
+        const material = new THREE.MeshBasicMaterial({color: color});
         const sphere = new THREE.Mesh(geometry, material);
         sphere.position.copy(position.toThreeJsVector());
+        sphere.layers.set(1);
         return sphere;
     }
 }

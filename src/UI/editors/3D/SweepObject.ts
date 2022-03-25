@@ -37,4 +37,8 @@ export class SweepObject extends THREE.Object3D implements IMateriable {
     }
 
     public updateMaterial(material: THREE.Material): void {}
+
+    public getMesh(): THREE.Mesh {
+        return this.mesh;
+    }
 }

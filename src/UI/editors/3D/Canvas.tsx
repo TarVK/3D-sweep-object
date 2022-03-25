@@ -18,8 +18,11 @@ import {useDataHook} from "model-react";
 import {OrbitTransformControls} from "./controllers/OrbitTransformControls";
 import editSweepPoints from "./EditSweepPoints";
 
-export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
+export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...props}) => {
     const [h] = useDataHook();
+    const sweepObjectRef = useRef(sweepObjectState);
+    sweepObjectRef.current = sweepObjectState; // Keep a reference to the latest state
+
     const rendererRef = useRef<Renderer | undefined>();
     const controlsRef = useRef<OrbitTransformControls | undefined>();
     const sceneRef = useRefLazy<Scene>(() => new Scene());
@@ -35,6 +38,10 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
     function toggleMeshDisplaying() {
         scene.sweepObject.visible = !scene.sweepObject.visible;
     }
+
+    useEffect(() => {
+        updateScene!(sceneRef);
+    }, [sceneRef]);
 
     const pointMenuItems = [
         {

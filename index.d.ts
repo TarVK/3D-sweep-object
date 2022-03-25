@@ -1,1 +1,1 @@
-declare module "react-360-view";
+declare module "three/examples/js/exporters/OBJExporter";
