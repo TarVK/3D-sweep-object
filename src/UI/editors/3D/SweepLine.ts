@@ -9,14 +9,15 @@ export class SweepLine extends THREE.Object3D implements IMateriable {
     readonly helperLineColor = 0x00cccc;
     protected lines: THREE.Line[] = [];
 
-    public constructor() {
+    public constructor(visible = true) {
         super();
+        this.visible = visible;
         this.layers.set(1);
     }
 
     public updateMaterial(material: THREE.Material): void {}
 
-    public updateLine(segments: BezierSegmentState<Vec3>[], updatePoints = true) {
+    public updateLine(segments: BezierSegmentState<Vec3>[]) {
         if (this.lines && this.lines.length > 0) {
             this.lines.forEach(line => this.remove(line));
             this.lines = [];

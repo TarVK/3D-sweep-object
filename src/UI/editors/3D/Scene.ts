@@ -25,9 +25,9 @@ export class Scene extends THREE.Scene {
         this.addGround(this.groundColor);
 
         this.sweepObject = new SweepObject();
-        this.sweepLine = new SweepLine();
         this.crossSection = new CrossSection();
-        this.sweepPoints = new SweepPoints();
+        this.sweepLine = new SweepLine(true);
+        this.sweepPoints = new SweepPoints(true);
 
         this.objects.push(
             this.sweepObject,
@@ -75,9 +75,6 @@ export class Scene extends THREE.Scene {
         directionalLight.position.set(0, 200, 100);
         directionalLight.castShadow = true;
         this.add(directionalLight);
-
-        // const directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight);
-        // this.add(directionalLightHelper);
     };
 
     public addHemiLight(skyColor = this.lightColor, groundColor = this.groundColor) {

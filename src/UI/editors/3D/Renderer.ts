@@ -1,6 +1,6 @@
 import {MutableRefObject} from "react";
 import * as THREE from "three";
-import {OrbitDragControls, OrbitTransformControls} from "./controllers/OrbitDragControls";
+import {OrbitTransformControls} from "./controllers/OrbitTransformControls";
 import {ViewCube} from "./ViewCube/ViewCube";
 
 export class Renderer {
@@ -10,7 +10,7 @@ export class Renderer {
     protected renderer: THREE.WebGLRenderer;
 
     protected camera: THREE.PerspectiveCamera | THREE.OrthographicCamera;
-    public controls: OrbitTransformControls;
+    public controls: OrbitTransformControls | undefined;
 
     protected width: number;
     protected height: number;
@@ -38,7 +38,6 @@ export class Renderer {
         target.appendChild(this.renderer.domElement);
 
         this.setPerspectiveCamera();
-        this.setOrbitControls();
         this.resetCameraPosition();
 
         this.animate();
@@ -108,9 +107,8 @@ export class Renderer {
         }
         this.camera = camera;
         this.camera.updateProjectionMatrix();
-        if (this.controls) {
-            this.controls.changeCamera(this.camera);
-        }
+
+        this.controls?.changeCamera(this.camera);
     }
 
     private animate = () => {
@@ -123,19 +121,6 @@ export class Renderer {
 
         this.camera.layers.set(1);
         this.renderer.render(this.scene, this.camera);
-    };
-
-    private setOrbitControls = () => {
-        if (this.controls) this.controls.dispose();
-        this.controls = new OrbitTransformControls(
-            this.scene,
-            [],
-            this.camera,
-            this.renderer.domElement
-        );
-        this.controls.orbitControls.addEventListener("change", () => {
-            this.viewCube?.current!.setRotation(this.getRotation());
-        });
     };
 
     public destroy() {
@@ -155,12 +140,14 @@ export class Renderer {
     }
 
     public setRotation(matrix: THREE.Matrix4) {
-        const fwd = new THREE.Vector3(0, 0, -1);
-        fwd.applyMatrix4(matrix).normalize();
-        const dist = 30;
-        const offset = fwd.multiplyScalar(dist);
-        this.camera.position.copy(this.controls.getTarget()).sub(offset);
-        this.controls.update();
+        if (this.controls) {
+            const fwd = new THREE.Vector3(0, 0, -1);
+            fwd.applyMatrix4(matrix).normalize();
+            const dist = 30;
+            const offset = fwd.multiplyScalar(dist);
+            this.camera.position.copy(this.controls.getTarget()).sub(offset);
+            this.controls.update();
+        }
     }
 
     public getRotation() {
@@ -174,5 +161,17 @@ export class Renderer {
         } else {
             this.setPerspectiveCamera();
         }
+    }
+
+    public getCamera() {
+        return this.camera;
+    }
+
+    public getRendererDomElem() {
+        return this.renderer.domElement;
+    }
+
+    public attachControls(controls: OrbitTransformControls) {
+        this.controls = controls;
     }
 }

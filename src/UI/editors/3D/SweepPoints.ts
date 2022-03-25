@@ -7,16 +7,21 @@ export class SweepPoints extends THREE.Object3D implements IMateriable {
     public updateMaterial(material: THREE.Material): void {}
 
     public points: THREE.Mesh[] = [];
-    readonly pointRadius = 0.5;
+    readonly pointRadius = 0.7;
 
-    public updatePoints(segments: BezierSegmentState<Vec3>[], initialize = true) {
-        if (initialize && this.points.length != 0) return;
+    public constructor(visible = true) {
+        super();
+        this.visible = visible;
+        this.layers.set(1);
+    }
+
+    public updatePoints(segments: BezierSegmentState<Vec3>[], force = false) {
+        if (!force && this.points.length != 0) return;
 
         if (this.points && this.points.length > 0) {
             this.points.forEach(point => this.remove(point));
             this.points = [];
         }
-        this.visible = true;
         segments.forEach(segment => {
             const startPoint = this.createSphere(
                 this.pointRadius,
@@ -55,25 +60,5 @@ export class SweepPoints extends THREE.Object3D implements IMateriable {
         sphere.position.copy(position.toThreeJsVector());
         sphere.layers.set(1);
         return sphere;
-    }
-
-    public getPointsAsBezierSegments() {
-        const segments: BezierSegmentState<Vec3>[] = [];
-        for (let i = 0; i < this.points.length - 1; i += 3) {
-            segments.push(
-                new BezierSegmentState<Vec3>(
-                    this.threeVectorToVec3(this.points[i].position),
-                    this.threeVectorToVec3(this.points[i + 1].position),
-                    this.threeVectorToVec3(this.points[i + 2].position),
-                    this.threeVectorToVec3(this.points[i + 3].position)
-                )
-            );
-        }
-
-        return segments;
-    }
-
-    private threeVectorToVec3(vec: THREE.Vector3) {
-        return new Vec3(vec.x, vec.y, vec.z);
     }
 }
