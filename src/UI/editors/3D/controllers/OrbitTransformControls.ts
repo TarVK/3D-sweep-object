@@ -5,6 +5,7 @@ import {TransformControls} from "three/examples/jsm/controls/TransformControls";
 type Camera = THREE.PerspectiveCamera | THREE.OrthographicCamera;
 type Modes = "add" | "delete" | "transform" | "move";
 
+//Thanks https://sbcode.net/threejs/multi-controls-example/#video-lecture
 export class OrbitTransformControls {
     public transformControls: TransformControls;
     public orbitControls: OrbitControls;

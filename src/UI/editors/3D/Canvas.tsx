@@ -15,7 +15,7 @@ import {
 } from "@mui/icons-material";
 import {Menu} from "../Menu";
 import {useDataHook} from "model-react";
-import {OrbitTransformControls} from "./controllers/OrbitDragControls";
+import {OrbitTransformControls} from "./controllers/OrbitTransformControls";
 import editSweepPoints from "./EditSweepPoints";
 
 export const Canvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {

@@ -1,6 +1,6 @@
 import {MutableRefObject} from "react";
 import * as THREE from "three";
-import {OrbitTransformControls} from "./controllers/OrbitDragControls";
+import {OrbitTransformControls} from "./controllers/OrbitTransformControls";
 import {ViewCube} from "./ViewCube/ViewCube";
 
 export class Renderer {
