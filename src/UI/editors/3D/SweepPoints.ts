@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import {BezierSegmentState} from "../../../state/BezierSegmentState";
 import {Vec3} from "../../../util/Vec3";
+import {colors} from "./ColorSchema";
 import {IMateriable} from "./_types/IMateriable";
 
 export class SweepPoints extends THREE.Object3D implements IMateriable {
@@ -26,17 +27,17 @@ export class SweepPoints extends THREE.Object3D implements IMateriable {
             const startPoint = this.createSphere(
                 this.pointRadius,
                 segment.getStart(),
-                0x00ff00
+                colors.SWEEP_POINT
             );
             const startControlPoint = this.createSphere(
                 this.pointRadius,
                 segment.getStartControl(),
-                0x00ff00
+                colors.SWEEP_POINT
             );
             const endControlPoint = this.createSphere(
                 this.pointRadius,
                 segment.getEndControl(),
-                0x00ff00
+                colors.SWEEP_POINT
             );
             this.add(startPoint, startControlPoint, endControlPoint);
             this.points.push(startPoint, startControlPoint, endControlPoint);
@@ -46,14 +47,14 @@ export class SweepPoints extends THREE.Object3D implements IMateriable {
             const endPoint = this.createSphere(
                 this.pointRadius,
                 lastSegment.getEnd(),
-                0x00ff00
+                colors.SWEEP_POINT
             );
             this.add(endPoint);
             this.points.push(endPoint);
         }
     }
 
-    private createSphere(radius: number, position: Vec3, color = 0x000000) {
+    private createSphere(radius: number, position: Vec3, color: number) {
         const geometry = new THREE.SphereGeometry(radius, 32, 32);
         const material = new THREE.MeshBasicMaterial({color: color});
         const sphere = new THREE.Mesh(geometry, material);

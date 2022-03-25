@@ -4,6 +4,7 @@ import {CrossSection} from "./CrossSection";
 import {SweepLine} from "./SweepLine";
 import {IMateriable} from "./_types/IMateriable";
 import {SweepPoints} from "./SweepPoints";
+import {colors} from "./ColorSchema";
 
 export class Scene extends THREE.Scene {
     public sweepObject: SweepObject;
@@ -12,17 +13,13 @@ export class Scene extends THREE.Scene {
     public sweepPoints: SweepPoints;
     public objects: IMateriable[] = [];
 
-    readonly bgColor = 0xa0a0a0;
-    readonly lightColor = 0xffffff;
-    readonly groundColor = 0x999999;
-
     public constructor() {
         super();
-        this.addBackground(this.bgColor);
-        this.addFog(this.bgColor, 100, 300);
-        this.addDirectionalLight(this.lightColor);
-        this.addHemiLight(this.lightColor, this.groundColor);
-        this.addGround(this.groundColor);
+        this.addBackground(colors.BACKGROUND);
+        this.addFog(colors.BACKGROUND, 100, 300);
+        this.addDirectionalLight(colors.LIGHT);
+        this.addHemiLight(colors.LIGHT, colors.GROUND);
+        this.addGround(colors.GROUND);
 
         this.sweepObject = new SweepObject();
         this.crossSection = new CrossSection();
@@ -52,7 +49,7 @@ export class Scene extends THREE.Scene {
         this.add(new THREE.AxesHelper(5));
     };
 
-    public addGround = (color = this.groundColor) => {
+    public addGround = (color: number) => {
         const ground = new THREE.Mesh(
             new THREE.PlaneGeometry(2000, 2000),
             new THREE.MeshPhongMaterial({color: color, depthWrite: false})
@@ -62,22 +59,22 @@ export class Scene extends THREE.Scene {
         this.add(ground);
     };
 
-    public addBackground(color = this.bgColor) {
+    public addBackground(color: number) {
         this.background = new THREE.Color(color);
     }
 
-    public addFog(color = this.bgColor, near = 10, far = 100) {
+    public addFog(color: number, near = 10, far = 100) {
         this.fog = new THREE.Fog(color, near, far);
     }
 
-    public addDirectionalLight = (color = this.lightColor) => {
+    public addDirectionalLight = (color: number) => {
         const directionalLight = new THREE.DirectionalLight(color);
         directionalLight.position.set(0, 200, 100);
         directionalLight.castShadow = true;
         this.add(directionalLight);
     };
 
-    public addHemiLight(skyColor = this.lightColor, groundColor = this.groundColor) {
+    public addHemiLight(skyColor: number, groundColor: number) {
         const hemiLight = new THREE.HemisphereLight(skyColor, groundColor);
         hemiLight.position.set(0, 200, 0);
         this.add(hemiLight);

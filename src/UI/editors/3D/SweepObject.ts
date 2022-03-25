@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import {IMesh} from "../../../sweepOperation/_types/IMesh";
+import {colors} from "./ColorSchema";
 import {IMateriable} from "./_types/IMateriable";
 
 export class SweepObject extends THREE.Object3D implements IMateriable {
@@ -18,12 +19,10 @@ export class SweepObject extends THREE.Object3D implements IMateriable {
                 3
             )
         );
-        geometry.setIndex(
-            newMesh.faces.flat()
-        );
+        geometry.setIndex(newMesh.faces.flat());
         geometry.computeVertexNormals();
         const material = new THREE.MeshPhongMaterial({
-            color: 0xff0000,
+            color: colors.SWEEP_OBJECT,
             // wireframe: true,
             // side: THREE.DoubleSide,
         });

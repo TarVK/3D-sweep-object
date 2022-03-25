@@ -1,12 +1,12 @@
 import * as THREE from "three";
 import {BezierSegmentState} from "../../../state/BezierSegmentState";
 import {Vec3} from "../../../util/Vec3";
+import {colors} from "./ColorSchema";
 import {IMateriable} from "./_types/IMateriable";
 
 export class SweepLine extends THREE.Object3D implements IMateriable {
     readonly nrOfDivisions = 50;
-    readonly lineColor = 0x000000;
-    readonly helperLineColor = 0x00cccc;
+
     protected lines: THREE.Line[] = [];
 
     public constructor(visible = true) {
@@ -37,7 +37,7 @@ export class SweepLine extends THREE.Object3D implements IMateriable {
             );
             const points = curve.getPoints(this.nrOfDivisions);
             const geometry = new THREE.BufferGeometry().setFromPoints(points);
-            const material = new THREE.LineBasicMaterial({color: this.lineColor});
+            const material = new THREE.LineBasicMaterial({color: colors.SWEEP_LINE});
             const curveLine = new THREE.Line(geometry, material);
 
             curveLine.layers.set(1);
@@ -45,15 +45,15 @@ export class SweepLine extends THREE.Object3D implements IMateriable {
             this.add(curveLine);
             this.lines.push(curveLine);
 
-            const helperLine1 = this.createHelperLine(
+            const helperLine1 = this.createStraightLine(
                 start,
                 startControl,
-                this.helperLineColor
+                colors.SWEEP_LINE_HELPER
             );
-            const helperLine2 = this.createHelperLine(
+            const helperLine2 = this.createStraightLine(
                 end,
                 endControl,
-                this.helperLineColor
+                colors.SWEEP_LINE_HELPER
             );
 
             this.add(helperLine1);
@@ -64,7 +64,7 @@ export class SweepLine extends THREE.Object3D implements IMateriable {
         });
     }
 
-    private createHelperLine(start: Vec3, end: Vec3, color: number) {
+    private createStraightLine(start: Vec3, end: Vec3, color: number) {
         const geometry = new THREE.BufferGeometry();
         const points = [start.x, start.y, start.z, end.x, end.y, end.z];
         geometry.setAttribute("position", new THREE.Float32BufferAttribute(points, 3));

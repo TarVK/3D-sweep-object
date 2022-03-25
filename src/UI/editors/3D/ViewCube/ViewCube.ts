@@ -2,6 +2,7 @@ import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 import * as THREE from "three";
 import {MutableRefObject} from "react";
 import {Renderer} from "../Renderer";
+import {colors} from "../ColorSchema";
 
 export class ViewCube {
     private camera: THREE.PerspectiveCamera;
@@ -43,7 +44,7 @@ export class ViewCube {
         const materials = this.cubeFaces.map(
             t =>
                 new THREE.MeshBasicMaterial({
-                    color: 0xeeeeee,
+                    color: colors.VIEWCUBE,
                     side: THREE.DoubleSide,
                     map: this.getTextTexture(t),
                 })
@@ -52,7 +53,10 @@ export class ViewCube {
         this.scene.add(this.cube);
 
         const geo = new THREE.EdgesGeometry(this.cube.geometry);
-        const mat = new THREE.LineBasicMaterial({color: 0x000000, linewidth: 4});
+        const mat = new THREE.LineBasicMaterial({
+            color: colors.VIEWCUBE_OUTLINE,
+            linewidth: 4,
+        });
         const cubeEdges = new THREE.LineSegments(geo, mat);
         cubeEdges.renderOrder = 1;
         this.scene.add(cubeEdges);
@@ -177,16 +181,16 @@ export class ViewCube {
             ) {
                 //@ts-ignore
                 intersects[0].object.material[this.activeFaceIndex].color.setHex(
-                    0xeeeeee
+                    colors.VIEWCUBE
                 );
             }
             this.activeFaceIndex = intersects[0].face!.materialIndex;
             //@ts-ignore
-            this.cube.material[this.activeFaceIndex].color.setHex(0xaaaaaa);
+            this.cube.material[this.activeFaceIndex].color.setHex(colors.VIEWCUBE_HOVER);
         } else {
             if (this.activeFaceIndex !== -1) {
                 //@ts-ignore
-                this.cube.material[this.activeFaceIndex].color.setHex(0xeeeeee);
+                this.cube.material[this.activeFaceIndex].color.setHex(colors.VIEWCUBE);
             }
             this.activeFaceIndex = -1;
         }
