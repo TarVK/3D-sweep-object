@@ -1,8 +1,9 @@
 import {AddBox, IndeterminateCheckBox} from "@mui/icons-material";
 import {Button} from "@mui/material";
 import {useDataHook} from "model-react";
-import {FC, useCallback} from "react";
+import {FC, useCallback, useState} from "react";
 import {CrossSectionState} from "../../state/CrossSectionState";
+import {CustomSvg} from "../CustomSvg";
 import {useCrossSectionEditorState} from "./crossSections/CrossSectionEditorStateContext";
 
 export const CrossSectionsMenu: FC = () => {
@@ -59,6 +60,8 @@ export const CrossSectionsMenu: FC = () => {
                 margin: "10px",
                 borderRadius: "4px",
                 minWidth: "100px",
+                maxWidth: "100px",
+                maxHeight: "140px",
                 padding: "5px",
                 color: "#145DA0",
             }}>
@@ -66,26 +69,26 @@ export const CrossSectionsMenu: FC = () => {
                 className="cross-sections"
                 css={{
                     display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "flex-start",
+                    flexWrap: "wrap",
+                    justifyContent: "space-around",
+                    maxHeight: "110px",
+                    minHeight: "110px",
                     overflowY: "auto",
-                    minHeight: "90px",
+                    scrollbarWidth: "none",
+                    borderBottom: "2px dashed #145DA0",
                 }}>
                 {crossSections.map((crossSection, index) => (
-                    <div
+                    <CustomSvg
                         key={index}
-                        css={{cursor: "pointer"}}
-                        onClick={() => editorState.selectCrossSection(index)}>
-                        <h4
-                            css={{
-                                margin: "5px",
-                                // TODO: add proper styling/differentiation
-                                fontWeight:
-                                    crossSection == selectedCrossSection ? 800 : 100,
-                            }}>
-                            cross section {index + 1}
-                        </h4>
-                    </div>
+                        backgroundColor={
+                            selectedCrossSection === crossSection ? "#145DA0" : "#B1D4E0"
+                        }
+                        strokeColor={
+                            selectedCrossSection === crossSection ? "#FFF" : "#145DA0"
+                        }
+                        crossSection={crossSection}
+                        onClick={() => editorState.selectCrossSection(index)}
+                    />
                 ))}
             </div>
             <div

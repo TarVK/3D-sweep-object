@@ -22,7 +22,7 @@ export const CrossSectionCanvas: FC<ICanvasProps> = ({sweepObjectState, ...props
             id: 0,
             icon: AddCircleOutlineSharp,
             hoverText: "Add point",
-            isSelected: false,
+            isSelected: true,
             iconOnClick: () => editorState.selectTool("add"),
         },
         {

@@ -134,4 +134,6 @@ export type ISegment<D extends Vec2 | Vec3> = {
      * @returns The approximate distance to this curve
      */
     getDistance(point: D): number;
+
+    getBoundingBox(): {minX: number, minY: number, maxX: number, maxY: number};
 };

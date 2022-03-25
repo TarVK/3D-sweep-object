@@ -22,6 +22,7 @@ import {
     Vector3,
 } from "three";
 import {useDataHook} from "model-react";
+import { Vec3 } from "../../../util/Vec3";
 
 export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...props}) => {
     const [h] = useDataHook();
@@ -106,8 +107,8 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
         }
     }, [sweepObjectMesh, rendererRef.current?.controls.currObj?.position]);
 
-    const setCurrentPointToUndefined = () => {
-        rendererRef.current!.controls.currObj = undefined;
+    const triggerUpdate = () => {
+        rendererRef.current?.controls.transformEvents.forEach(cb => cb());
     }
 
     // Just to simulate a button click (testing purposes)
@@ -177,7 +178,7 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
             }}>
             <Menu props={{items: pointMenuItems, position: {top: 0, left: 0}}} />
             <Menu props={{items: cameraMenuItems, position: {top: 0, right: 0}}} />
-            {selectedObj ? <SelectedPoint point={selectedObj} /> : null}
+            {selectedObj ? <SelectedPoint triggerUpdate={triggerUpdate} point={selectedObj} /> : null}
             <div
                 ref={cubeRef}
                 {...props}

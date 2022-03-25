@@ -49,7 +49,7 @@ export class OrbitTransformControls {
     public domElem: HTMLElement;
 
     private transformEnabled = true;
-    private transformEvents: Function[] = [];
+    public transformEvents: Function[] = [];
 
     public currObj: THREE.Object3D | undefined;
 

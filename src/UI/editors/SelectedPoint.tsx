@@ -1,9 +1,11 @@
-import {Input} from "@mui/material";
+import {HelpOutline, HelpOutlined} from "@mui/icons-material";
+import {Input, Tooltip} from "@mui/material";
 import {FC, useEffect, useState} from "react";
 import {Object3D} from "three";
 
 interface SelectedPointProps {
     point: Object3D;
+    triggerUpdate: Function;
 }
 
 export const SelectedPoint: FC<SelectedPointProps> = props => {
@@ -28,19 +30,20 @@ export const SelectedPoint: FC<SelectedPointProps> = props => {
     }, [props.point.position.z]);
 
     const enterXValue = (event: any) => {
-        // setLocalX(event.target.value);
-        // props.point.position.setX(event.target.value);
         props.point.position.set(event.target.value, localY, localZ);
         setLocalX(props.point.position.x);
+        props.triggerUpdate();
     };
 
     const enterYValue = (event: any) => {
         props.point.position.set(localX, event.target.value, localZ);
+        props.triggerUpdate();
         setLocalY(event.target.value);
     };
 
     const enterZValue = (event: any) => {
         props.point.position.set(localX, localY, event.target.value);
+        props.triggerUpdate();
         setLocalZ(event.target.value);
     };
 
@@ -51,6 +54,7 @@ export const SelectedPoint: FC<SelectedPointProps> = props => {
                 flexDirection: "column",
                 justifyContent: "space-around",
                 minWidth: "140px",
+                maxWidth: "140px",
                 maxHeight: "160px",
                 position: "absolute",
                 bottom: "0px",
@@ -61,12 +65,24 @@ export const SelectedPoint: FC<SelectedPointProps> = props => {
                 color: "#145DA0",
                 padding: "5px",
             }}>
-            <h3
+            <div
                 css={{
-                    margin: "0px 5px 5px",
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-around",
+                    alignItems: "center",
                 }}>
-                Selected point
-            </h3>
+                <h4
+                    css={{
+                        margin: "0",
+                    }}>
+                    Selected point
+                </h4>{" "}
+                <Tooltip title="Double click on value to update.">
+                    <HelpOutline sx={{transform: "scale(0.7)", opacity: .7}} />
+                </Tooltip>
+            </div>
+
             <div
                 className="coordinates"
                 css={{
@@ -89,7 +105,8 @@ export const SelectedPoint: FC<SelectedPointProps> = props => {
                         value={localX}
                         onChange={enterXValue}
                         onKeyDown={event => {
-                            if (event.key === "Enter") setXIsOnEditMode(false)}}
+                            if (event.key === "Enter") setXIsOnEditMode(false);
+                        }}
                     />
                 )}
                 {!yIsOnEditMode ? (
