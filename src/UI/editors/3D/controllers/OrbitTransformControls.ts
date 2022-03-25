@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 import {TransformControls} from "three/examples/jsm/controls/TransformControls";
+import {colors} from "../ColorSchema";
 
 type Camera = THREE.PerspectiveCamera | THREE.OrthographicCamera;
 type Modes = "add" | "delete" | "transform" | "move";
@@ -11,7 +12,7 @@ export class OrbitTransformControls {
     public orbitControls: OrbitControls;
 
     private raycaster: THREE.Raycaster;
-    private objects: THREE.Object3D[];
+    private objects: THREE.Mesh[];
     private scene: THREE.Scene;
     private camera: Camera;
     private domElem: HTMLElement;
@@ -23,11 +24,12 @@ export class OrbitTransformControls {
     private deleteListeners: ((point: THREE.Object3D) => void)[] = [];
 
     public currObj: THREE.Object3D | undefined;
+    public hoverObj: THREE.Object3D | undefined;
     private mode: Modes = "transform";
 
     constructor(
         scene: THREE.Scene,
-        objects: THREE.Object3D[],
+        objects: THREE.Mesh[],
         camera: Camera,
         domElem: HTMLElement
     ) {
@@ -38,6 +40,7 @@ export class OrbitTransformControls {
         this.scene = scene;
         this.camera = camera;
         this.domElem = domElem;
+        domElem.addEventListener("mousemove", this.hoverPoint);
         domElem.addEventListener("mousedown", this.onMouseDown);
         domElem.addEventListener("dblclick", this.deselectOnDoubleClick);
     }
@@ -104,8 +107,37 @@ export class OrbitTransformControls {
             this.transformControls.addEventListener("objectChange", () => {
                 this.transformListeners.forEach(cb => cb());
             });
+            this.setObjectColors();
         }
     };
+
+    private hoverPoint = (event: MouseEvent) => {
+        const {x, y} = this.getMouseXandY(event);
+        this.raycaster.setFromCamera(new THREE.Vector2(x, y), this.camera);
+        const intersects = this.raycaster.intersectObjects(this.objects);
+
+        if (intersects.length > 0) {
+            this.hoverObj = intersects[0].object;
+        } else {
+            this.hoverObj = undefined;
+        }
+        this.setObjectColors();
+    };
+
+    private setObjectColors() {
+        this.objects.forEach(o => {
+            if (o == this.currObj) {
+                //@ts-ignore
+                o.material.color.setHex(colors.SWEEP_POINT_SELECTED);
+            } else if (o == this.hoverObj) {
+                //@ts-ignore
+                o.material.color.setHex(colors.SWEEP_POINT_HOVER);
+            } else {
+                //@ts-ignore
+                o.material.color.setHex(colors.SWEEP_POINT);
+            }
+        });
+    }
 
     private createNewPointOnClick(event: MouseEvent) {
         const target = this.getTarget().clone();
@@ -161,6 +193,7 @@ export class OrbitTransformControls {
             this.transformControls.dispose();
             this.transformControls.removeFromParent();
         }
+        this.setObjectColors();
     }
 
     public onTransform(cb: () => void) {
@@ -202,7 +235,7 @@ export class OrbitTransformControls {
         }
     }
 
-    public changeObjects(objects: THREE.Object3D[]) {
+    public changeObjects(objects: THREE.Mesh[]) {
         if (objects == this.objects) return;
         this.disposeTransform();
         this.objects = objects;
