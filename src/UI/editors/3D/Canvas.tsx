@@ -114,7 +114,7 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
                 renderer.getRendererDomElem()
             ));
             renderer.attachControls(controls);
-            controls.orbitControls.addEventListener("change", () => {
+            controls.onOrbiting(() => {
                 viewCubeRef.current!.setRotation(renderer.getRotation());
             });
             viewCubeRef.current!.setRotation(renderer.getRotation());

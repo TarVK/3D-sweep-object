@@ -8,8 +8,8 @@ type Modes = "add" | "delete" | "transform" | "move";
 
 //Thanks https://sbcode.net/threejs/multi-controls-example/#video-lecture
 export class OrbitTransformControls {
-    public transformControls: TransformControls;
-    public orbitControls: OrbitControls;
+    private transformControls: TransformControls;
+    private orbitControls: OrbitControls;
 
     private raycaster: THREE.Raycaster;
     private objects: THREE.Mesh[];
@@ -23,9 +23,10 @@ export class OrbitTransformControls {
     private addListeners: ((point: THREE.Vector3) => void)[] = [];
     private deleteListeners: ((point: THREE.Object3D) => void)[] = [];
 
-    public currObj: THREE.Object3D | undefined;
-    public hoverObj: THREE.Object3D | undefined;
+    private hoverObj: THREE.Object3D | undefined;
     private mode: Modes = "transform";
+
+    public currObj: THREE.Object3D | undefined;
 
     constructor(
         scene: THREE.Scene,
@@ -206,6 +207,10 @@ export class OrbitTransformControls {
 
     public onDelete(cb: (point: THREE.Object3D) => void) {
         this.deleteListeners.push(cb);
+    }
+
+    public onOrbiting(cb: () => void) {
+        this.orbitControls.addEventListener("change", cb);
     }
 
     public getTarget() {
