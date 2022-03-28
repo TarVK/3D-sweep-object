@@ -35,6 +35,7 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
     const [selectedPoint] = useState({x: 100, y: 211, z: 5});
     const scene = sceneRef.current;
 
+    // TODO: place this somewhere
     function toggleMeshDisplaying() {
         scene.sweepObject.visible = !scene.sweepObject.visible;
     }
@@ -74,9 +75,10 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
         {
             icon: ZoomOutMapOutlined,
             hoverText: "Change camera position",
-            // TODO: remove the toggling from here
             iconOnClick: () => {
-                toggleMeshDisplaying();
+                controlsRef.current!.setMode("move");
+                scene.sweepPoints.visible = true;
+                scene.sweepLine.visible = true;
             },
         },
     ];
@@ -143,7 +145,6 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
                 scene.sweepPoints.updatePoints(segments, true);
             });
             controls.onDelete(pointObj => {
-                // prettier-ignore
                 const segments = deletePoint(pointObj);
                 sweepObjectState.getSweepLine().setSegments(segments, true);
                 scene.sweepPoints.updatePoints(segments, true);

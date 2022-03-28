@@ -109,6 +109,7 @@ export class Renderer {
             camera.position.copy(this.camera.position);
             camera.rotation.copy(this.camera.rotation);
             camera.zoom = this.camera.zoom;
+            this.scene.remove(this.camera);
         }
         this.camera = camera;
         this.camera.updateProjectionMatrix();

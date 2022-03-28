@@ -15,6 +15,7 @@ export class ViewCube {
     private clock: THREE.Clock;
     private controls: CameraControls;
     private orbitListeners: (() => void)[] = [];
+    private allowOrbitListeners = true;
 
     constructor(domElem: HTMLElement) {
         this.initScene(domElem);
@@ -128,6 +129,13 @@ export class ViewCube {
         this.controls.mouseButtons.shiftLeft = CameraControls.ACTION.NONE;
         this.controls.mouseButtons.wheel = CameraControls.ACTION.NONE;
         this.controls.maxPolarAngle = Math.PI * 2;
+
+        this.controls.addEventListener("transitionstart", () => {
+            this.allowOrbitListeners = true;
+        });
+        this.controls.addEventListener("rest", () => {
+            this.allowOrbitListeners = false;
+        });
     };
 
     private setEvents = (domElem: HTMLElement) => {
@@ -235,6 +243,10 @@ export class ViewCube {
 
     public onOrbiting(cb: () => void) {
         this.orbitListeners.push(cb);
-        this.controls.addEventListener("control", cb);
+        this.controls.addEventListener("update", () => {
+            if (this.allowOrbitListeners) {
+                cb();
+            }
+        });
     }
 }

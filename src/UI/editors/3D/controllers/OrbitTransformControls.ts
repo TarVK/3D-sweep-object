@@ -26,6 +26,7 @@ export class OrbitTransformControls {
     private addListeners: ((point: THREE.Vector3) => void)[] = [];
     private deleteListeners: ((point: THREE.Object3D) => void)[] = [];
     private orbitListeners: (() => void)[] = [];
+    private allowOrbitListeners = true;
 
     private hoverObj: THREE.Object3D | undefined;
     private mode: Modes = "transform";
@@ -44,11 +45,23 @@ export class OrbitTransformControls {
         this.orbitControls.mouseButtons.left = CameraControls.ACTION.ROTATE;
         this.orbitControls.mouseButtons.wheel = CameraControls.ACTION.DOLLY;
         this.orbitControls.mouseButtons.right = CameraControls.ACTION.OFFSET;
+        this.orbitControls.mouseButtons.shiftLeft = CameraControls.ACTION.ROTATE;
         this.orbitControls.mouseButtons.middle = CameraControls.ACTION.NONE;
-        this.orbitControls.mouseButtons.shiftLeft = CameraControls.ACTION.NONE;
 
         this.orbitControls.saveState();
         this.initialOrbitRadius = this.orbitControls.distance;
+        this.orbitControls.addEventListener("transitionstart", () => {
+            this.allowOrbitListeners = true;
+        });
+        this.orbitControls.addEventListener("rest", () => {
+            this.allowOrbitListeners = false;
+        });
+        this.orbitControls.addEventListener("update", () => {
+            if (this.camera instanceof THREE.OrthographicCamera) {
+                const dolly = this.getDollyFromZoom(this.camera.zoom);
+                this.setDolly(dolly);
+            }
+        });
 
         this.raycaster = new THREE.Raycaster();
         this.raycaster.layers.set(1);
@@ -65,16 +78,36 @@ export class OrbitTransformControls {
     public setMode(mode: Modes) {
         this.mode = mode;
         if (this.mode == "transform") {
-            this.enableTransform();
-            this.orbitControls.enabled = true;
+            this.orbitControls.mouseButtons.left = CameraControls.ACTION.ROTATE;
+            this.orbitControls.mouseButtons.right = CameraControls.ACTION.OFFSET;
         } else if (this.mode == "add") {
-            this.disableTransform();
-            this.orbitControls.enabled = false;
+            this.disposeTransform();
+            this.orbitControls.mouseButtons.left = CameraControls.ACTION.NONE;
+            this.orbitControls.mouseButtons.right = CameraControls.ACTION.OFFSET;
         } else if (this.mode == "delete") {
-            this.disableTransform();
-            this.orbitControls.enabled = true;
+            this.disposeTransform();
+            this.orbitControls.mouseButtons.left = CameraControls.ACTION.ROTATE;
+            this.orbitControls.mouseButtons.right = CameraControls.ACTION.OFFSET;
         } else if (this.mode == "move") {
+            this.disposeTransform();
+            this.orbitControls.mouseButtons.left = CameraControls.ACTION.ROTATE;
+            this.orbitControls.mouseButtons.right = CameraControls.ACTION.OFFSET;
         }
+    }
+
+    private setObjectColors() {
+        this.objects.forEach(o => {
+            if (o == this.currObj) {
+                //@ts-ignore
+                o.material.color.setHex(colors.SWEEP_POINT_SELECTED);
+            } else if (o == this.hoverObj) {
+                //@ts-ignore
+                o.material.color.setHex(colors.SWEEP_POINT_HOVER);
+            } else {
+                //@ts-ignore
+                o.material.color.setHex(colors.SWEEP_POINT);
+            }
+        });
     }
 
     private onMouseDown = (event: MouseEvent) => {
@@ -85,6 +118,7 @@ export class OrbitTransformControls {
         } else if (this.mode == "delete") {
             this.deletePointOnClick(event);
         } else if (this.mode == "move") {
+            return;
         }
     };
 
@@ -99,7 +133,21 @@ export class OrbitTransformControls {
         }
     };
 
+    private hoverPoint = (event: MouseEvent) => {
+        const {x, y} = this.getMouseXandY(event);
+        this.raycaster.setFromCamera(new THREE.Vector2(x, y), this.camera);
+        const intersects = this.raycaster.intersectObjects(this.objects);
+
+        if (intersects.length > 0) {
+            this.hoverObj = intersects[0].object;
+        } else {
+            this.hoverObj = undefined;
+        }
+        this.setObjectColors();
+    };
+
     private selectPointForMovement = (event: MouseEvent) => {
+        if (event.button != 0) return;
         if (!this.transformEnabled) {
             this.orbitControls.enabled = true;
             return;
@@ -128,35 +176,8 @@ export class OrbitTransformControls {
         }
     };
 
-    private hoverPoint = (event: MouseEvent) => {
-        const {x, y} = this.getMouseXandY(event);
-        this.raycaster.setFromCamera(new THREE.Vector2(x, y), this.camera);
-        const intersects = this.raycaster.intersectObjects(this.objects);
-
-        if (intersects.length > 0) {
-            this.hoverObj = intersects[0].object;
-        } else {
-            this.hoverObj = undefined;
-        }
-        this.setObjectColors();
-    };
-
-    private setObjectColors() {
-        this.objects.forEach(o => {
-            if (o == this.currObj) {
-                //@ts-ignore
-                o.material.color.setHex(colors.SWEEP_POINT_SELECTED);
-            } else if (o == this.hoverObj) {
-                //@ts-ignore
-                o.material.color.setHex(colors.SWEEP_POINT_HOVER);
-            } else {
-                //@ts-ignore
-                o.material.color.setHex(colors.SWEEP_POINT);
-            }
-        });
-    }
-
     private createNewPointOnClick(event: MouseEvent) {
+        if (event.button != 0 || event.shiftKey) return;
         const plane = new THREE.Plane();
         const cameraQ = this.camera.quaternion.clone();
         plane.normal.set(0, 0, -1).applyQuaternion(cameraQ);
@@ -171,6 +192,7 @@ export class OrbitTransformControls {
     }
 
     private deletePointOnClick(event: MouseEvent) {
+        if (event.button != 0) return;
         const {x, y} = this.getMouseXandY(event);
         this.raycaster.setFromCamera(new THREE.Vector2(x, y), this.camera);
         const intersects = this.raycaster.intersectObjects(this.objects);
@@ -207,7 +229,6 @@ export class OrbitTransformControls {
 
     private disposeTransform() {
         this.currObj = undefined;
-        this.orbitControls.enabled = this.mode != "add";
         if (this.transformControls) {
             this.transformControls.dispose();
             this.transformControls.removeFromParent();
@@ -234,7 +255,11 @@ export class OrbitTransformControls {
 
     public onOrbiting(cb: () => void) {
         this.orbitListeners.push(cb);
-        this.orbitControls.addEventListener("control", cb);
+        this.orbitControls.addEventListener("update", () => {
+            if (this.allowOrbitListeners) {
+                cb();
+            }
+        });
     }
 
     public update() {
@@ -242,31 +267,32 @@ export class OrbitTransformControls {
         return this.orbitControls.update(delta);
     }
 
-    public enableTransform() {
-        this.transformEnabled = true;
+    private getDollyFromZoom(zoom: number) {
+        return this.initialOrbitRadius / zoom;
     }
 
-    public disableTransform() {
-        this.transformEnabled = false;
-        this.disposeTransform();
-    }
-
-    public changeCamera(camera: Camera) {
-        this.camera = camera;
-        this.orbitControls.camera = this.camera;
-
+    private fixZoomAndDoly() {
         if (this.camera instanceof THREE.PerspectiveCamera) {
             // dolly is the radius of the control sphere
-            const dolly = this.initialOrbitRadius / this.camera.zoom;
+            const dolly = this.getDollyFromZoom(this.camera.zoom);
             this.setZoom(1);
             this.setDolly(dolly);
             this.orbitControls.mouseButtons.wheel = CameraControls.ACTION.DOLLY;
         } else if (this.camera instanceof THREE.OrthographicCamera) {
             // zoom is the fraction of the initial control radius and the current one
             const zoom = this.initialOrbitRadius / this.orbitControls.distance;
+            const dolly = this.getDollyFromZoom(zoom);
             this.setZoom(zoom);
+            this.setDolly(dolly);
             this.orbitControls.mouseButtons.wheel = CameraControls.ACTION.ZOOM;
         }
+    }
+
+    public changeCamera(camera: Camera) {
+        this.camera = camera;
+        this.orbitControls.camera = this.camera;
+
+        this.fixZoomAndDoly();
 
         if (this.transformControls) {
             this.transformControls.camera = camera;
