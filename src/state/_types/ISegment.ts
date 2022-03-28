@@ -1,6 +1,7 @@
 import {IDataHook} from "model-react";
 import {Vec2} from "../../util/Vec2";
 import {Vec3} from "../../util/Vec3";
+import {IBoundingBox} from "./IBoundingBox";
 
 export type ISegment<D extends Vec2 | Vec3> = {
     /**
@@ -8,6 +9,13 @@ export type ISegment<D extends Vec2 | Vec3> = {
      * @returns The copied segment
      */
     copy(): ISegment<D>;
+
+    /**
+     * Retrieves the bounding box of the segment
+     * @param hook The hook to subscribe to changes
+     * @returns The axis aligned bounding box of this segment
+     */
+    getBoundingBox(hook?: IDataHook): IBoundingBox;
 
     // Control the start/end points
     /**
@@ -134,10 +142,4 @@ export type ISegment<D extends Vec2 | Vec3> = {
      * @returns The approximate distance to this curve
      */
     getDistance(point: D): number;
-
-    /**
-     * 
-     * @param h 
-     */
-    getBoundingBox(h?: IDataHook): {minX: number, minY: number, maxX: number, maxY: number};
 };

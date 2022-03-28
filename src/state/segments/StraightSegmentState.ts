@@ -211,14 +211,24 @@ export class StraightSegmentState<D extends Vec2 | Vec3> implements ISegment<D> 
         return {distance: startDistance, point: start, handle: "start"};
     }
 
-    public getBoundingBox(h?: IDataHook): {minX: number, minY: number, maxX: number, maxY: number} {
-        let minX = Math.min(this.getStart(h).x, this.getEnd(h).x);
-        let minY = Math.min(this.getStart(h).y, this.getEnd(h).y);
-        let maxX = Math.max(this.getStart(h).x, this.getEnd(h).x);
-        let maxY = Math.max(this.getStart(h).y, this.getEnd(h).y);
+    public getBoundingBox(hook?: IDataHook): {
+        minX: number;
+        minY: number;
+        maxX: number;
+        maxY: number;
+    } {
+        const start = this.getStart(hook);
+        const end = this.getEnd(hook);
+        const minX = Math.min(start.x, end.x);
+        const minY = Math.min(start.y, end.y);
+        const maxX = Math.max(start.x, end.x);
+        const maxY = Math.max(start.y, end.y);
 
         return {
-            minX, minY, maxX, maxY
+            minX,
+            minY,
+            maxX,
+            maxY,
         };
     }
 }

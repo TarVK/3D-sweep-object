@@ -9,6 +9,7 @@ import {IBezierApproximationConfig} from "../../util/bezier/_types/IBezierApprox
 import {IBezierNode} from "../../util/bezier/_types/IBezierNode";
 import {Vec2} from "../../util/Vec2";
 import {Vec3} from "../../util/Vec3";
+import {IBoundingBox} from "../_types/IBoundingBox";
 import {ISegment} from "../_types/ISegment";
 
 /**
@@ -421,14 +422,21 @@ export class BezierSegmentState<D extends Vec2 | Vec3> implements ISegment<D> {
         );
     }
 
-    public getBoundingBox(h?: IDataHook): {minX: number, minY: number, maxX: number, maxY: number} {
-        let minX = Math.min(this.getStart(h).x, this.getStartControl(h).x, this.getEndControl(h).x, this.getEnd(h).x);
-        let minY = Math.min(this.getStart(h).y, this.getStartControl(h).y, this.getEndControl(h).y, this.getEnd(h).y);
-        let maxX = Math.max(this.getStart(h).x, this.getStartControl(h).x, this.getEndControl(h).x, this.getEnd(h).x);
-        let maxY = Math.max(this.getStart(h).y, this.getStartControl(h).y, this.getEndControl(h).y, this.getEnd(h).y);
+    public getBoundingBox(hook?: IDataHook): IBoundingBox {
+        const start = this.getStart(hook);
+        const startControl = this.getStartControl(hook);
+        const endControl = this.getEndControl(hook);
+        const end = this.getEnd(hook);
+        const minX = Math.min(start.x, startControl.x, endControl.x, end.x);
+        const minY = Math.min(start.y, startControl.y, endControl.y, end.y);
+        const maxX = Math.max(start.x, startControl.x, endControl.x, end.x);
+        const maxY = Math.max(start.y, startControl.y, endControl.y, end.y);
 
         return {
-            minX, minY, maxX, maxY
+            minX,
+            minY,
+            maxX,
+            maxY,
         };
     }
 }

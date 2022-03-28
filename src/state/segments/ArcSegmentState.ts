@@ -10,6 +10,7 @@ import {IBezierNode} from "../../util/bezier/_types/IBezierNode";
 import {getCircleThroughPoints} from "../../util/geometry/getCircleThroughPoints";
 import {Vec2} from "../../util/Vec2";
 import {Vec3} from "../../util/Vec3";
+import {IBoundingBox} from "../_types/IBoundingBox";
 import {ISegment} from "../_types/ISegment";
 
 /**
@@ -365,5 +366,49 @@ export class ArcSegmentState implements ISegment<Vec2> {
             (best, option) => (option.distance < best.distance ? option : best),
             {point: start, distance: Infinity, handle: "start"}
         );
+    }
+
+    public getBoundingBox(hook?: IDataHook): IBoundingBox {
+        const start = this.getStart(hook);
+        const control = this.getControl(hook);
+        const end = this.getEnd(hook);
+        let minX = Math.min(start.x, control.x, end.x);
+        let minY = Math.min(start.y, control.y, end.y);
+        let maxX = Math.max(start.x, control.x, end.x);
+        let maxY = Math.max(start.y, control.y, end.y);
+
+        const spec = this.getSpec(hook);
+        if (spec.origin) {
+            // Find all directions that the arc increased the BB of
+            const {
+                origin: {x, y},
+                radius,
+                start,
+                delta,
+            } = spec;
+
+            // Calculate what direction we're starting off at, and ending in (both modulo 4):
+            // 0: right, 1: up, 2: left, 3: down
+            const hPI = Math.PI / 2;
+            const startDir = Math.floor(start / hPI) + 8;
+            const endDir = Math.floor((start + delta) / hPI) + 8;
+
+            const handle = (dir: number) => {
+                const dirC = dir % 4;
+                if (dirC == 0) maxX = Math.max(maxX, x + radius);
+                if (dirC == 1) maxY = Math.max(maxY, y + radius);
+                if (dirC == 2) minX = Math.min(maxX, x - radius);
+                if (dirC == 3) minY = Math.min(maxY, y - radius);
+            };
+            if (delta < 0) for (let d = startDir; d > endDir; d--) handle(d);
+            else for (let d = startDir; d < endDir; d++) handle(d + 1);
+        }
+
+        return {
+            minX,
+            minY,
+            maxX,
+            maxY,
+        };
     }
 }
