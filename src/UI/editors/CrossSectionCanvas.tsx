@@ -1,4 +1,4 @@
-import {FC, useEffect, useRef, useState} from "react";
+import {FC, useEffect, useMemo, useRef, useState} from "react";
 import {Menu} from "./Menu";
 import {ICanvasProps} from "./3D/_types/ICanvasProps";
 import {
@@ -12,60 +12,51 @@ import {CrossSectionsMenu} from "./CrossSectionsMenu";
 import {RotationScaleMenu} from "./RotationScaleMenu";
 import {CrossSectionEditor} from "./crossSections/CrossSectionEditor";
 import {useCrossSectionEditorState} from "./crossSections/CrossSectionEditorStateContext";
-import { IMenuButtonProps } from "./MenuButton";
+import {useMemoDataHook} from "model-react";
 
 export const CrossSectionCanvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
     const editorState = useCrossSectionEditorState();
-    const [pointMenuItems, setPointMenuItems] = useState<Array<IMenuButtonProps>>([]);
-    const pointMenuItemsArray = [
-        {
-            id: 0,
-            icon: AddCircleOutlineSharp,
-            hoverText: "Add point",
-            isSelected: false,
-            iconOnClick: () => editorState.selectTool("add"),
-        },
-        {
-            id: 1,
-            icon: MouseOutlined,
-            hoverText: "Select point",
-            isSelected: false,
-            iconOnClick: () => editorState.selectTool("edit"),
-        },
-        {
-            id: 2,
-            icon: ClearOutlined,
-            hoverText: "Delete point",
-            isSelected: false,
-            iconOnClick: () => editorState.selectTool("delete"),
-        },
-    ];
-
-    const selectPointMenuItem = (index: number) => {
-        pointMenuItemsArray.forEach(item => item.isSelected = false);
-
-        pointMenuItemsArray[index].isSelected = true;
-
-        setPointMenuItems(pointMenuItemsArray);
-    }
-
-    const exportImportMenu = [
-        {
-            icon: FileUploadOutlined,
-            hoverText: "Import",
-            iconOnClick: () => {},
-        },
-        {
-            icon: FileDownloadOutlined,
-            hoverText: "Export",
-            iconOnClick: () => {},
-        },
-    ];
-
-    useEffect(() => {
-        setPointMenuItems(pointMenuItemsArray);
+    const [pointMenuItems] = useMemoDataHook(h => {
+        const selectedTool = editorState.getSelectedTool(h);
+        return [
+            {
+                id: 0,
+                icon: AddCircleOutlineSharp,
+                hoverText: "Add point",
+                isSelected: selectedTool == "add",
+                onClick: () => editorState.selectTool("add"),
+            },
+            {
+                id: 1,
+                icon: MouseOutlined,
+                hoverText: "Select point",
+                isSelected: selectedTool == "edit",
+                onClick: () => editorState.selectTool("edit"),
+            },
+            {
+                id: 2,
+                icon: ClearOutlined,
+                hoverText: "Delete point",
+                isSelected: selectedTool == "delete",
+                onClick: () => editorState.selectTool("delete"),
+            },
+        ];
     }, []);
-
+    const exportImportMenu = useMemo(
+        () => [
+            {
+                icon: FileUploadOutlined,
+                hoverText: "Import",
+                onClick: () => {},
+            },
+            {
+                icon: FileDownloadOutlined,
+                hoverText: "Export",
+                onClick: () => {},
+            },
+        ],
+        []
+    );
     return (
         <div
             {...props}
@@ -79,8 +70,8 @@ export const CrossSectionCanvas: FC<ICanvasProps> = ({sweepObjectState, ...props
                 width="100%"
                 height="100%"
             />
-            <Menu props={{items: pointMenuItems, position: {top: 0, left: 0}, selectItem: selectPointMenuItem}} />
-            <Menu props={{items: exportImportMenu, position: {top: 0, right: 0}}} />
+            <Menu items={pointMenuItems} position={{top: 0, left: 0}} />
+            <Menu items={exportImportMenu} position={{top: 0, right: 0}} />
             <CrossSectionsMenu />
             <RotationScaleMenu />
         </div>

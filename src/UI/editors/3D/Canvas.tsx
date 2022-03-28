@@ -47,7 +47,7 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
         {
             icon: AddCircleOutlineSharp,
             hoverText: "Add point",
-            iconOnClick: () => {
+            onClick: () => {
                 controlsRef.current!.setMode("add");
                 scene.sweepPoints.visible = true;
                 scene.sweepLine.visible = true;
@@ -56,7 +56,7 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
         {
             icon: MouseOutlined,
             hoverText: "Select point",
-            iconOnClick: () => {
+            onClick: () => {
                 controlsRef.current!.setMode("transform");
                 scene.sweepPoints.visible = true;
                 scene.sweepLine.visible = true;
@@ -65,7 +65,7 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
         {
             icon: ClearOutlined,
             hoverText: "Delete point",
-            iconOnClick: () => {
+            onClick: () => {
                 controlsRef.current!.setMode("delete");
                 scene.sweepPoints.visible = true;
                 scene.sweepLine.visible = true;
@@ -75,7 +75,7 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
             icon: ZoomOutMapOutlined,
             hoverText: "Change camera position",
             // TODO: remove the toggling from here
-            iconOnClick: () => {
+            onClick: () => {
                 toggleMeshDisplaying();
             },
         },
@@ -85,14 +85,14 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
         {
             icon: RestartAltOutlined,
             hoverText: "Reset camera",
-            iconOnClick: () => {
+            onClick: () => {
                 rendererRef.current!.resetCameraPosition();
             },
         },
         {
             icon: CameraAltOutlined,
             hoverText: "Camera mode",
-            iconOnClick: () => {
+            onClick: () => {
                 rendererRef.current!.toggleCamera();
             },
         },
@@ -169,8 +169,8 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
                 borderRadius: "4px",
                 overflow: "hidden",
             }}>
-            <Menu props={{items: pointMenuItems, position: {top: 0, left: 0}}} />
-            <Menu props={{items: cameraMenuItems, position: {top: 0, right: 0}}} />
+            <Menu items={pointMenuItems} position={{top: 0, left: 0}} />
+            <Menu items={cameraMenuItems} position={{top: 0, right: 0}} />
             {selectedPoint ? <SelectedPoint props={selectedPoint} /> : null}
             <div
                 ref={cubeRef}
