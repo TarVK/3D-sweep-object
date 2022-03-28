@@ -86,6 +86,7 @@ export const CrossSectionsMenu: FC = () => {
                         strokeColor={
                             selectedCrossSection === crossSection ? "#FFF" : "#145DA0"
                         }
+                        index={index}
                         crossSection={crossSection}
                         onClick={() => editorState.selectCrossSection(index)}
                     />

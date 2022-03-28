@@ -8,6 +8,7 @@ interface ICustomSvg {
     crossSection: CrossSectionState;
     strokeColor: string;
     backgroundColor: string;
+    index: number;
     onClick: React.MouseEventHandler<HTMLDivElement>;
 }
 
@@ -72,10 +73,24 @@ export const CustomSvg: FC<ICustomSvg> = props => {
             flex: "50%",
             margin: "3px",
             background: props.backgroundColor,
+            position: "relative",
             ":hover": {
                 cursor: "pointer"
             }
         }} onClick={props.onClick}>
+            <div css={{
+                position: "absolute",
+                top: -3,
+                left: -3,
+                zIndex: 1,
+                backgroundColor: "#0C2D48",
+                color: "#FFF",
+                width: "10px",
+                height: "10px",
+                fontSize: "10px",
+                textAlign: "center",
+                borderRadius: "4px"
+            }}>{ props.index }</div>
             <svg
                 width="40"
                 height="40"
