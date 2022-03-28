@@ -1,7 +1,7 @@
 import {Field, IDataHook} from "model-react";
-import {Vec2} from "../util/Vec2";
-import {Vec3} from "../util/Vec3";
-import {ISegment} from "./_types/ISegment";
+import {Vec2} from "../../util/Vec2";
+import {Vec3} from "../../util/Vec3";
+import {ISegment} from "../_types/ISegment";
 
 /**
  * A class to represent subscribable straight line segments

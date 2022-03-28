@@ -1,10 +1,9 @@
 import {IDataHook} from "model-react";
 import {Vec2} from "../../util/Vec2";
 import {Vec3} from "../../util/Vec3";
-import {BezierSegmentState} from "../BezierSegmentState";
+import {ArcSegmentState} from "../segments/ArcSegmentState";
+import {BezierSegmentState} from "../segments/BezierSegmentState";
 import {ISegment} from "../_types/ISegment";
-import {I2DPointJSON} from "./_types/I2DPointJSON";
-import {I3DPointJSON} from "./_types/I3DPointJSON";
 import {IBezierJSON} from "./_types/IBezierJSON";
 import {ISegmentJSON} from "./_types/ISegmentJSON";
 import {IStraightLineJSON} from "./_types/IStraightLineJSON";
@@ -22,6 +21,14 @@ export function segmentToJSON<P extends Vec2 | Vec3>(
 ): ISegmentJSON<TVecToPoint<P>> {
     if (segment instanceof BezierSegmentState)
         return bezierSegmentToJSON<P>(segment, hook);
+    if (segment instanceof ArcSegmentState) {
+        return {
+            type: "arc",
+            start: convertPoint(segment.getStart(hook)),
+            control: convertPoint(segment.getControl(hook)) as any,
+            end: convertPoint(segment.getEnd(hook)),
+        };
+    }
 
     const straightJSON: IStraightLineJSON<TVecToPoint<P>> = {
         type: "straight",

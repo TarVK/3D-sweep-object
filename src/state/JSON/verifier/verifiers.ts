@@ -33,23 +33,71 @@ export const Opt =
  * @param verifierB The second verification option
  * @returns The unified verifier
  */
-export const Or =
-    <A, B>(verifierA: IVerifier<A>, verifierB: IVerifier<B>): IVerifier<A | B> =>
-    val => {
-        const resA = verifierA(val);
-        if ("result" in resA) return resA;
-        const resB = verifierB(val);
-        if ("result" in resB) return resB;
+export function Or<A, B>(
+    verifierA: IVerifier<A>,
+    verifierB: IVerifier<B>
+): IVerifier<A | B>;
+/**
+ * Creates a union verifier for the given verifiers
+ * @param verifierA The first verification option
+ * @param verifierB The second verification option
+ * @param verifierC The second verification option
+ * @returns The unified verifier
+ */
+export function Or<A, B, C>(
+    verifierA: IVerifier<A>,
+    verifierB: IVerifier<B>,
+    verifierC: IVerifier<C>
+): IVerifier<A | B | C>;
+/**
+ * Creates a union verifier for the given verifiers
+ * @param verifierA The first verification option
+ * @param verifierB The second verification option
+ * @param verifierC The second verification option
+ * @param verifierD The second verification option
+ * @returns The unified verifier
+ */
+export function Or<A, B, C, D>(
+    verifierA: IVerifier<A>,
+    verifierB: IVerifier<B>,
+    verifierC: IVerifier<C>,
+    verifierD: IVerifier<D>
+): IVerifier<A | B | C | D>;
+/**
+ * Creates a union verifier for the given verifiers
+ * @param verifierA The first verification option
+ * @param verifierB The second verification option
+ * @param verifierC The second verification option
+ * @param verifierD The second verification option
+ * @param verifierE The second verification option
+ * @returns The unified verifier
+ */
+export function Or<A, B, C, D, E>(
+    verifierA: IVerifier<A>,
+    verifierB: IVerifier<B>,
+    verifierC: IVerifier<C>,
+    verifierD: IVerifier<D>,
+    verifierE: IVerifier<E>
+): IVerifier<A | B | C | D | E>;
+export function Or<A>(...verifiers: IVerifier<A>[]): IVerifier<A> {
+    return val => {
+        const errors: IErrorData[][] = [];
+        for (let verifier of verifiers) {
+            const res = verifier(val);
+            if ("result" in res) return res;
+            errors.push(res.errors);
+        }
 
         return {
             errors: [
                 {
                     message: `value did not adhere to either option`,
-                    subErrors: [resA.errors, resB.errors],
+                    subErrors: errors,
                 },
             ],
         };
     };
+}
 
 /**
  * Creates a new verifier to check for the literal given value (only works on primitives)
