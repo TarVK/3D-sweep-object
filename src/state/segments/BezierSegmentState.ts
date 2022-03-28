@@ -420,4 +420,15 @@ export class BezierSegmentState<D extends Vec2 | Vec3> implements ISegment<D> {
             {point: start, distance: Infinity, handle: "start"}
         );
     }
+
+    public getBoundingBox(h?: IDataHook): {minX: number, minY: number, maxX: number, maxY: number} {
+        let minX = Math.min(this.getStart(h).x, this.getStartControl(h).x, this.getEndControl(h).x, this.getEnd(h).x);
+        let minY = Math.min(this.getStart(h).y, this.getStartControl(h).y, this.getEndControl(h).y, this.getEnd(h).y);
+        let maxX = Math.max(this.getStart(h).x, this.getStartControl(h).x, this.getEndControl(h).x, this.getEnd(h).x);
+        let maxY = Math.max(this.getStart(h).y, this.getStartControl(h).y, this.getEndControl(h).y, this.getEnd(h).y);
+
+        return {
+            minX, minY, maxX, maxY
+        };
+    }
 }

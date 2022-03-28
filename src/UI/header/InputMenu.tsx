@@ -28,22 +28,6 @@ export const InputMenu: FC<IInputMenuProps> = ({
                 Import model
             </Button>
             <ExportModel open={open} exportToFile={exportToFile} />
-            {/* <Button variant="contained" size="small" onClick={() => openExportModel()}>
-                Export model
-            </Button> */}
-            {/* <Button
-                variant="contained"
-                size="small"
-                onClick={
-                    // TODO: replace with the proper download modal/functionality
-                    () => {
-                        const json = sweepObjectToJSON(sweepObjectState);
-                        (window as any).output = JSON.stringify(json, null, 4);
-                        console.log(json);
-                    }
-                }>
-                Export model
-            </Button> */}
             <TextField
                 label="Intersections"
                 type="number"
