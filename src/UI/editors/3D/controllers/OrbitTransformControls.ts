@@ -22,6 +22,7 @@ export class OrbitTransformControls {
     private transformListeners: (() => void)[] = [];
     private addListeners: ((point: THREE.Vector3) => void)[] = [];
     private deleteListeners: ((point: THREE.Object3D) => void)[] = [];
+    public transformEvents: Function[] = [];
 
     public currObj: THREE.Object3D | undefined;
     public hoverObj: THREE.Object3D | undefined;
@@ -214,6 +215,9 @@ export class OrbitTransformControls {
 
     public update() {
         this.orbitControls.update();
+        if (this.transformControls) {
+            this.transformControls.updateMatrixWorld();
+        }
     }
 
     public enableTransform() {
