@@ -20,6 +20,8 @@ import {Scene} from "three";
 import {useStateLazy} from "./hooks/useStateLazy";
 import {sweepObjectToJSON} from "../state/JSON/sweepObjectToJSON";
 import {ArcSegmentState} from "../state/segments/ArcSegmentState";
+import { ThemeProvider } from "@emotion/react";
+import { theme } from "../themes/MUITheme";
 
 export const App: FC = () => {
     const [h] = useDataHook();
@@ -103,6 +105,7 @@ export const App: FC = () => {
     };
 
     return (
+        <ThemeProvider theme={theme}>
         <div
             css={{
                 background: "#C3E0E5",
@@ -113,7 +116,7 @@ export const App: FC = () => {
                 css={{
                     width: "100%",
                     margin: "0px 0px 25px",
-                    background: "#145DA0",
+                    background: theme.primaryColor,
                     color: "#FFF",
                 }}>
                 <InputMenu
@@ -153,5 +156,6 @@ export const App: FC = () => {
                 />
             </div>
         </div>
+        </ThemeProvider>
     );
 };

@@ -1,7 +1,6 @@
 import {useTheme} from "@mui/material";
 import {useDataHook, useMemoDataHook} from "model-react";
-import {FC, useMemo} from "react";
-import {Vec2} from "../../../../util/Vec2";
+import {FC} from "react";
 import {useCrossSectionEditorState} from "../CrossSectionEditorStateContext";
 import {getSegmentSVGSpec} from "./getSegmentSVGSpec";
 

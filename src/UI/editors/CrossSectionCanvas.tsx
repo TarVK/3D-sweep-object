@@ -13,6 +13,9 @@ import {RotationScaleMenu} from "./RotationScaleMenu";
 import {CrossSectionEditor} from "./crossSections/CrossSectionEditor";
 import {useCrossSectionEditorState} from "./crossSections/CrossSectionEditorStateContext";
 import {useMemoDataHook} from "model-react";
+import { CustomArcIcon } from "../custom/CustomArcIcon";
+import { CustomBezierIcon } from "../custom/CustomBezierIcon";
+import { CustomStraightLineIcon } from "../custom/CustomStraightIcon";
 
 export const CrossSectionCanvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
     const editorState = useCrossSectionEditorState();
@@ -45,15 +48,20 @@ export const CrossSectionCanvas: FC<ICanvasProps> = ({sweepObjectState, ...props
     const exportImportMenu = useMemo(
         () => [
             {
-                icon: FileUploadOutlined,
-                hoverText: "Import",
+                icon:  CustomStraightLineIcon,
+                hoverText: "Straight Line",
                 onClick: () => {},
             },
             {
-                icon: FileDownloadOutlined,
-                hoverText: "Export",
+                icon: CustomArcIcon,
+                hoverText: "Arc Line",
                 onClick: () => {},
             },
+            {
+                icon:  CustomBezierIcon,
+                hoverText: "Bezier Line",
+                onClick: () => {},
+            }
         ],
         []
     );
@@ -74,6 +82,8 @@ export const CrossSectionCanvas: FC<ICanvasProps> = ({sweepObjectState, ...props
             <Menu items={exportImportMenu} position={{top: 0, right: 0}} />
             <CrossSectionsMenu />
             <RotationScaleMenu />
+            {/* <CustomIcon src={require=("/svgs/arc-line.svg")} /> */}
+            <img src={require("/public/box.png")} />
         </div>
     );
 };
