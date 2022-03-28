@@ -104,7 +104,7 @@ export default (sweepPointsContainer: {points: THREE.Object3D[]}) => {
         for (let i = 0; i < points.length; i++) {
             if (points[i].position.equals(pointObj.position)) {
                 if (i == 0 && points.length > 4) {
-                    points.splice(0, 2);
+                    points.splice(0, 3);
                 } else if (i == points.length - 1 && points.length > 4) {
                     points.splice(i - 2, 3);
                 } else if (i % 3 == 0 && points.length > 4) {

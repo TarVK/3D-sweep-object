@@ -1,8 +1,6 @@
-import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 import * as THREE from "three";
-import {MutableRefObject} from "react";
-import {Renderer} from "../Renderer";
 import {colors} from "../ColorSchema";
+import CameraControls from "camera-controls";
 
 export class ViewCube {
     private camera: THREE.PerspectiveCamera;
@@ -14,8 +12,9 @@ export class ViewCube {
     private activeFaceIndex = 0;
 
     private raycaster: THREE.Raycaster;
-    private controls: OrbitControls;
-    private rend: MutableRefObject<Renderer | undefined>;
+    private clock: THREE.Clock;
+    private controls: CameraControls;
+    private orbitListeners: (() => void)[] = [];
 
     constructor(domElem: HTMLElement) {
         this.initScene(domElem);
@@ -35,6 +34,7 @@ export class ViewCube {
         this.renderer = new THREE.WebGLRenderer({antialias: true});
         this.renderer.setPixelRatio(width / height);
         this.renderer.setSize(width, height);
+        this.clock = new THREE.Clock();
 
         // remove bg
         this.scene.background = null;
@@ -68,27 +68,24 @@ export class ViewCube {
         this.animate();
     };
 
-    public getRotation = () => {
-        const rotMat = new THREE.Matrix4().makeRotationFromEuler(this.camera.rotation);
-        return rotMat;
-    };
+    public getAzimuthAngle() {
+        return this.controls.azimuthAngle;
+    }
 
-    public setRotation = (matrix: THREE.Matrix4) => {
-        const fwd = new THREE.Vector3(0, 0, -1);
-        fwd.applyMatrix4(matrix).normalize();
-        const dist = this.camera.position.distanceTo(this.cube.position);
-        const offset = fwd.multiplyScalar(dist);
-        this.camera.position.copy(this.controls.target).sub(offset);
-        this.controls.update();
-    };
+    public getPolarAngle() {
+        return this.controls.polarAngle;
+    }
 
-    public attachRenderer = (rendRef: MutableRefObject<Renderer | undefined>) => {
-        this.rend = rendRef;
-    };
+    public setRotation(azimuthAngle: number, polarAngle: number, smooth = false) {
+        this.controls.rotateTo(azimuthAngle, polarAngle, smooth);
+    }
 
     private animate = () => {
         requestAnimationFrame(this.animate);
-        this.renderer?.render(this.scene, this.camera);
+        const delta = this.clock.getDelta();
+        if (this.controls.update(delta)) {
+            this.renderer?.render(this.scene, this.camera);
+        }
     };
 
     private getTextTexture = (text: string, flipH = false, flipV = false) => {
@@ -117,11 +114,19 @@ export class ViewCube {
         return new THREE.CanvasTexture(canvas);
     };
 
-    private createOrbitControls = (camera: THREE.Camera, elem: HTMLElement) => {
+    private createOrbitControls = (
+        camera: THREE.PerspectiveCamera,
+        elem: HTMLElement
+    ) => {
         if (this.controls) this.controls.dispose();
-        this.controls = new OrbitControls(camera, elem);
-        this.controls.enablePan = false;
-        this.controls.enableZoom = false;
+        CameraControls.install({THREE: THREE});
+        this.controls = new CameraControls(camera, elem);
+        this.controls.enabled = true;
+        this.controls.mouseButtons.left = CameraControls.ACTION.ROTATE;
+        this.controls.mouseButtons.middle = CameraControls.ACTION.NONE;
+        this.controls.mouseButtons.right = CameraControls.ACTION.NONE;
+        this.controls.mouseButtons.shiftLeft = CameraControls.ACTION.NONE;
+        this.controls.mouseButtons.wheel = CameraControls.ACTION.NONE;
         this.controls.maxPolarAngle = Math.PI * 2;
     };
 
@@ -136,8 +141,7 @@ export class ViewCube {
                 const yMoved =
                     Math.abs(moveEvent.clientY - downEvent.clientY) < dragDelta;
                 if (xMoved || yMoved) drag = true;
-                // TODO: make this call to setRotation of rend in only 1 place!!!
-                this.rend.current!.setRotation(this.getRotation());
+                this.orbitListeners.forEach(cb => cb());
             };
             window.addEventListener("mousemove", copyMovement, false);
             window.addEventListener(
@@ -199,37 +203,38 @@ export class ViewCube {
     private clickCube(event: MouseEvent, domElem: HTMLElement) {
         const intersects = this.getRayIntersection(event, domElem);
         if (intersects.length > 0) {
-            const matrix = new THREE.Matrix4();
-            matrix.identity();
             switch (this.cubeFaces[intersects[0].face!.materialIndex]) {
                 case "Front":
-                    matrix.makeRotationX(0);
+                    this.setRotation(0, Math.PI / 2);
                     break;
 
                 case "Back":
-                    matrix.makeRotationX(Math.PI);
+                    this.setRotation(Math.PI, Math.PI / 2);
                     break;
 
                 case "Left":
-                    matrix.makeRotationY(-Math.PI / 2);
+                    this.setRotation(-Math.PI / 2, Math.PI / 2);
                     break;
 
                 case "Right":
-                    matrix.makeRotationY(Math.PI / 2);
+                    this.setRotation(Math.PI / 2, Math.PI / 2);
                     break;
 
                 case "Top":
-                    matrix.makeRotationX(-Math.PI / 2);
+                    this.setRotation(0, -Math.PI / 2);
                     break;
 
                 case "Bottom":
-                    matrix.makeRotationX(Math.PI / 2);
+                    this.setRotation(0, Math.PI);
                     break;
             }
             this.activeFaceIndex = -1;
-            this.setRotation(matrix);
-            // TODO: make this call to setRotation of rend in only 1 place!!!
-            this.rend.current!.setRotation(this.getRotation());
+            this.orbitListeners.forEach(cb => cb());
         }
+    }
+
+    public onOrbiting(cb: () => void) {
+        this.orbitListeners.push(cb);
+        this.controls.addEventListener("control", cb);
     }
 }

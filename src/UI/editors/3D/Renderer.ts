@@ -1,7 +1,5 @@
-import {MutableRefObject} from "react";
 import * as THREE from "three";
 import {OrbitTransformControls} from "./controllers/OrbitTransformControls";
-import {ViewCube} from "./ViewCube/ViewCube";
 
 export class Renderer {
     protected isOrthographic = false;
@@ -18,7 +16,7 @@ export class Renderer {
     protected container: HTMLElement;
     protected destroyed = false;
 
-    protected viewCube: MutableRefObject<ViewCube | undefined>;
+    public readonly cameraFov = 90;
     /**
      * Creates a new scene in which the sweep object is rendered
      * @param target The target container to render the scene in
@@ -38,15 +36,25 @@ export class Renderer {
         target.appendChild(this.renderer.domElement);
 
         this.setPerspectiveCamera();
-        this.resetCameraPosition();
+        this.camera.position.set(-10, 6, 12);
+        this.camera.rotation.set(0, 0, 0);
+        this.camera.zoom = 1;
 
         this.animate();
-        window.addEventListener("resize", this.updateSize);
+        this.renderer.domElement.addEventListener("resize", this.updateSize);
     }
 
-    public attachViewCube = (viewCube: MutableRefObject<ViewCube | undefined>) => {
-        this.viewCube = viewCube;
-        this.viewCube.current!.setRotation(this.getRotation());
+    private animate = () => {
+        if (!this.destroyed) requestAnimationFrame(this.animate);
+        this.renderer.clear();
+        this.renderer.clearColor();
+
+        this.controls?.update();
+
+        this.camera.layers.set(0);
+        this.renderer.render(this.scene, this.camera);
+        this.camera.layers.set(1);
+        this.renderer.render(this.scene, this.camera);
     };
 
     private updateSize = () => {
@@ -63,11 +71,8 @@ export class Renderer {
      * @returns {size_x: Number, size_y: Number}
      */
     private calculateOrthograhicProjection() {
-        // TODO: look into how to make this better, this might help (Also could remove it cuz might be better )
-        // TODO: fov, Z and the depth_s division is hardcoded, so fix it later
-        // https://stackoverflow.com/questions/48758959/what-is-required-to-convert-threejs-perspective-camera-to-orthographic
-        let fov_y = 90;
-        let depht_s = Math.tan(((fov_y / 2.0) * Math.PI) / 180.0) * 2.0;
+        let depht_s = Math.tan((this.cameraFov / 2.0) * THREE.MathUtils.DEG2RAD) * 2.0;
+        // Z is 12 because that's how we initialized the camera
         let Z = 12;
         let aspect = this.width / this.height;
         let size_y = depht_s * Z;
@@ -78,7 +83,7 @@ export class Renderer {
 
     private setPerspectiveCamera() {
         const camera = new THREE.PerspectiveCamera(
-            90,
+            this.cameraFov,
             this.width / this.height,
             0.1,
             10000
@@ -111,47 +116,9 @@ export class Renderer {
         this.controls?.changeCamera(this.camera);
     }
 
-    private animate = () => {
-        if (!this.destroyed) requestAnimationFrame(this.animate);
-        this.renderer.clear();
-        this.renderer.clearColor();
-
-        this.camera.layers.set(0);
-        this.renderer.render(this.scene, this.camera);
-
-        this.camera.layers.set(1);
-        this.renderer.render(this.scene, this.camera);
-    };
-
     public destroy() {
         this.destroyed = true;
         window.removeEventListener("resize", this.updateSize);
-    }
-
-    public resetCameraPosition() {
-        // TODO: fix reset when moving (not rotating)
-        this.camera.position.set(-10, 6, 12);
-        this.camera.rotation.set(0, 0, 0);
-        this.camera.zoom = 1;
-        this.camera.updateProjectionMatrix();
-        this.controls?.update();
-
-        this.viewCube?.current?.setRotation(this.getRotation());
-    }
-
-    public setRotation(matrix: THREE.Matrix4) {
-        if (this.controls) {
-            const fwd = new THREE.Vector3(0, 0, -1);
-            fwd.applyMatrix4(matrix).normalize();
-            const dist = 30;
-            const offset = fwd.multiplyScalar(dist);
-            this.camera.position.copy(this.controls.getTarget()).sub(offset);
-            this.controls.update();
-        }
-    }
-
-    public getRotation() {
-        return new THREE.Matrix4().makeRotationFromEuler(this.camera.rotation);
     }
 
     public toggleCamera() {

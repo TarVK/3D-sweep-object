@@ -86,7 +86,7 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
             icon: RestartAltOutlined,
             hoverText: "Reset camera",
             iconOnClick: () => {
-                rendererRef.current!.resetCameraPosition();
+                controlsRef.current!.resetCamera();
             },
         },
         {
@@ -102,11 +102,8 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
         const cubeEl = cubeRef.current;
         const el = elementRef.current;
         if (el && cubeEl) {
-            viewCubeRef.current = new ViewCube(cubeEl);
-            viewCubeRef.current.attachRenderer(rendererRef);
-
+            const viewCube = (viewCubeRef.current = new ViewCube(cubeEl));
             const renderer = (rendererRef.current = new Renderer(el, scene));
-            renderer.attachViewCube(viewCubeRef);
             const controls = (controlsRef.current = new OrbitTransformControls(
                 scene,
                 scene.sweepPoints.points,
@@ -114,10 +111,21 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
                 renderer.getRendererDomElem()
             ));
             renderer.attachControls(controls);
-            controls.onOrbiting(() => {
-                viewCubeRef.current!.setRotation(renderer.getRotation());
+            controls.resetCamera();
+
+            viewCube.onOrbiting(() => {
+                controls.setRotation(
+                    viewCube.getAzimuthAngle(),
+                    viewCube.getPolarAngle()
+                );
             });
-            viewCubeRef.current!.setRotation(renderer.getRotation());
+            controls.onOrbiting(() => {
+                viewCube.setRotation(
+                    controls.getAzimuthAngle(),
+                    controls.getPolarAngle()
+                );
+            });
+            viewCube.setRotation(controls.getAzimuthAngle(), controls.getPolarAngle());
 
             const {
                 getSweeplineAsBezierSegments: getBezierSegments,
