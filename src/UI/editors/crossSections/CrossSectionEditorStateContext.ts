@@ -1,8 +1,8 @@
 import {createContext, useContext} from "react";
-import {BezierSegmentState} from "../../../state/BezierSegmentState";
+import {BezierSegmentState} from "../../../state/segments/BezierSegmentState";
 import {CrossSectionEditorState} from "../../../state/CrossSectionEditorState";
 import {CrossSectionState} from "../../../state/CrossSectionState";
-import {StraightSegmentState} from "../../../state/StraightSegmentState";
+import {StraightSegmentState} from "../../../state/segments/StraightSegmentState";
 import {SweepLineState} from "../../../state/SweepLineState";
 import {SweepObjectState} from "../../../state/SweepObjectState";
 import {Vec2} from "../../../util/Vec2";

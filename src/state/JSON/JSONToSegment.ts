@@ -1,12 +1,14 @@
 import {Vec2} from "../../util/Vec2";
 import {Vec3} from "../../util/Vec3";
-import {BezierSegmentState} from "../BezierSegmentState";
-import {StraightSegmentState} from "../StraightSegmentState";
+import {ArcSegmentState} from "../segments/ArcSegmentState";
+import {BezierSegmentState} from "../segments/BezierSegmentState";
+import {StraightSegmentState} from "../segments/StraightSegmentState";
 import {ISegment} from "../_types/ISegment";
 import {Or, VLiteral, VNumber, VObject} from "./verifier/verifiers";
 import {IVerifier} from "./verifier/_types/IVerifier";
 import {I2DPointJSON} from "./_types/I2DPointJSON";
 import {I3DPointJSON} from "./_types/I3DPointJSON";
+import {IArcJSON} from "./_types/IArcJSON";
 import {IBezierJSON} from "./_types/IBezierJSON";
 import {IImportResult} from "./_types/IImportResult";
 import {IJSON} from "./_types/IJSON";
@@ -38,6 +40,15 @@ export function segmentJSONToSegment<P extends I2DPointJSON | I3DPointJSON>(
     json: ISegmentJSON<P>
 ): ISegment<TPointToVec<P>> {
     if (json.type == "bezier") return bezierJSONToBezier(json);
+    /** Only supported for 2d lines currently */
+    if (json.type == "arc" && !("z" in json.start)) {
+        const gp = (v: I2DPointJSON) => getPoint(v) as Vec2;
+        return new ArcSegmentState(
+            gp(json.start),
+            gp(json.control),
+            gp(json.end)
+        ) as any as ISegment<TPointToVec<P>>;
+    }
     return new StraightSegmentState(getPoint(json.start), getPoint(json.end)) as any;
 }
 
@@ -83,7 +94,11 @@ export const VSegment = (
         start: pointVerifier,
         end: pointVerifier,
     });
-    const verifier = Or(VBezier(dimensionality), straightLineVerifier);
+    const verifier = Or(
+        VBezier(dimensionality),
+        straightLineVerifier,
+        VArc(dimensionality)
+    );
     return verifier as any;
 };
 
@@ -122,6 +137,23 @@ export const VBezier = (
         start: pointVerifier,
         startControl: pointVerifier,
         endControl: pointVerifier,
+        end: pointVerifier,
+    });
+};
+
+/**
+ * Creates an arc JSON verifier
+ * @param dimensionality The dimensionality of the points of the curve
+ * @returns The arc verifier
+ */
+export const VArc = (
+    dimensionality: 2 | 3
+): IVerifier<IArcJSON<typeof dimensionality extends 2 ? I2DPointJSON : I3DPointJSON>> => {
+    const pointVerifier = VPoint(dimensionality);
+    return VObject({
+        type: VLiteral("arc" as const),
+        start: pointVerifier,
+        control: pointVerifier,
         end: pointVerifier,
     });
 };

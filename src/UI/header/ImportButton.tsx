@@ -50,6 +50,7 @@ export const ImportButton: FC<{onInput: (object: SweepObjectState) => void}> = (
                     position: "absolute",
                     width: "100%",
                     height: "100%",
+                    cursor: "pointer",
                     opacity: 0,
                 }}
                 onChange={onFileSelect}

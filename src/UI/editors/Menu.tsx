@@ -1,9 +1,8 @@
 import {FC, useEffect, useState} from "react";
-import {MenuButton} from "./MenuButton";
+import {IMenuButtonProps, MenuButton} from "./MenuButton";
 
 interface IMenuProps {
-    items: Array<any>;
-    selectItem?: Function;
+    items: Array<IMenuButtonProps>;
     position?: {
         top?: number;
         bottom?: number;
@@ -13,7 +12,7 @@ interface IMenuProps {
     };
 }
 
-export const Menu: FC<{props: IMenuProps}> = ({props}) => {
+export const Menu: FC<IMenuProps> = ({position, items}) => {
     return (
         <div
             css={{
@@ -24,11 +23,11 @@ export const Menu: FC<{props: IMenuProps}> = ({props}) => {
                 backgroundColor: "rgba(177,212,224,0.7)",
                 margin: "10px",
                 borderRadius: "4px",
-                ...props.position,
+                ...position,
             }}>
-            {props.items.map((item, index) => {
-                return <MenuButton props={{...item, selectItem: props.selectItem}} key={index}/>;
-            })}
+            {items.map((item, index) => (
+                <MenuButton {...item} key={index} />
+            ))}
         </div>
     );
 };

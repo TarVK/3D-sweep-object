@@ -3,15 +3,19 @@ import {Button, Tooltip} from "@mui/material";
 import {FC} from "react";
 
 export interface IMenuButtonProps {
-    id: number;
+    id?: number;
     icon: SvgIconComponent;
     hoverText: string;
-    isSelected: boolean;
-    iconOnClick: Function;
-    selectItem?: Function;
+    isSelected?: boolean;
+    onClick: () => void;
 }
 
-export const MenuButton: FC<{props: IMenuButtonProps}> = ({props}) => {
+export const MenuButton: FC<IMenuButtonProps> = ({
+    isSelected,
+    hoverText,
+    onClick,
+    icon: Icon,
+}) => {
     return (
         <div
             css={{
@@ -19,22 +23,18 @@ export const MenuButton: FC<{props: IMenuButtonProps}> = ({props}) => {
                 minWidth: "50px",
                 display: "flex",
                 justifyContent: "center",
-                backgroundColor: props.isSelected ? "#145DA0" : "#B1D4E0",
+                backgroundColor: isSelected ? "#145DA0" : "#B1D4E0",
                 borderRadius: "4px",
             }}>
-            <Tooltip title={props.hoverText}>
+            <Tooltip title={hoverText}>
                 <Button
-                    onClick={() => {
-                        console.log(props.selectItem)
-                        if (props.selectItem) props.selectItem(props.id);
-                        props.iconOnClick();
-                    }}
+                    onClick={onClick}
                     size="small"
                     style={{
                         maxWidth: "50px",
-                        color: props.isSelected ? "#FFF" : "#145DA0",
+                        color: isSelected ? "#FFF" : "#145DA0",
                     }}>
-                    <props.icon></props.icon>
+                    <Icon />
                 </Button>
             </Tooltip>
         </div>

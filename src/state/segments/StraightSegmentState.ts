@@ -1,7 +1,7 @@
 import {Field, IDataHook} from "model-react";
-import {Vec2} from "../util/Vec2";
-import {Vec3} from "../util/Vec3";
-import {ISegment} from "./_types/ISegment";
+import {Vec2} from "../../util/Vec2";
+import {Vec3} from "../../util/Vec3";
+import {ISegment} from "../_types/ISegment";
 
 /**
  * A class to represent subscribable straight line segments
@@ -209,5 +209,26 @@ export class StraightSegmentState<D extends Vec2 | Vec3> implements ISegment<D> 
                 return {distance: endDistance, point: end, handle: "end"};
         }
         return {distance: startDistance, point: start, handle: "start"};
+    }
+
+    public getBoundingBox(hook?: IDataHook): {
+        minX: number;
+        minY: number;
+        maxX: number;
+        maxY: number;
+    } {
+        const start = this.getStart(hook);
+        const end = this.getEnd(hook);
+        const minX = Math.min(start.x, end.x);
+        const minY = Math.min(start.y, end.y);
+        const maxX = Math.max(start.x, end.x);
+        const maxY = Math.max(start.y, end.y);
+
+        return {
+            minX,
+            minY,
+            maxX,
+            maxY,
+        };
     }
 }

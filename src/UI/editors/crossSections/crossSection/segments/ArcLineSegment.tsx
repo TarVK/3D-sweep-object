@@ -1,13 +1,12 @@
 import {useTheme} from "@mui/material";
 import {useDataHook, useMemoDataHook} from "model-react";
 import {FC, useMemo} from "react";
-import {BezierSegmentState} from "../../../../../state/segments/BezierSegmentState";
-import {Vec2} from "../../../../../util/Vec2";
+import {ArcSegmentState} from "../../../../../state/segments/ArcSegmentState";
 import {useCrossSectionEditorState} from "../../CrossSectionEditorStateContext";
 import {getSegmentSVGSpec} from "../getSegmentSVGSpec";
 
-export const BezierLineSegment: FC<{
-    segment: BezierSegmentState<Vec2>;
+export const ArcLineSegment: FC<{
+    segment: ArcSegmentState;
     includeLastPoint?: boolean;
 }> = ({segment, includeLastPoint}) => {
     const handleSize = 5;
@@ -22,26 +21,17 @@ export const BezierLineSegment: FC<{
 
     const [path] = useMemoDataHook(h => getSegmentSVGSpec(segment, true, h), [segment]);
     const start = segment.getStart(h);
-    const startControl = segment.getStartControl(h);
-    const endControl = segment.getEndControl(h);
+    const control = segment.getControl(h);
     const end = segment.getEnd(h);
-    const startLine = useMemo(
-        () => `M ${start.x} ${-start.y} L ${startControl.x} ${-startControl.y}`,
-        [start, startControl]
-    );
-    const endLine = useMemo(
-        () => `M ${endControl.x} ${-endControl.y} L ${end.x} ${-end.y}`,
-        [end, endControl]
-    );
 
     return (
         <>
             <path
                 stroke={theme.palette.primary.main}
                 d={path}
+                fill="none"
                 strokeWidth={edgeWidth / scale}
                 opacity={edgeOpacity}
-                fill="none"
             />
             <circle
                 cx={start.x}
@@ -50,29 +40,9 @@ export const BezierLineSegment: FC<{
                 fill={theme.palette.primary.main}
                 opacity={handleOpacity}
             />
-
-            <path
-                stroke={theme.palette.primary.light}
-                d={startLine}
-                strokeWidth={edgeWidth / scale}
-                opacity={edgeOpacity}
-            />
-            <path
-                stroke={theme.palette.primary.light}
-                d={endLine}
-                strokeWidth={edgeWidth / scale}
-                opacity={edgeOpacity}
-            />
             <circle
-                cx={startControl.x}
-                cy={-startControl.y}
-                r={handleSize / scale}
-                fill={theme.palette.primary.main}
-                opacity={controlHandleOpacity}
-            />
-            <circle
-                cx={endControl.x}
-                cy={-endControl.y}
+                cx={control.x}
+                cy={-control.y}
                 r={handleSize / scale}
                 fill={theme.palette.primary.main}
                 opacity={controlHandleOpacity}

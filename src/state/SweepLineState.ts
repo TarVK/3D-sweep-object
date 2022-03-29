@@ -3,7 +3,7 @@ import {ISweepLineNode} from "../sweepOperation/_types/spec/ISweepLineNode";
 import {sampleBezier} from "../util/bezier/sampleBezier";
 import {IBezierNode} from "../util/bezier/_types/IBezierNode";
 import {Vec3} from "../util/Vec3";
-import {BezierSegmentState} from "./BezierSegmentState";
+import {BezierSegmentState} from "./segments/BezierSegmentState";
 
 /**
  * A class to represent sweep line state

@@ -1,15 +1,16 @@
 import {DataCacher, Field, IDataHook} from "model-react";
-import {approximateBezier} from "../util/bezier/approximateBezier";
-import {getPointOnBezier} from "../util/bezier/getPointOnBezier";
-import {getTangentOnBezier} from "../util/bezier/getTangentOnBezier";
-import {projectOnBezier} from "../util/bezier/projectOnBezier";
-import {sampleBezier} from "../util/bezier/sampleBezier";
-import {IBezier} from "../util/bezier/_types/IBezier";
-import {IBezierApproximationConfig} from "../util/bezier/_types/IBezierApproximationConfig";
-import {IBezierNode} from "../util/bezier/_types/IBezierNode";
-import {Vec2} from "../util/Vec2";
-import {Vec3} from "../util/Vec3";
-import {ISegment} from "./_types/ISegment";
+import {approximateBezier} from "../../util/bezier/approximateBezier";
+import {getPointOnBezier} from "../../util/bezier/getPointOnBezier";
+import {getTangentOnBezier} from "../../util/bezier/getTangentOnBezier";
+import {projectOnBezier} from "../../util/bezier/projectOnBezier";
+import {sampleBezier} from "../../util/bezier/sampleBezier";
+import {IBezier} from "../../util/bezier/_types/IBezier";
+import {IBezierApproximationConfig} from "../../util/bezier/_types/IBezierApproximationConfig";
+import {IBezierNode} from "../../util/bezier/_types/IBezierNode";
+import {Vec2} from "../../util/Vec2";
+import {Vec3} from "../../util/Vec3";
+import {IBoundingBox} from "../_types/IBoundingBox";
+import {ISegment} from "../_types/ISegment";
 
 /**
  * A class to represent subscribable state of a bezier curve and handle some of its logic
@@ -419,5 +420,23 @@ export class BezierSegmentState<D extends Vec2 | Vec3> implements ISegment<D> {
             (best, option) => (option.distance < best.distance ? option : best),
             {point: start, distance: Infinity, handle: "start"}
         );
+    }
+
+    public getBoundingBox(hook?: IDataHook): IBoundingBox {
+        const start = this.getStart(hook);
+        const startControl = this.getStartControl(hook);
+        const endControl = this.getEndControl(hook);
+        const end = this.getEnd(hook);
+        const minX = Math.min(start.x, startControl.x, endControl.x, end.x);
+        const minY = Math.min(start.y, startControl.y, endControl.y, end.y);
+        const maxX = Math.max(start.x, startControl.x, endControl.x, end.x);
+        const maxY = Math.max(start.y, startControl.y, endControl.y, end.y);
+
+        return {
+            minX,
+            minY,
+            maxX,
+            maxY,
+        };
     }
 }

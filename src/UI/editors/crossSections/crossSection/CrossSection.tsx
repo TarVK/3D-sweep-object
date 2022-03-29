@@ -1,11 +1,13 @@
 import {useDataHook, useMemoDataHook} from "model-react";
 import {FC, useCallback, useRef, useState} from "react";
-import {BezierSegmentState} from "../../../../state/BezierSegmentState";
-import {StraightSegmentState} from "../../../../state/StraightSegmentState";
+import {ArcSegmentState} from "../../../../state/segments/ArcSegmentState";
+import {BezierSegmentState} from "../../../../state/segments/BezierSegmentState";
+import {StraightSegmentState} from "../../../../state/segments/StraightSegmentState";
 import {Vec2} from "../../../../util/Vec2";
 import {useCrossSectionEditorState} from "../CrossSectionEditorStateContext";
 import {CrossSectionApproximationPoints} from "./CrossSectionApproximationPoints";
 import {CrossSectionPolygon} from "./CrossSectionPolygon";
+import {ArcLineSegment} from "./segments/ArcLineSegment";
 import {BezierLineSegment} from "./segments/BezierLineSegment";
 import {StraightLineSegment} from "./segments/StraightLineSegment";
 
@@ -34,6 +36,8 @@ export const CrossSection: FC = () => {
                         return <StraightLineSegment key={i} segment={segment} />;
                     if (segment instanceof BezierSegmentState)
                         return <BezierLineSegment key={i} segment={segment} />;
+                    if (segment instanceof ArcSegmentState)
+                        return <ArcLineSegment key={i} segment={segment} />;
                     return undefined;
                 })
                 .filter(Boolean);

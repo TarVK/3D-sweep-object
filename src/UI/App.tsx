@@ -1,8 +1,8 @@
 import {useDataHook} from "model-react";
 import {FC, useState} from "react";
-import {BezierSegmentState} from "../state/BezierSegmentState";
+import {BezierSegmentState} from "../state/segments/BezierSegmentState";
 import {CrossSectionState} from "../state/CrossSectionState";
-import {StraightSegmentState} from "../state/StraightSegmentState";
+import {StraightSegmentState} from "../state/segments/StraightSegmentState";
 import {SweepLineState} from "../state/SweepLineState";
 import {SweepObjectState} from "../state/SweepObjectState";
 import {Vec2} from "../util/Vec2";
@@ -15,10 +15,11 @@ import {FileType} from "./editors/ExportModel";
 import {OBJExporter} from "../exporters/OBJExporter";
 import {IMesh} from "../sweepOperation/_types/IMesh";
 import {SweepObject} from "./editors/3D/SweepObject";
-import { STLExporter } from "../exporters/STLExporter";
-import { Scene } from "three";
-import { useStateLazy } from "./hooks/useStateLazy";
-import { sweepObjectToJSON } from "../state/JSON/sweepObjectToJSON";
+import {STLExporter} from "../exporters/STLExporter";
+import {Scene} from "three";
+import {useStateLazy} from "./hooks/useStateLazy";
+import {sweepObjectToJSON} from "../state/JSON/sweepObjectToJSON";
+import {ArcSegmentState} from "../state/segments/ArcSegmentState";
 
 export const App: FC = () => {
     const [h] = useDataHook();
@@ -27,7 +28,7 @@ export const App: FC = () => {
         const crossSection1 = new CrossSectionState([
             new StraightSegmentState(new Vec2(-3, 0), new Vec2(3, -3)),
             new BezierSegmentState(new Vec2(3, -3), new Vec2(3, 3)),
-            new StraightSegmentState(new Vec2(3, 3), new Vec2(-3, 0)),
+            new ArcSegmentState(new Vec2(3, 3), new Vec2(0, 0), new Vec2(-3, 0)),
         ]);
         // const crossSection2 = new CrossSectionState([
         //     new StraightSegmentState(new Vec2(-3, 3), new Vec2(3, 3)),
@@ -40,7 +41,7 @@ export const App: FC = () => {
         const crossSection2 = new CrossSectionState([
             new StraightSegmentState(new Vec2(-3, 0), new Vec2(3, -3)),
             new BezierSegmentState(new Vec2(3, -3), new Vec2(3, 3)),
-            new StraightSegmentState(new Vec2(3, 3), new Vec2(-3, 0)),
+            new ArcSegmentState(new Vec2(3, 3), new Vec2(0, 3), new Vec2(-3, 0)),
         ]);
         crossSection2.setRotation(2 * Math.PI);
         crossSection2.setPosition(1);
@@ -68,8 +69,7 @@ export const App: FC = () => {
     const sweepObject = sweepObjectState;
 
     const exportToFile = (fileType: FileType) => {
-        if (!sweepObjectState)
-            return;
+        if (!sweepObjectState) return;
 
         if (fileType === FileType.OBJ) {
             const mesh = convertIMeshToThreeMesh(sweepObjectState.getMesh()!);
@@ -100,7 +100,7 @@ export const App: FC = () => {
             document.body.removeChild(a);
             window.URL.revokeObjectURL(url);
         }, 0);
-    }
+    };
 
     return (
         <div
@@ -120,7 +120,8 @@ export const App: FC = () => {
                     sweepObjectState={sweepObject}
                     onSweepObjectChange={setSweepObjectState}
                     openExportModel={() => setExportModelOpen(true)}
-                    open exportToFile={exportToFile}
+                    open
+                    exportToFile={exportToFile}
                 />
             </div>
             <div
@@ -128,7 +129,7 @@ export const App: FC = () => {
                     display: "flex",
                     justifyContent: "space-around",
                     margin: "auto auto",
-                    userSelect: "none"
+                    userSelect: "none",
                 }}>
                 <Canvas
                     css={{

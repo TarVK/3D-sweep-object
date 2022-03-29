@@ -17,6 +17,7 @@ import {Menu} from "../Menu";
 import {useDataHook} from "model-react";
 import {OrbitTransformControls} from "./controllers/OrbitTransformControls";
 import editSweepPoints from "./EditSweepPoints";
+import {Object3D} from "three";
 
 export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...props}) => {
     const [h] = useDataHook();
@@ -31,9 +32,8 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
     const viewCubeRef = useRef<ViewCube | undefined>();
     const cubeRef = useRef<HTMLDivElement>(null);
     const cubeSize = 100; //px
-
-    const [selectedPoint] = useState({x: 100, y: 211, z: 5});
     const scene = sceneRef.current;
+    const [selectedObj, setSelectedObj] = useState<Object3D>();
 
     // TODO: place this somewhere
     function toggleMeshDisplaying() {
@@ -44,11 +44,15 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
         updateScene!(sceneRef);
     }, [sceneRef]);
 
+    useEffect(() => {
+        setSelectedObj(controlsRef.current?.currObj);
+    }, [controlsRef.current?.currObj]);
+
     const pointMenuItems = [
         {
             icon: AddCircleOutlineSharp,
             hoverText: "Add point",
-            iconOnClick: () => {
+            onClick: () => {
                 controlsRef.current!.setMode("add");
                 scene.sweepPoints.visible = true;
                 scene.sweepLine.visible = true;
@@ -57,7 +61,7 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
         {
             icon: MouseOutlined,
             hoverText: "Select point",
-            iconOnClick: () => {
+            onClick: () => {
                 controlsRef.current!.setMode("transform");
                 scene.sweepPoints.visible = true;
                 scene.sweepLine.visible = true;
@@ -66,7 +70,7 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
         {
             icon: ClearOutlined,
             hoverText: "Delete point",
-            iconOnClick: () => {
+            onClick: () => {
                 controlsRef.current!.setMode("delete");
                 scene.sweepPoints.visible = true;
                 scene.sweepLine.visible = true;
@@ -75,7 +79,7 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
         {
             icon: ZoomOutMapOutlined,
             hoverText: "Change camera position",
-            iconOnClick: () => {
+            onClick: () => {
                 controlsRef.current!.setMode("move");
                 scene.sweepPoints.visible = true;
                 scene.sweepLine.visible = true;
@@ -87,14 +91,14 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
         {
             icon: RestartAltOutlined,
             hoverText: "Reset camera",
-            iconOnClick: () => {
+            onClick: () => {
                 controlsRef.current!.resetCamera();
             },
         },
         {
             icon: CameraAltOutlined,
             hoverText: "Camera mode",
-            iconOnClick: () => {
+            onClick: () => {
                 rendererRef.current!.toggleCamera();
             },
         },
@@ -154,6 +158,17 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
         }
     }, []);
 
+
+    // TO-DO figure out how to do with transformEvents
+    const triggerUpdate = () => {
+        const {getSweeplineAsBezierSegments: getBezierSegments} = editSweepPoints(
+            scene.sweepPoints
+        );
+        const segments = getBezierSegments();
+        sweepObjectState.getSweepLine().setSegments(segments, true);
+        scene.sweepPoints.updatePoints(segments);
+    };
+
     const sweepObjectMesh = sweepObjectState.getMesh(h);
 
     useEffect(() => {
@@ -178,9 +193,11 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
                 borderRadius: "4px",
                 overflow: "hidden",
             }}>
-            <Menu props={{items: pointMenuItems, position: {top: 0, left: 0}}} />
-            <Menu props={{items: cameraMenuItems, position: {top: 0, right: 0}}} />
-            {selectedPoint ? <SelectedPoint props={selectedPoint} /> : null}
+            <Menu items={pointMenuItems} position={{top: 0, left: 0}} />
+            <Menu items={cameraMenuItems} position={{top: 0, right: 0}} />
+            {selectedObj ? (
+                <SelectedPoint triggerUpdate={triggerUpdate} point={selectedObj} />
+            ) : null}
             <div
                 ref={cubeRef}
                 {...props}

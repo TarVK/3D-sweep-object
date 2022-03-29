@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import {BezierSegmentState} from "../../../state/BezierSegmentState";
+import {BezierSegmentState} from "../../../state/segments/BezierSegmentState";
 import {Vec3} from "../../../util/Vec3";
 import {colors} from "./ColorSchema";
 import {IMateriable} from "./_types/IMateriable";
