@@ -1,6 +1,6 @@
 export const colors = Object.freeze({
     GROUND: 0x999999,
-    BACKGROUND: 0xa0a0a0,
+    BACKGROUND: 0x0C2D48,
     LIGHT: 0xffffff,
     SWEEP_LINE: 0x000000,
     SWEEP_LINE_HELPER: 0x00cccc,
@@ -8,7 +8,7 @@ export const colors = Object.freeze({
     SWEEP_POINT_SELECTED: 0x006600,
     SWEEP_POINT_HOVER: 0xdda0dd,
     SWEEP_OBJECT: 0xff0000,
-    VIEWCUBE: 0xeeeeee,
-    VIEWCUBE_OUTLINE: 0x000000,
-    VIEWCUBE_HOVER: 0xaaaaaa,
+    VIEWCUBE: 0xB1D4E0,
+    VIEWCUBE_OUTLINE: 0x2E8BC0,
+    VIEWCUBE_HOVER: 0x145DA0,
 });

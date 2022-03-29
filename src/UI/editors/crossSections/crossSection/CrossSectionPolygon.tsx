@@ -1,7 +1,6 @@
 import {useTheme} from "@mui/material";
 import {useDataHook, useMemoDataHook} from "model-react";
-import {FC, useMemo} from "react";
-import {Vec2} from "../../../../util/Vec2";
+import {FC} from "react";
 import {useCrossSectionEditorState} from "../CrossSectionEditorStateContext";
 import {getSegmentSVGSpec} from "./getSegmentSVGSpec";
 
@@ -22,5 +21,5 @@ export const CrossSectionPolygon: FC = () => {
                 .join(" "),
         [segments]
     );
-    return <path fill={theme.palette.primary.light} opacity={0.6} d={path} />;
+    return <path fill={theme.palette.primaryColor} opacity={0.6} d={path} />;
 };

@@ -13,6 +13,11 @@ import {RotationScaleMenu} from "./RotationScaleMenu";
 import {CrossSectionEditor} from "./crossSections/CrossSectionEditor";
 import {useCrossSectionEditorState} from "./crossSections/CrossSectionEditorStateContext";
 import {useMemoDataHook} from "model-react";
+import { CustomArcIcon } from "../custom/CustomArcIcon";
+import { CustomBezierIcon } from "../custom/CustomBezierIcon";
+import { CustomStraightLineIcon } from "../custom/CustomStraightIcon";
+import { ThemeProvider } from "@emotion/react";
+import { theme } from "../../themes/MUITheme";
 
 export const CrossSectionCanvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
     const editorState = useCrossSectionEditorState();
@@ -42,18 +47,26 @@ export const CrossSectionCanvas: FC<ICanvasProps> = ({sweepObjectState, ...props
             },
         ];
     }, []);
-    const exportImportMenu = useMemo(
+    const lineTypeMenu = useMemo(
         () => [
             {
-                icon: FileUploadOutlined,
-                hoverText: "Import",
+                icon:  CustomStraightLineIcon,
+                hoverText: "Straight Line",
+                isSelected: true,
                 onClick: () => {},
             },
             {
-                icon: FileDownloadOutlined,
-                hoverText: "Export",
+                icon: CustomArcIcon,
+                hoverText: "Arc Line",
+                isSelected: false,
                 onClick: () => {},
             },
+            {
+                icon:  CustomBezierIcon,
+                hoverText: "Bezier Line",
+                isSelected: false,
+                onClick: () => {},
+            }
         ],
         []
     );
@@ -71,9 +84,13 @@ export const CrossSectionCanvas: FC<ICanvasProps> = ({sweepObjectState, ...props
                 height="100%"
             />
             <Menu items={pointMenuItems} position={{top: 0, left: 0}} />
-            <Menu items={exportImportMenu} position={{top: 0, right: 0}} />
+            <Menu items={lineTypeMenu} position={{top: 0, right: 0}} />
+            <ThemeProvider theme={theme}>
             <CrossSectionsMenu />
+            </ThemeProvider>
             <RotationScaleMenu />
+            {/* <CustomIcon src={require=("/svgs/arc-line.svg")} /> */}
+            <img src={require("/public/box.png")} />
         </div>
     );
 };

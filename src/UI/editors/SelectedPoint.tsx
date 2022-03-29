@@ -1,5 +1,5 @@
 import {HelpOutline, HelpOutlined} from "@mui/icons-material";
-import {Input, Tooltip} from "@mui/material";
+import {Input, Tooltip, useTheme} from "@mui/material";
 import {FC, useEffect, useState} from "react";
 import {Object3D} from "three";
 
@@ -9,6 +9,7 @@ interface SelectedPointProps {
 }
 
 export const SelectedPoint: FC<SelectedPointProps> = props => {
+    const theme = useTheme();
     const [localX, setLocalX] = useState<number>(props.point.position.x);
     const [localY, setLocalY] = useState<number>(props.point.position.y);
     const [localZ, setLocalZ] = useState<number>(props.point.position.z);
@@ -53,8 +54,8 @@ export const SelectedPoint: FC<SelectedPointProps> = props => {
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "space-around",
-                minWidth: "140px",
-                maxWidth: "140px",
+                minWidth: "160px",
+                maxWidth: "160px",
                 maxHeight: "160px",
                 position: "absolute",
                 bottom: "0px",
@@ -62,7 +63,7 @@ export const SelectedPoint: FC<SelectedPointProps> = props => {
                 backgroundColor: "rgba(177,212,224,0.7)",
                 margin: "10px",
                 borderRadius: "4px",
-                color: "#145DA0",
+                color: theme.palette.primaryColor,
                 padding: "5px",
             }}>
             <div
@@ -72,12 +73,13 @@ export const SelectedPoint: FC<SelectedPointProps> = props => {
                     justifyContent: "space-around",
                     alignItems: "center",
                 }}>
-                <h4
+                <h3
                     css={{
                         margin: "0",
+                        fontSize: theme.typography.h3.fontSize
                     }}>
                     Selected point
-                </h4>{" "}
+                </h3>{" "}
                 <Tooltip title="Double click on value to update.">
                     <HelpOutline sx={{transform: "scale(0.7)", opacity: .7}} />
                 </Tooltip>
@@ -92,14 +94,15 @@ export const SelectedPoint: FC<SelectedPointProps> = props => {
                 }}>
                 {" "}
                 {!xIsOnEditMode ? (
-                    <p
+                    <h4
                         className="xCoordinate"
                         css={{
                             margin: "5px",
+                            ...theme.typography.h4
                         }}
                         onDoubleClick={() => setXIsOnEditMode(true)}>
                         <b>X:</b> {Number(localX).toFixed(2)}
-                    </p>
+                    </h4>
                 ) : (
                     <Input
                         value={localX}
@@ -110,14 +113,15 @@ export const SelectedPoint: FC<SelectedPointProps> = props => {
                     />
                 )}
                 {!yIsOnEditMode ? (
-                    <p
+                    <h4
                         className="yCoordinate"
                         css={{
                             margin: "5px",
+                            ...theme.typography.h4
                         }}
                         onDoubleClick={() => setYIsOnEditMode(true)}>
                         <b>Y:</b> {Number(localY).toFixed(2)}
-                    </p>
+                    </h4>
                 ) : (
                     <Input
                         value={localY}
@@ -128,14 +132,15 @@ export const SelectedPoint: FC<SelectedPointProps> = props => {
                     />
                 )}
                 {!zIsOnEditMode ? (
-                    <p
+                    <h4
                         className="zCoordinate"
                         css={{
                             margin: "5px",
+                            ...theme.typography.h4
                         }}
                         onDoubleClick={() => setZIsOnEditMode(true)}>
                         <b>Z:</b> {Number(localZ).toFixed(2)}
-                    </p>
+                    </h4>
                 ) : (
                     <Input
                         value={localZ}

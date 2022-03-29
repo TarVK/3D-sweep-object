@@ -27,7 +27,7 @@ export const ArcLineSegment: FC<{
     return (
         <>
             <path
-                stroke={theme.palette.primary.main}
+                stroke={theme.palette.primaryColor}
                 d={path}
                 fill="none"
                 strokeWidth={edgeWidth / scale}
@@ -37,14 +37,14 @@ export const ArcLineSegment: FC<{
                 cx={start.x}
                 cy={-start.y}
                 r={handleSize / scale}
-                fill={theme.palette.primary.main}
+                fill={theme.palette.primaryColor}
                 opacity={handleOpacity}
             />
             <circle
                 cx={control.x}
                 cy={-control.y}
                 r={handleSize / scale}
-                fill={theme.palette.primary.main}
+                fill={theme.palette.primaryColor}
                 opacity={controlHandleOpacity}
             />
             {includeLastPoint && (
@@ -52,7 +52,7 @@ export const ArcLineSegment: FC<{
                     cx={end.x}
                     cy={-end.y}
                     r={handleSize / scale}
-                    fill={theme.palette.primary.main}
+                    fill={theme.palette.primaryColor}
                     opacity={handleOpacity}
                 />
             )}

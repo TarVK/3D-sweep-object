@@ -1,12 +1,13 @@
 import {TextField} from "@mui/material";
+import { useTheme } from "@mui/system";
 import {useDataHook} from "model-react";
 import {FC, useCallback, useState} from "react";
 import {useCrossSectionEditorState} from "./crossSections/CrossSectionEditorStateContext";
 
 // TO-DO add props for this component
 export const RotationScaleMenu: FC = () => {
+    const theme = useTheme();
     const [h] = useDataHook();
-
     const editorState = useCrossSectionEditorState();
     const crossSection = editorState.getSelectedCrossSection(h);
     const rotation = (crossSection.getRotation(h) / Math.PI) * 180;
@@ -29,7 +30,7 @@ export const RotationScaleMenu: FC = () => {
                 borderRadius: "4px",
                 maxWidth: "150px",
                 padding: "5px",
-                color: "#145DA0",
+                color: theme.palette.primaryColor,
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "space-around",

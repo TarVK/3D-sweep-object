@@ -31,7 +31,7 @@ export const CrossSectionApproximationPoints: FC = () => {
                     cx={point.x}
                     cy={-point.y}
                     r={size / scale}
-                    fill={theme.palette.primary.main}
+                    fill={theme.palette.secondaryColor}
                     opacity={opacity}
                 />
             ))}

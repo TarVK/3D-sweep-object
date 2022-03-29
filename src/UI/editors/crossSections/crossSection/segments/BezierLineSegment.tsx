@@ -37,7 +37,7 @@ export const BezierLineSegment: FC<{
     return (
         <>
             <path
-                stroke={theme.palette.primary.main}
+                stroke={theme.palette.primaryColor}
                 d={path}
                 strokeWidth={edgeWidth / scale}
                 opacity={edgeOpacity}
@@ -47,18 +47,18 @@ export const BezierLineSegment: FC<{
                 cx={start.x}
                 cy={-start.y}
                 r={handleSize / scale}
-                fill={theme.palette.primary.main}
+                fill={theme.palette.primaryColor}
                 opacity={handleOpacity}
             />
 
             <path
-                stroke={theme.palette.primary.light}
+                stroke={theme.palette.lightBlue}
                 d={startLine}
                 strokeWidth={edgeWidth / scale}
                 opacity={edgeOpacity}
             />
             <path
-                stroke={theme.palette.primary.light}
+                stroke={theme.palette.lightBlue}
                 d={endLine}
                 strokeWidth={edgeWidth / scale}
                 opacity={edgeOpacity}
@@ -67,14 +67,14 @@ export const BezierLineSegment: FC<{
                 cx={startControl.x}
                 cy={-startControl.y}
                 r={handleSize / scale}
-                fill={theme.palette.primary.main}
+                fill={theme.palette.primaryColor}
                 opacity={controlHandleOpacity}
             />
             <circle
                 cx={endControl.x}
                 cy={-endControl.y}
                 r={handleSize / scale}
-                fill={theme.palette.primary.main}
+                fill={theme.palette.primaryColor}
                 opacity={controlHandleOpacity}
             />
             {includeLastPoint && (
@@ -82,7 +82,7 @@ export const BezierLineSegment: FC<{
                     cx={end.x}
                     cy={-end.y}
                     r={handleSize / scale}
-                    fill={theme.palette.primary.main}
+                    fill={theme.palette.primaryColor}
                     opacity={handleOpacity}
                 />
             )}

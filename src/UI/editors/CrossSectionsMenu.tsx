@@ -1,12 +1,14 @@
 import {AddBox, IndeterminateCheckBox} from "@mui/icons-material";
 import {Button} from "@mui/material";
+import { useTheme } from "@mui/system";
 import {useDataHook} from "model-react";
-import {FC, useCallback, useEffect, useState} from "react";
+import {FC, useCallback} from "react";
 import {CrossSectionState} from "../../state/CrossSectionState";
 import {CustomSvg} from "../CustomSvg";
 import {useCrossSectionEditorState} from "./crossSections/CrossSectionEditorStateContext";
 
 export const CrossSectionsMenu: FC = () => {
+    const theme = useTheme();
     const [h] = useDataHook();
     const editorState = useCrossSectionEditorState();
     const sweepObject = editorState.getSweepObject(h);
@@ -63,7 +65,7 @@ export const CrossSectionsMenu: FC = () => {
                 maxWidth: "100px",
                 maxHeight: "140px",
                 padding: "5px",
-                color: "#145DA0",
+                color: theme.palette["primaryColor"],
             }}>
             <div
                 className="cross-sections"
@@ -75,16 +77,16 @@ export const CrossSectionsMenu: FC = () => {
                     minHeight: "110px",
                     overflowY: "auto",
                     scrollbarWidth: "none",
-                    borderBottom: "2px dashed #145DA0",
+                    borderBottom: `2px dashed ${theme.palette.primaryColor}`,
                 }}>
                 {crossSections.map((crossSection, index) => (
                     <CustomSvg
                         key={index}
                         backgroundColor={
-                            selectedCrossSection === crossSection ? "#145DA0" : "#B1D4E0"
+                            selectedCrossSection === crossSection ? theme.palette.primaryColor : theme.palette.lightBlue
                         }
                         strokeColor={
-                            selectedCrossSection === crossSection ? "#FFF" : "#145DA0"
+                            selectedCrossSection === crossSection ? "#FFF" : theme.palette.primaryColor
                         }
                         index={index}
                         crossSection={crossSection}
@@ -104,7 +106,7 @@ export const CrossSectionsMenu: FC = () => {
                     css={{
                         maxWidth: "30px",
                         minWidth: "30px",
-                        color: "#145DA0",
+                        color: theme.palette.primaryColor,
                         margin: "0px 5px 0px",
                     }}>
                     <AddBox />
@@ -114,7 +116,7 @@ export const CrossSectionsMenu: FC = () => {
                     css={{
                         maxWidth: "30px",
                         minWidth: "30px",
-                        color: "#145DA0",
+                        color: theme.palette.primaryColor,
                         margin: "0px 5px 0px",
                     }}>
                     <IndeterminateCheckBox />
