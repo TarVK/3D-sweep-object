@@ -17,6 +17,9 @@ import {Menu} from "../Menu";
 import {useDataHook} from "model-react";
 import {OrbitTransformControls} from "./controllers/OrbitTransformControls";
 import editSweepPoints from "./EditSweepPoints";
+import {HistoryManager} from "../../HistoryManager";
+import {Vec3} from "../../../util/Vec3";
+import {BezierSegmentState} from "../../../state/BezierSegmentState";
 
 export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...props}) => {
     const [h] = useDataHook();
@@ -32,8 +35,13 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
     const cubeRef = useRef<HTMLDivElement>(null);
     const cubeSize = 100; //px
 
+    const historyRef = useRefLazy<HistoryManager<BezierSegmentState<Vec3>[]>>(
+        () => new HistoryManager(sweepObjectState.getSweepLine().getSegments())
+    );
+
     const [selectedPoint] = useState({x: 100, y: 211, z: 5});
     const scene = sceneRef.current;
+    const history = historyRef.current;
 
     // TODO: place this somewhere
     function toggleMeshDisplaying() {
@@ -103,6 +111,7 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
     useEffect(() => {
         const cubeEl = cubeRef.current;
         const el = elementRef.current;
+
         if (el && cubeEl) {
             const viewCube = (viewCubeRef.current = new ViewCube(cubeEl));
             const renderer = (rendererRef.current = new Renderer(el, scene));
@@ -134,22 +143,32 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
                 addPointToSweepline: addPoint,
                 deletePointFromSweepline: deletePoint,
             } = editSweepPoints(scene.sweepPoints);
-            controls.onTransform(() => {
+            controls.onTransform(event => {
                 const segments = getBezierSegments();
                 sweepObjectState.getSweepLine().setSegments(segments, true);
                 scene.sweepPoints.updatePoints(segments);
+                if (event && event.type == "mouseUp") {
+                    history.push(segments);
+                }
             });
             controls.onAdd(pointVec => {
                 const segments = addPoint(pointVec);
+                history.push(segments);
                 sweepObjectState.getSweepLine().setSegments(segments, true);
                 scene.sweepPoints.updatePoints(segments, true);
             });
             controls.onDelete(pointObj => {
+                // TODO: Add to history only when a point is deleted / moved
                 const segments = deletePoint(pointObj);
+                history.push(segments);
                 sweepObjectState.getSweepLine().setSegments(segments, true);
                 scene.sweepPoints.updatePoints(segments, true);
             });
 
+            history.onChange(segments => {
+                sweepObjectState.getSweepLine().setSegments(segments);
+                scene.sweepPoints.updatePoints(segments, true);
+            });
             return () => renderer.destroy();
         }
     }, []);
@@ -171,6 +190,8 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
     // this div decides the size of the canvas
     return (
         <div
+            onKeyDown={history.onKeyDown}
+            tabIndex={0}
             ref={elementRef}
             {...props}
             css={{

@@ -22,7 +22,7 @@ export class OrbitTransformControls {
 
     private transformEnabled = true;
 
-    private transformListeners: (() => void)[] = [];
+    private transformListeners: ((event?: THREE.Event) => void)[] = [];
     private addListeners: ((point: THREE.Vector3) => void)[] = [];
     private deleteListeners: ((point: THREE.Object3D) => void)[] = [];
     private orbitListeners: (() => void)[] = [];
@@ -49,6 +49,7 @@ export class OrbitTransformControls {
         this.orbitControls.mouseButtons.middle = CameraControls.ACTION.NONE;
 
         this.orbitControls.saveState();
+
         this.initialOrbitRadius = this.orbitControls.distance;
         this.orbitControls.addEventListener("transitionstart", () => {
             this.allowOrbitListeners = true;
@@ -169,9 +170,13 @@ export class OrbitTransformControls {
             this.transformControls.addEventListener("dragging-changed", event => {
                 this.orbitControls.enabled = !event.value;
             });
-            this.transformControls.addEventListener("objectChange", () => {
-                this.transformListeners.forEach(cb => cb());
+            this.transformControls.addEventListener("objectChange", e => {
+                this.transformListeners.forEach(cb => cb(e));
             });
+            this.transformControls.addEventListener("mouseUp", e => {
+                this.transformListeners.forEach(cb => cb(e));
+            });
+
             this.setObjectColors();
         }
     };
@@ -241,7 +246,7 @@ export class OrbitTransformControls {
         this.orbitControls.dispose();
     }
 
-    public onTransform(cb: () => void) {
+    public onTransform(cb: (event?: THREE.Event) => void) {
         this.transformListeners.push(cb);
     }
 
