@@ -1,17 +1,20 @@
 import * as THREE from "three";
-import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 import {TransformControls} from "three/examples/jsm/controls/TransformControls";
 import {colors} from "../ColorSchema";
+import CameraControls from "camera-controls";
 
 type Camera = THREE.PerspectiveCamera | THREE.OrthographicCamera;
 type Modes = "add" | "delete" | "transform" | "move";
 
 //Thanks https://sbcode.net/threejs/multi-controls-example/#video-lecture
 export class OrbitTransformControls {
-    public transformControls: TransformControls;
-    public orbitControls: OrbitControls;
+    private initialOrbitRadius: number;
+    private transformControls: TransformControls;
+    private orbitControls: CameraControls;
 
     private raycaster: THREE.Raycaster;
+    private clock: THREE.Clock;
+
     private objects: THREE.Mesh[];
     private scene: THREE.Scene;
     private camera: Camera;
@@ -22,11 +25,13 @@ export class OrbitTransformControls {
     private transformListeners: (() => void)[] = [];
     private addListeners: ((point: THREE.Vector3) => void)[] = [];
     private deleteListeners: ((point: THREE.Object3D) => void)[] = [];
-    public transformEvents: Function[] = [];
+    private orbitListeners: (() => void)[] = [];
+    private allowOrbitListeners = true;
+
+    private hoverObj: THREE.Object3D | undefined;
+    private mode: Modes = "transform";
 
     public currObj: THREE.Object3D | undefined;
-    public hoverObj: THREE.Object3D | undefined;
-    private mode: Modes = "transform";
 
     constructor(
         scene: THREE.Scene,
@@ -34,9 +39,33 @@ export class OrbitTransformControls {
         camera: Camera,
         domElem: HTMLElement
     ) {
-        this.orbitControls = new OrbitControls(camera, domElem);
+        CameraControls.install({THREE: THREE});
+
+        this.orbitControls = new CameraControls(camera, domElem);
+        this.orbitControls.mouseButtons.left = CameraControls.ACTION.ROTATE;
+        this.orbitControls.mouseButtons.wheel = CameraControls.ACTION.DOLLY;
+        this.orbitControls.mouseButtons.right = CameraControls.ACTION.OFFSET;
+        this.orbitControls.mouseButtons.shiftLeft = CameraControls.ACTION.ROTATE;
+        this.orbitControls.mouseButtons.middle = CameraControls.ACTION.NONE;
+
+        this.orbitControls.saveState();
+        this.initialOrbitRadius = this.orbitControls.distance;
+        this.orbitControls.addEventListener("transitionstart", () => {
+            this.allowOrbitListeners = true;
+        });
+        this.orbitControls.addEventListener("rest", () => {
+            this.allowOrbitListeners = false;
+        });
+        this.orbitControls.addEventListener("update", () => {
+            if (this.camera instanceof THREE.OrthographicCamera) {
+                const dolly = this.getDollyFromZoom(this.camera.zoom);
+                this.setDolly(dolly);
+            }
+        });
+
         this.raycaster = new THREE.Raycaster();
         this.raycaster.layers.set(1);
+        this.clock = new THREE.Clock();
         this.objects = objects;
         this.scene = scene;
         this.camera = camera;
@@ -49,16 +78,36 @@ export class OrbitTransformControls {
     public setMode(mode: Modes) {
         this.mode = mode;
         if (this.mode == "transform") {
-            this.enableTransform();
-            this.orbitControls.enabled = true;
+            this.orbitControls.mouseButtons.left = CameraControls.ACTION.ROTATE;
+            this.orbitControls.mouseButtons.right = CameraControls.ACTION.OFFSET;
         } else if (this.mode == "add") {
-            this.disableTransform();
-            this.orbitControls.enabled = false;
+            this.disposeTransform();
+            this.orbitControls.mouseButtons.left = CameraControls.ACTION.NONE;
+            this.orbitControls.mouseButtons.right = CameraControls.ACTION.OFFSET;
         } else if (this.mode == "delete") {
-            this.disableTransform();
-            this.orbitControls.enabled = true;
+            this.disposeTransform();
+            this.orbitControls.mouseButtons.left = CameraControls.ACTION.ROTATE;
+            this.orbitControls.mouseButtons.right = CameraControls.ACTION.OFFSET;
         } else if (this.mode == "move") {
+            this.disposeTransform();
+            this.orbitControls.mouseButtons.left = CameraControls.ACTION.ROTATE;
+            this.orbitControls.mouseButtons.right = CameraControls.ACTION.OFFSET;
         }
+    }
+
+    private setObjectColors() {
+        this.objects.forEach(o => {
+            if (o == this.currObj) {
+                //@ts-ignore
+                o.material.color.setHex(colors.SWEEP_POINT_SELECTED);
+            } else if (o == this.hoverObj) {
+                //@ts-ignore
+                o.material.color.setHex(colors.SWEEP_POINT_HOVER);
+            } else {
+                //@ts-ignore
+                o.material.color.setHex(colors.SWEEP_POINT);
+            }
+        });
     }
 
     private onMouseDown = (event: MouseEvent) => {
@@ -69,6 +118,7 @@ export class OrbitTransformControls {
         } else if (this.mode == "delete") {
             this.deletePointOnClick(event);
         } else if (this.mode == "move") {
+            return;
         }
     };
 
@@ -83,7 +133,21 @@ export class OrbitTransformControls {
         }
     };
 
+    private hoverPoint = (event: MouseEvent) => {
+        const {x, y} = this.getMouseXandY(event);
+        this.raycaster.setFromCamera(new THREE.Vector2(x, y), this.camera);
+        const intersects = this.raycaster.intersectObjects(this.objects);
+
+        if (intersects.length > 0) {
+            this.hoverObj = intersects[0].object;
+        } else {
+            this.hoverObj = undefined;
+        }
+        this.setObjectColors();
+    };
+
     private selectPointForMovement = (event: MouseEvent) => {
+        if (event.button != 0) return;
         if (!this.transformEnabled) {
             this.orbitControls.enabled = true;
             return;
@@ -112,43 +176,15 @@ export class OrbitTransformControls {
         }
     };
 
-    private hoverPoint = (event: MouseEvent) => {
-        const {x, y} = this.getMouseXandY(event);
-        this.raycaster.setFromCamera(new THREE.Vector2(x, y), this.camera);
-        const intersects = this.raycaster.intersectObjects(this.objects);
-
-        if (intersects.length > 0) {
-            this.hoverObj = intersects[0].object;
-        } else {
-            this.hoverObj = undefined;
-        }
-        this.setObjectColors();
-    };
-
-    private setObjectColors() {
-        this.objects.forEach(o => {
-            if (o == this.currObj) {
-                //@ts-ignore
-                o.material.color.setHex(colors.SWEEP_POINT_SELECTED);
-            } else if (o == this.hoverObj) {
-                //@ts-ignore
-                o.material.color.setHex(colors.SWEEP_POINT_HOVER);
-            } else {
-                //@ts-ignore
-                o.material.color.setHex(colors.SWEEP_POINT);
-            }
-        });
-    }
-
     private createNewPointOnClick(event: MouseEvent) {
-        const target = this.getTarget().clone();
+        if (event.button != 0 || event.shiftKey) return;
         const plane = new THREE.Plane();
-        let normal = target.clone().normalize().sub(this.camera.position);
-        plane.setFromNormalAndCoplanarPoint(normal, target);
+        const cameraQ = this.camera.quaternion.clone();
+        plane.normal.set(0, 0, -1).applyQuaternion(cameraQ);
 
         const {x, y} = this.getMouseXandY(event);
         this.raycaster.setFromCamera(new THREE.Vector2(x, y), this.camera);
-        const point = this.raycaster.ray.intersectPlane(plane, target);
+        const point = this.raycaster.ray.intersectPlane(plane, new THREE.Vector3());
 
         if (point) {
             this.addListeners.forEach(cb => cb(point));
@@ -156,6 +192,7 @@ export class OrbitTransformControls {
     }
 
     private deletePointOnClick(event: MouseEvent) {
+        if (event.button != 0) return;
         const {x, y} = this.getMouseXandY(event);
         this.raycaster.setFromCamera(new THREE.Vector2(x, y), this.camera);
         const intersects = this.raycaster.intersectObjects(this.objects);
@@ -182,19 +219,26 @@ export class OrbitTransformControls {
         return {x, y};
     }
 
-    public dispose() {
-        this.disposeTransform();
-        this.orbitControls.dispose();
+    private setZoom(zoom: number, smooth = false) {
+        this.orbitControls.zoomTo(zoom, smooth);
+    }
+
+    private setDolly(dolly: number, smooth = false) {
+        this.orbitControls.dollyTo(dolly, smooth);
     }
 
     private disposeTransform() {
         this.currObj = undefined;
-        this.orbitControls.enabled = this.mode != "add";
         if (this.transformControls) {
             this.transformControls.dispose();
             this.transformControls.removeFromParent();
         }
         this.setObjectColors();
+    }
+
+    public dispose() {
+        this.disposeTransform();
+        this.orbitControls.dispose();
     }
 
     public onTransform(cb: () => void) {
@@ -209,30 +253,47 @@ export class OrbitTransformControls {
         this.deleteListeners.push(cb);
     }
 
-    public getTarget() {
-        return this.orbitControls.target;
+    public onOrbiting(cb: () => void) {
+        this.orbitListeners.push(cb);
+        this.orbitControls.addEventListener("update", () => {
+            if (this.allowOrbitListeners) {
+                cb();
+            }
+        });
     }
 
     public update() {
-        this.orbitControls.update();
-        if (this.transformControls) {
-            this.transformControls.updateMatrixWorld();
+        const delta = this.clock.getDelta();
+        return this.orbitControls.update(delta);
+    }
+
+    private getDollyFromZoom(zoom: number) {
+        return this.initialOrbitRadius / zoom;
+    }
+
+    private fixZoomAndDoly() {
+        if (this.camera instanceof THREE.PerspectiveCamera) {
+            // dolly is the radius of the control sphere
+            const dolly = this.getDollyFromZoom(this.camera.zoom);
+            this.setZoom(1);
+            this.setDolly(dolly);
+            this.orbitControls.mouseButtons.wheel = CameraControls.ACTION.DOLLY;
+        } else if (this.camera instanceof THREE.OrthographicCamera) {
+            // zoom is the fraction of the initial control radius and the current one
+            const zoom = this.initialOrbitRadius / this.orbitControls.distance;
+            const dolly = this.getDollyFromZoom(zoom);
+            this.setZoom(zoom);
+            this.setDolly(dolly);
+            this.orbitControls.mouseButtons.wheel = CameraControls.ACTION.ZOOM;
         }
-    }
-
-    public enableTransform() {
-        this.transformEnabled = true;
-    }
-
-    public disableTransform() {
-        this.transformEnabled = false;
-        this.disposeTransform();
     }
 
     public changeCamera(camera: Camera) {
         this.camera = camera;
-        this.orbitControls.object = camera;
-        this.orbitControls.update();
+        this.orbitControls.camera = this.camera;
+
+        this.fixZoomAndDoly();
+
         if (this.transformControls) {
             this.transformControls.camera = camera;
             this.transformControls.updateMatrix();
@@ -245,12 +306,20 @@ export class OrbitTransformControls {
         this.objects = objects;
     }
 
-    // public createCopyAndDispose(){
-    //     const copy = new OrbitTransformControls(this.scene, this.objects, this.camera, this.domElem);
-    //     this.transformListeners.forEach(cb => {
-    //         copy.onTransform(cb);
-    //     })
-    //     this.dispose();
-    //     return copy;
-    // }
+    public getAzimuthAngle() {
+        return this.orbitControls.azimuthAngle;
+    }
+
+    public getPolarAngle() {
+        return this.orbitControls.polarAngle;
+    }
+
+    public setRotation(azimuthAngle: number, polarAngle: number, smooth = false) {
+        this.orbitControls.rotateTo(azimuthAngle, polarAngle, smooth);
+    }
+
+    public resetCamera(smooth = false) {
+        this.orbitControls.reset(smooth);
+        this.orbitListeners.forEach(cb => cb());
+    }
 }

@@ -35,6 +35,7 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
     const scene = sceneRef.current;
     const [selectedObj, setSelectedObj] = useState<Object3D>();
 
+    // TODO: place this somewhere
     function toggleMeshDisplaying() {
         scene.sweepObject.visible = !scene.sweepObject.visible;
     }
@@ -78,9 +79,10 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
         {
             icon: ZoomOutMapOutlined,
             hoverText: "Change camera position",
-            // TODO: remove the toggling from here
             onClick: () => {
-                toggleMeshDisplaying();
+                controlsRef.current!.setMode("move");
+                scene.sweepPoints.visible = true;
+                scene.sweepLine.visible = true;
             },
         },
     ];
@@ -90,7 +92,7 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
             icon: RestartAltOutlined,
             hoverText: "Reset camera",
             onClick: () => {
-                rendererRef.current!.resetCameraPosition();
+                controlsRef.current!.resetCamera();
             },
         },
         {
@@ -106,11 +108,8 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
         const cubeEl = cubeRef.current;
         const el = elementRef.current;
         if (el && cubeEl) {
-            viewCubeRef.current = new ViewCube(cubeEl);
-            viewCubeRef.current.attachRenderer(rendererRef);
-
+            const viewCube = (viewCubeRef.current = new ViewCube(cubeEl));
             const renderer = (rendererRef.current = new Renderer(el, scene));
-            renderer.attachViewCube(viewCubeRef);
             const controls = (controlsRef.current = new OrbitTransformControls(
                 scene,
                 scene.sweepPoints.points,
@@ -118,10 +117,21 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
                 renderer.getRendererDomElem()
             ));
             renderer.attachControls(controls);
-            controls.orbitControls.addEventListener("change", () => {
-                viewCubeRef.current!.setRotation(renderer.getRotation());
+            controls.resetCamera();
+
+            viewCube.onOrbiting(() => {
+                controls.setRotation(
+                    viewCube.getAzimuthAngle(),
+                    viewCube.getPolarAngle()
+                );
             });
-            viewCubeRef.current!.setRotation(renderer.getRotation());
+            controls.onOrbiting(() => {
+                viewCube.setRotation(
+                    controls.getAzimuthAngle(),
+                    controls.getPolarAngle()
+                );
+            });
+            viewCube.setRotation(controls.getAzimuthAngle(), controls.getPolarAngle());
 
             const {
                 getSweeplineAsBezierSegments: getBezierSegments,
@@ -139,7 +149,6 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
                 scene.sweepPoints.updatePoints(segments, true);
             });
             controls.onDelete(pointObj => {
-                // prettier-ignore
                 const segments = deletePoint(pointObj);
                 sweepObjectState.getSweepLine().setSegments(segments, true);
                 scene.sweepPoints.updatePoints(segments, true);
