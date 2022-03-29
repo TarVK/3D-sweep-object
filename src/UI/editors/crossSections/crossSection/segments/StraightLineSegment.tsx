@@ -26,7 +26,7 @@ export const StraightLineSegment: FC<{
     return (
         <>
             <path
-                stroke={theme.palette.primary.main}
+                stroke={theme.palette.primaryColor}
                 d={path}
                 strokeWidth={edgeWidth / scale}
                 opacity={edgeOpacity}
@@ -35,7 +35,7 @@ export const StraightLineSegment: FC<{
                 cx={start.x}
                 cy={-start.y}
                 r={handleSize / scale}
-                fill={theme.palette.primary.main}
+                fill={theme.palette.primaryColor}
                 opacity={handleOpacity}
             />
             {includeLastPoint && (
@@ -43,7 +43,7 @@ export const StraightLineSegment: FC<{
                     cx={end.x}
                     cy={-end.y}
                     r={handleSize / scale}
-                    fill={theme.palette.primary.main}
+                    fill={theme.palette.primaryColor}
                     opacity={handleOpacity}
                 />
             )}

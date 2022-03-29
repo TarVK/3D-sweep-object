@@ -1,3 +1,4 @@
+import { useTheme } from "@mui/system";
 import {useMemoDataHook} from "model-react";
 import {FC, useEffect, useState} from "react";
 import {CrossSectionState} from "../state/CrossSectionState";
@@ -19,6 +20,7 @@ export const CustomSvg: FC<ICustomSvg> = ({
     index,
     onClick,
 }) => {
+    const theme = useTheme();
     const [path] = useMemoDataHook(
         h => {
             const segments = crossSection.getSegments(h);
@@ -77,7 +79,7 @@ export const CustomSvg: FC<ICustomSvg> = ({
                     top: -3,
                     left: -3,
                     zIndex: 1,
-                    backgroundColor: "#0C2D48",
+                    backgroundColor: theme.palette.darkBlue,
                     color: "#FFF",
                     width: "10px",
                     height: "10px",

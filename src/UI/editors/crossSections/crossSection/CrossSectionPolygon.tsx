@@ -21,5 +21,5 @@ export const CrossSectionPolygon: FC = () => {
                 .join(" "),
         [segments]
     );
-    return <path fill={theme.palette.primary.light} opacity={0.6} d={path} />;
+    return <path fill={theme.palette.primaryColor} opacity={0.6} d={path} />;
 };

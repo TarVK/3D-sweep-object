@@ -1,5 +1,6 @@
 import {SvgIconComponent} from "@mui/icons-material";
 import {Button, Tooltip} from "@mui/material";
+import { useTheme } from "@mui/system";
 import {FC} from "react";
 
 export interface IMenuButtonProps {
@@ -16,6 +17,8 @@ export const MenuButton: FC<IMenuButtonProps> = ({
     onClick,
     icon: Icon,
 }) => {
+    const theme = useTheme();
+
     return (
         <div
             css={{
@@ -23,7 +26,7 @@ export const MenuButton: FC<IMenuButtonProps> = ({
                 minWidth: "50px",
                 display: "flex",
                 justifyContent: "center",
-                backgroundColor: isSelected ? "#145DA0" : "#B1D4E0",
+                backgroundColor: isSelected ? theme.palette.primaryColor : theme.palette.lightBlue,
                 borderRadius: "4px",
             }}>
             <Tooltip title={hoverText}>
@@ -32,9 +35,11 @@ export const MenuButton: FC<IMenuButtonProps> = ({
                     size="small"
                     style={{
                         maxWidth: "50px",
-                        color: isSelected ? "#FFF" : "#145DA0",
+                        color: isSelected ? "#FFF" : theme.palette.primaryColor,
                     }}>
-                    <Icon />
+                    <Icon sx={{
+                        stroke: isSelected ? "#FFF" : theme.palette.primaryColor
+                    }} />
                 </Button>
             </Tooltip>
         </div>
