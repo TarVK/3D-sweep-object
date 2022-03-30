@@ -45,11 +45,6 @@ export class StraightSegmentState<D extends Vec2 | Vec3> implements ISegment<D> 
     }
 
     // Chaining
-    /**
-     * Sets the previous segment, whose end is linked to this segment
-     * @param segment The segment to be linked, or null to unlink segments
-     * @param sync Whether to synchronize with the set neighbor
-     */
     public setPreviousSegment(segment: ISegment<D> | null, sync: boolean = true): void {
         const current = this.previous.get();
         if (segment == current) return;
@@ -66,12 +61,6 @@ export class StraightSegmentState<D extends Vec2 | Vec3> implements ISegment<D> 
             this.previous.set(null);
         }
     }
-
-    /**
-     * Sets the next segment, whose start is linked to this segment
-     * @param segment The segment to be linked, or null to unlink segments
-     * @param sync Whether to synchronize with the set neighbor
-     */
     public setNextSegment(segment: ISegment<D> | null, sync: boolean = true): void {
         const current = this.next.get();
         if (segment == current) return;
@@ -88,21 +77,9 @@ export class StraightSegmentState<D extends Vec2 | Vec3> implements ISegment<D> 
             this.next.set(null);
         }
     }
-
-    /**
-     * Retrieves the previously connected segment
-     * @param hook The hook to subscribe to changes
-     * @returns The currently connected segment that's ahead of this segment
-     */
     public getPreviousSegment(hook?: IDataHook): ISegment<D> | null {
         return this.previous.get(hook);
     }
-
-    /**
-     * Retrieves the next connected segment
-     * @param hook The hook to subscribe to changes
-     * @returns The currently connected segment that's behind this segment
-     */
     public getNextSegment(hook?: IDataHook): ISegment<D> | null {
         return this.next.get(hook);
     }
@@ -129,20 +106,20 @@ export class StraightSegmentState<D extends Vec2 | Vec3> implements ISegment<D> 
     }
 
     // Setters
-    public setStart(vec: D, sync: boolean = true): void {
+    public setStart(vec: D, sync: boolean = true, move: boolean = true): void {
         this.start.set(vec);
 
         if (sync) {
             const prev = this.previous.get();
-            if (prev) prev.setEnd(vec, false);
+            if (prev) prev.setEnd(vec, false, move);
         }
     }
-    public setEnd(vec: D, sync: boolean = true): void {
+    public setEnd(vec: D, sync: boolean = true, move: boolean = true): void {
         this.end.set(vec);
 
         if (sync) {
             const next = this.next.get();
-            if (next) next.setStart(vec, false);
+            if (next) next.setStart(vec, false, move);
         }
     }
 
@@ -189,9 +166,9 @@ export class StraightSegmentState<D extends Vec2 | Vec3> implements ISegment<D> 
         ];
     }
 
-    public moveHandle(handle: string, to: D): void {
-        if (handle == "start") this.setStart(to);
-        else if (handle == "end") this.setEnd(to);
+    public moveHandle(handle: string, to: D, moveAttachedPoints = true): void {
+        if (handle == "start") this.setStart(to, true, moveAttachedPoints);
+        else if (handle == "end") this.setEnd(to, true, moveAttachedPoints);
     }
 
     public getHandle(

@@ -4,7 +4,7 @@ import {IKeyboardHandler} from "./IKeyboardHandler";
 export type ICrossSectionPlaneProps = {
     onMouseDown?: IInteractionHandler;
     onMouseUp?: IInteractionHandler;
-    onMouseMove?: IInteractionHandler;
+    onMouseMove?: IInteractionHandler<boolean | void>;
 
     onMouseLeave?: React.MouseEventHandler<HTMLDivElement>;
     onMouseEnter?: React.MouseEventHandler<HTMLDivElement>;

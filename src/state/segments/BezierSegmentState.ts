@@ -115,12 +115,6 @@ export class BezierSegmentState<D extends Vec2 | Vec3> implements ISegment<D> {
     }
 
     // Chaining
-    /**
-     * Sets the previous curve, whose end is linked to this curve
-     * @param segment The curve to be linked, or null to unlink curves
-     * @param sync Whether to synchronize with the set neighbor
-     * @param copyDirection Whether to make sure the curves' directions should be linked
-     */
     public setPreviousSegment(
         segment: ISegment<D> | null,
         sync: boolean = true,
@@ -143,13 +137,6 @@ export class BezierSegmentState<D extends Vec2 | Vec3> implements ISegment<D> {
             this.previous.set(null);
         }
     }
-
-    /**
-     * Sets the next curve, whose start is linked to this curve
-     * @param segment The curve to be linked, or null to unlink curves
-     * @param sync Whether to synchronize with the set neighbor
-     * @param copyDirection Whether to make sure the curves' directions should be linked
-     */
     public setNextSegment(
         segment: ISegment<D> | null,
         sync: boolean = true,
@@ -172,21 +159,9 @@ export class BezierSegmentState<D extends Vec2 | Vec3> implements ISegment<D> {
             this.next.set(null);
         }
     }
-
-    /**
-     * Retrieves the previously connected curve
-     * @param hook The hook to subscribe to changes
-     * @returns The currently connected curve that's ahead of this curve
-     */
     public getPreviousSegment(hook?: IDataHook): ISegment<D> | null {
         return this.previous.get(hook);
     }
-
-    /**
-     * Retrieves the next connected curve
-     * @param hook The hook to subscribe to changes
-     * @returns The currently connected curve that's behind this curve
-     */
     public getNextSegment(hook?: IDataHook): ISegment<D> | null {
         return this.next.get(hook);
     }
@@ -243,37 +218,61 @@ export class BezierSegmentState<D extends Vec2 | Vec3> implements ISegment<D> {
     }
 
     // Setters
-    public setStart(vec: D, sync: boolean = true): void {
+    public setStart(vec: D, sync: boolean = true, move: boolean = true): void {
+        if (move) {
+            const delta = this.startControl.get().sub(this.start.get() as Vec3) as Vec3;
+            this.startControl.set(vec.add(delta) as D);
+        }
+
         this.start.set(vec);
 
         if (sync) {
             const prev = this.previous.get();
-            if (prev) prev.setEnd(vec, false);
+            if (prev) prev.setEnd(vec, false, move);
         }
     }
-    public setEnd(vec: D, sync: boolean = true): void {
+    public setEnd(vec: D, sync: boolean = true, move: boolean = true): void {
+        if (move) {
+            const delta = this.endControl.get().sub(this.end.get() as Vec3) as Vec3;
+            this.endControl.set(vec.add(delta) as D);
+        }
+
         this.end.set(vec);
 
         if (sync) {
             const next = this.next.get();
-            if (next) next.setStart(vec, false);
+            if (next) next.setStart(vec, false, move);
         }
     }
 
     /**
      * Sets the control point that directs the start of the segment
      * @param vec The vector representing the control for the start direction
+     * @param syncDir Whether to sync the neighbor direction
      */
-    public setStartControl(vec: D): void {
+    public setStartControl(vec: D, syncDir: boolean = true): void {
         this.startControl.set(vec);
+        if (syncDir) {
+            const previous = this.getPreviousSegment();
+            if (!previous) return;
+
+            previous.setEndDirection(this.getStartDirection().mul(-1) as D);
+        }
     }
 
     /**
      * Sets the control point that directs the end of the segment
      * @param vec The vector representing the control for the end direction
+     * @param syncDir Whether to sync the neighbor direction
      */
-    public setEndControl(vec: D): void {
+    public setEndControl(vec: D, syncDir: boolean = true): void {
         this.endControl.set(vec);
+        if (syncDir) {
+            const next = this.getNextSegment();
+            if (!next) return;
+
+            next.setStartDirection(this.getEndDirection().mul(-1) as D);
+        }
     }
 
     /**
@@ -281,7 +280,7 @@ export class BezierSegmentState<D extends Vec2 | Vec3> implements ISegment<D> {
      * @param vec The vector representing the control for the start direction
      */
     public setStartControlDelta(vec: D): void {
-        this.startControl.set(vec.sub(this.start.get() as Vec3) as D);
+        this.startControl.set(vec.add(this.start.get() as Vec3) as D);
     }
 
     /**
@@ -289,39 +288,21 @@ export class BezierSegmentState<D extends Vec2 | Vec3> implements ISegment<D> {
      * @param vec The vector representing the control for the end direction
      */
     public setEndControlDelta(vec: D): void {
-        this.endControl.set(vec.sub(this.end.get() as Vec3) as D);
+        this.endControl.set(vec.add(this.end.get() as Vec3) as D);
     }
 
     public setStartDirection(direction: D): boolean {
         const length = this.getStartControlDelta().length();
+        if (direction.length() == 0) return false;
         this.setStartControlDelta(direction.normalize().mul(length) as D);
         return true;
     }
 
     public setEndDirection(direction: D): boolean {
         const length = this.getEndControlDelta().length();
+        if (direction.length() == 0) return false;
         this.setEndControlDelta(direction.normalize().mul(length) as D);
         return true;
-    }
-
-    /**
-     * Moves the start point to the new position. Also moves the start control such that the control's delta remains the same
-     * @param vec The vector representing the new start position
-     */
-    public moveStart(vec: D): void {
-        const delta = this.startControl.get().sub(this.start.get() as Vec3) as Vec3;
-        this.startControl.set(vec.add(delta) as D);
-        this.start.set(vec);
-    }
-
-    /**
-     * Moves the end point to the new position. Also moves the end control such that the control's delta remains the same
-     * @param vec The vector representing the new end position
-     */
-    public moveEnd(vec: D): void {
-        const delta = this.endControl.get().sub(this.end.get() as Vec3) as Vec3;
-        this.endControl.set(vec.add(delta) as D);
-        this.end.set(vec);
     }
 
     // Segment approximation
@@ -378,11 +359,11 @@ export class BezierSegmentState<D extends Vec2 | Vec3> implements ISegment<D> {
         );
     }
 
-    public moveHandle(handle: string, to: D): void {
-        if (handle == "start") this.setStart(to);
-        else if (handle == "startControl") this.setStartControl(to);
-        else if (handle == "endControl") this.setEndControl(to);
-        else if (handle == "end") this.setEnd(to);
+    public moveHandle(handle: string, to: D, moveAttachedPoints = true): void {
+        if (handle == "start") this.setStart(to, true, moveAttachedPoints);
+        else if (handle == "startControl") this.setStartControl(to, moveAttachedPoints);
+        else if (handle == "endControl") this.setEndControl(to, moveAttachedPoints);
+        else if (handle == "end") this.setEnd(to, true, moveAttachedPoints);
     }
 
     public getHandle(
@@ -394,7 +375,6 @@ export class BezierSegmentState<D extends Vec2 | Vec3> implements ISegment<D> {
         const endControl = this.getEndControl();
 
         const options = [
-            {point: start, distance: start.sub(point as Vec3).length(), handle: "start"},
             {
                 point: startControl,
                 distance: startControl.sub(point as Vec3).length(),
@@ -405,6 +385,7 @@ export class BezierSegmentState<D extends Vec2 | Vec3> implements ISegment<D> {
                 distance: endControl.sub(point as Vec3).length(),
                 handle: "endControl",
             },
+            {point: start, distance: start.sub(point as Vec3).length(), handle: "start"},
         ];
 
         if (includeLast) {

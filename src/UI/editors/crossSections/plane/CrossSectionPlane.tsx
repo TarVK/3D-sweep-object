@@ -91,12 +91,13 @@ export const CrossSectionPlane: FC<ICrossSectionPlaneProps> = ({
 
     const onMouseDrag = useCallback(
         (evt: React.MouseEvent<HTMLDivElement>) => {
-            if (evt.buttons == 2)
-                state.translate(new Vec2(evt.movementX, -evt.movementY));
             if (onMouseMoveHandler) {
                 const {worldDelta, worldPoint} = getEventData(evt);
-                onMouseMoveHandler(evt, worldPoint, worldDelta);
+                const preventDefault = onMouseMoveHandler(evt, worldPoint, worldDelta);
+                if (preventDefault) return;
             }
+            if (evt.buttons == 2)
+                state.translate(new Vec2(evt.movementX, -evt.movementY));
         },
         [onMouseMoveHandler]
     );

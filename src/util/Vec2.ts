@@ -176,4 +176,12 @@ export class Vec2 {
     public toString(): string {
         return `(${this.x}, ${this.y})`;
     }
+
+    /**
+     * Retrieves the angle corresponding to the polar coordinate representation of this vector
+     * @returns The angle
+     */
+    public getAngle(): number {
+        return Math.atan2(this.y, this.x);
+    }
 }

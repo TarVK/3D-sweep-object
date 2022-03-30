@@ -13,6 +13,8 @@ export function createDeleteHandler(
     return {
         mode: ["delete"],
         onMouseDown: (e, p) => {
+            if (e.button != 0) return;
+
             const crossSection = state.getSelectedCrossSection();
             const segments = crossSection.getSegments();
             if (segments.length <= 3) return;

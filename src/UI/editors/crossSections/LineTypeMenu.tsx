@@ -24,6 +24,14 @@ export const LineTypeMenu: FC = ({}) => {
                 const replacement = getReplacement(segment);
                 crossSection.replaceSegment(segment, replacement);
                 editorState.selectHandle({segment: replacement, handle: "none"});
+
+                const nextSegment = replacement.getNextSegment();
+                if (nextSegment)
+                    replacement.setEndDirection(nextSegment.getStartDirection().mul(-1));
+
+                const prevSegment = replacement.getPreviousSegment();
+                if (prevSegment)
+                    replacement.setStartDirection(prevSegment.getEndDirection().mul(-1));
             };
         return [
             {

@@ -13,6 +13,7 @@ export function createAddHandler(
     return {
         mode: ["add"],
         onMouseDown: (e, p) => {
+            if (e.button != 0) return;
             const crossSection = state.getSelectedCrossSection();
             const target = state.snap(p);
             const segment = crossSection.addPoint(target);

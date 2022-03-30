@@ -7,8 +7,8 @@ import {Vec2} from "../../../../../util/Vec2";
  * @param worldPoint The mouse location in world coordinates
  * @param worldDelta The mouse's movement in world units
  */
-export type IInteractionHandler = (
+export type IInteractionHandler<R = void> = (
     evt: React.MouseEvent<HTMLDivElement>,
     worldPoint: Vec2,
     worldDelta: Vec2
-) => void;
+) => R;

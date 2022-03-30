@@ -11,7 +11,7 @@ export type IInteractionModeController<M> = {
     /** The function to execute when a mouse button is pressed down */
     onMouseDown?: IInteractionHandler;
     /** The function to execute when the mouse is moved */
-    onMouseMove?: IInteractionHandler;
+    onMouseMove?: IInteractionHandler<boolean | void>;
     /** The function to execute when a mouse button is released */
     onMouseUp?: IInteractionHandler;
     /** The function to execute when a keyboard key is pressed */

@@ -35,14 +35,16 @@ export type ISegment<D extends Vec2 | Vec3> = {
      * Sets the start point of this segment
      * @param point The point to be set
      * @param sync Whether to synchronize with its neighbor
+     * @param move Whether to move along reference points
      */
-    setStart(point: D, sync?: boolean): void;
+    setStart(point: D, sync?: boolean, move?: boolean): void;
     /**
      * Sets the end point of this segment
      * @param point The point to be set
      * @param sync Whether to synchronize with its neighbor
+     * @param move Whether to move along reference points
      */
-    setEnd(point: D, sync?: boolean): void;
+    setEnd(point: D, sync?: boolean, move?: boolean): void;
 
     // Direction
     /**
@@ -93,6 +95,18 @@ export type ISegment<D extends Vec2 | Vec3> = {
         sync?: boolean,
         copyDirection?: boolean
     ): void;
+    /**
+     * Retrieves the previously connected curve
+     * @param hook The hook to subscribe to changes
+     * @returns The currently connected curve that's ahead of this curve
+     */
+    getPreviousSegment(hook?: IDataHook): ISegment<D> | null;
+    /**
+     * Retrieves the next connected curve
+     * @param hook The hook to subscribe to changes
+     * @returns The currently connected curve that's behind this curve
+     */
+    getNextSegment(hook?: IDataHook): ISegment<D> | null;
 
     // Approximating the segment
     /**
@@ -122,8 +136,9 @@ export type ISegment<D extends Vec2 | Vec3> = {
      * Moves the given handle to the given location
      * @param handle The id of the handle to move
      * @param to The location to move the handle to
+     * @param syncNeighborDirections Whether to synchronize neighbor directions
      */
-    moveHandle(handle: string, to: D): void;
+    moveHandle(handle: string, to: D, syncNeighborDirections?: boolean): void;
 
     /**
      * Retrieves the handle of this segment closest to the given point

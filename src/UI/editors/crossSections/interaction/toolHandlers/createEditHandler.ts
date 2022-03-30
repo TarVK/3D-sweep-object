@@ -49,15 +49,20 @@ export function createEditHandler(
                 state.selectHandle({...closestSegment, handle: "none"});
         },
         onMouseMove: (e, p) => {
-            if (e.buttons != 1) return;
+            if (![1, 2].includes(e.buttons)) return;
 
             const selected = state.getSelectedHandle();
-            if (!selected) return;
+            if (!selected || selected.handle == "none") return;
 
             const {segment, handle} = selected;
             const target = state.snap(p);
-            segment.moveHandle(handle, target);
+            segment.moveHandle(handle, target, e.buttons == 1);
+
+            return true;
         },
-        onMouseUp: (s, p) => {},
+        onMouseUp: (s, p) => {
+            const selected = state.getSelectedHandle();
+            if (selected) state.selectHandle({...selected, handle: "none"});
+        },
     };
 }

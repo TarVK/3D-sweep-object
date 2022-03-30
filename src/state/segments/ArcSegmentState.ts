@@ -1,5 +1,6 @@
 import {DataCacher, Field, IDataHook} from "model-react";
 import {getCircleThroughPoints} from "../../util/geometry/getCircleThroughPoints";
+import {Point2D, Rotate, Scale} from "../../util/Point2D";
 import {Vec2} from "../../util/Vec2";
 import {IBoundingBox} from "../_types/IBoundingBox";
 import {ISegment} from "../_types/ISegment";
@@ -113,7 +114,9 @@ export class ArcSegmentState implements ISegment<Vec2> {
         if (spec.origin) {
             const {start, delta} = spec;
             const angle = start + delta * t;
-            return new Vec2(Math.sin(angle), Math.cos(angle)).normalize();
+            return new Vec2(-Math.sin(angle), Math.cos(angle))
+                .normalize()
+                .mul(delta < 0 ? -1 : 1);
         }
 
         const {delta} = spec;
@@ -130,12 +133,6 @@ export class ArcSegmentState implements ISegment<Vec2> {
     }
 
     // Chaining
-    /**
-     * Sets the previous curve, whose end is linked to this curve
-     * @param segment The curve to be linked, or null to unlink curves
-     * @param sync Whether to synchronize with the set neighbor
-     * @param copyDirection Whether to make sure the curves' directions should be linked
-     */
     public setPreviousSegment(
         segment: ISegment<Vec2> | null,
         sync: boolean = true,
@@ -157,13 +154,6 @@ export class ArcSegmentState implements ISegment<Vec2> {
             this.previous.set(null);
         }
     }
-
-    /**
-     * Sets the next curve, whose start is linked to this curve
-     * @param segment The curve to be linked, or null to unlink curves
-     * @param sync Whether to synchronize with the set neighbor
-     * @param copyDirection Whether to make sure the curves' directions should be linked
-     */
     public setNextSegment(
         segment: ISegment<Vec2> | null,
         sync: boolean = true,
@@ -185,21 +175,9 @@ export class ArcSegmentState implements ISegment<Vec2> {
             this.next.set(null);
         }
     }
-
-    /**
-     * Retrieves the previously connected curve
-     * @param hook The hook to subscribe to changes
-     * @returns The currently connected curve that's ahead of this curve
-     */
     public getPreviousSegment(hook?: IDataHook): ISegment<Vec2> | null {
         return this.previous.get(hook);
     }
-
-    /**
-     * Retrieves the next connected curve
-     * @param hook The hook to subscribe to changes
-     * @returns The currently connected curve that's behind this curve
-     */
     public getNextSegment(hook?: IDataHook): ISegment<Vec2> | null {
         return this.next.get(hook);
     }
@@ -229,29 +207,73 @@ export class ArcSegmentState implements ISegment<Vec2> {
     }
 
     // Setters
-    public setStart(vec: Vec2, sync: boolean = true): void {
+    public setStart(vec: Vec2, sync: boolean = true, move: boolean = true): void {
+        if (move) {
+            this.moveControl(this.getEnd(), this.getStart(), vec);
+            this.syncNeighborDirections();
+        }
+
         this.start.set(vec);
 
         if (sync) {
             const prev = this.previous.get();
-            if (prev) prev.setEnd(vec, false);
+            if (prev) prev.setEnd(vec, false, move);
         }
     }
-    public setEnd(vec: Vec2, sync: boolean = true): void {
+
+    public setEnd(vec: Vec2, sync: boolean = true, move: boolean = true): void {
+        if (move) {
+            this.moveControl(this.getStart(), this.getEnd(), vec);
+            this.syncNeighborDirections();
+        }
+
         this.end.set(vec);
 
         if (sync) {
             const next = this.next.get();
-            if (next) next.setStart(vec, false);
+            if (next) next.setStart(vec, false, move);
         }
+    }
+
+    protected moveControl(
+        referenceA: Vec2,
+        oldReferenceB: Vec2,
+        newReferenceB: Vec2
+    ): void {
+        const oldDelta = referenceA.sub(oldReferenceB);
+        const newDelta = referenceA.sub(newReferenceB);
+
+        const angleDelta = newDelta.getAngle() - oldDelta.getAngle();
+        const scaleDelta = newDelta.length() / oldDelta.length();
+        const transformation = Scale(scaleDelta).mul(Rotate(angleDelta));
+
+        const newControl = transformation
+            .mul(Point2D.create(this.getControl().sub(referenceA)))
+            .toCartesian()
+            .add(referenceA);
+        this.control.set(newControl);
     }
 
     /**
      * Sets the control point of this arc
      * @param vec The control point to be set
+     * @param syncDir Whether to sync the neighbor direction
      */
-    public setControl(vec: Vec2): void {
+    public setControl(vec: Vec2, syncDir: boolean = true): void {
         this.control.set(vec);
+
+        if (syncDir) this.syncNeighborDirections();
+    }
+
+    /**
+     * Synchronizes the directions of neighboring segments with the direction of this segment
+     */
+    protected syncNeighborDirections(): void {
+        const next = this.getNextSegment();
+        if (next) next.setStartDirection(this.getEndDirection().mul(-1));
+
+        const prev = this.getPreviousSegment();
+        if (prev) prev.setEndDirection(this.getStartDirection().mul(-1));
     }
 
     public setStartDirection(direction: Vec2): boolean {
@@ -330,10 +352,10 @@ export class ArcSegmentState implements ISegment<Vec2> {
         return this.copy();
     }
 
-    public moveHandle(handle: string, to: Vec2): void {
-        if (handle == "start") this.setStart(to);
-        else if (handle == "control") this.setControl(to);
-        else if (handle == "end") this.setEnd(to);
+    public moveHandle(handle: string, to: Vec2, moveAttachedPoints = true): void {
+        if (handle == "start") this.setStart(to, true, moveAttachedPoints);
+        else if (handle == "control") this.setControl(to, moveAttachedPoints);
+        else if (handle == "end") this.setEnd(to, true, moveAttachedPoints);
     }
 
     public getHandle(

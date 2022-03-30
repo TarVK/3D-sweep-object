@@ -52,9 +52,10 @@ export function useCombinedHandlers<S, M>(
                 ) => undefined | ((...args: A) => void)
             ): ((...args: A) => void) =>
             (...args) => {
-                currentControllers.forEach(controller =>
+                const preventDefault = currentControllers.find(controller =>
                     getCaller(controller)?.(...args)
                 );
+                return preventDefault;
             };
 
         return {
