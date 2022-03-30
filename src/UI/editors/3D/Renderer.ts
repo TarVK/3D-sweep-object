@@ -41,7 +41,7 @@ export class Renderer {
         this.camera.zoom = 1;
 
         this.animate();
-        this.renderer.domElement.addEventListener("resize", this.updateSize);
+        window.addEventListener("resize", this.updateSize);
     }
 
     private animate = () => {

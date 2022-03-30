@@ -13,11 +13,9 @@ import {RotationScaleMenu} from "./RotationScaleMenu";
 import {CrossSectionEditor} from "./crossSections/CrossSectionEditor";
 import {useCrossSectionEditorState} from "./crossSections/CrossSectionEditorStateContext";
 import {useMemoDataHook} from "model-react";
-import { CustomArcIcon } from "../custom/CustomArcIcon";
-import { CustomBezierIcon } from "../custom/CustomBezierIcon";
-import { CustomStraightLineIcon } from "../custom/CustomStraightIcon";
-import { ThemeProvider } from "@emotion/react";
-import { theme } from "../../themes/MUITheme";
+import {CustomArcIcon} from "../custom/CustomArcIcon";
+import {CustomBezierIcon} from "../custom/CustomBezierIcon";
+import {CustomStraightLineIcon} from "../custom/CustomStraightIcon";
 
 export const CrossSectionCanvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
     const editorState = useCrossSectionEditorState();
@@ -50,7 +48,7 @@ export const CrossSectionCanvas: FC<ICanvasProps> = ({sweepObjectState, ...props
     const lineTypeMenu = useMemo(
         () => [
             {
-                icon:  CustomStraightLineIcon,
+                icon: CustomStraightLineIcon,
                 hoverText: "Straight Line",
                 isSelected: true,
                 onClick: () => {},
@@ -62,11 +60,11 @@ export const CrossSectionCanvas: FC<ICanvasProps> = ({sweepObjectState, ...props
                 onClick: () => {},
             },
             {
-                icon:  CustomBezierIcon,
+                icon: CustomBezierIcon,
                 hoverText: "Bezier Line",
                 isSelected: false,
                 onClick: () => {},
-            }
+            },
         ],
         []
     );
@@ -85,12 +83,8 @@ export const CrossSectionCanvas: FC<ICanvasProps> = ({sweepObjectState, ...props
             />
             <Menu items={pointMenuItems} position={{top: 0, left: 0}} />
             <Menu items={lineTypeMenu} position={{top: 0, right: 0}} />
-            <ThemeProvider theme={theme}>
             <CrossSectionsMenu />
-            </ThemeProvider>
             <RotationScaleMenu />
-            {/* <CustomIcon src={require=("/svgs/arc-line.svg")} /> */}
-            <img src={require("/public/box.png")} />
         </div>
     );
 };

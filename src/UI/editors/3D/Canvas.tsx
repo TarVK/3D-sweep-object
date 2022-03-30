@@ -18,6 +18,7 @@ import {useDataHook} from "model-react";
 import {OrbitTransformControls} from "./controllers/OrbitTransformControls";
 import editSweepPoints from "./EditSweepPoints";
 import {Object3D} from "three";
+import {useWindowSize} from "../../hooks/useWindowSize";
 
 export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...props}) => {
     const [h] = useDataHook();
@@ -157,7 +158,6 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
             return () => renderer.destroy();
         }
     }, []);
-
 
     // TO-DO figure out how to do with transformEvents
     const triggerUpdate = () => {
