@@ -19,7 +19,12 @@ import {OrbitTransformControls} from "./controllers/OrbitTransformControls";
 import editSweepPoints from "./EditSweepPoints";
 import {Object3D} from "three";
 
-export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...props}) => {
+export const Canvas: FC<ICanvasProps> = ({
+    sweepObjectState,
+    updateScene,
+    imports,
+    ...props
+}) => {
     const [h] = useDataHook();
     const sweepObjectRef = useRef(sweepObjectState);
     sweepObjectRef.current = sweepObjectState; // Keep a reference to the latest state
@@ -158,7 +163,6 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
         }
     }, []);
 
-
     // TO-DO figure out how to do with transformEvents
     const triggerUpdate = () => {
         const {getSweeplineAsBezierSegments: getBezierSegments} = editSweepPoints(
@@ -176,12 +180,25 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
             scene.sweepObject.updateMesh(sweepObjectMesh);
             const sweepLine = sweepObjectState.getSweepLine().getSegments(h);
             scene.sweepLine.updateLine(sweepLine);
-            scene.sweepPoints.updatePoints(sweepLine);
+            if (imports) {
+                scene.sweepPoints.updatePoints(sweepLine, true);
+            } else {
+                scene.sweepPoints.updatePoints(sweepLine);
+            }
 
             // update controls, so that sweep line points are editable
             controlsRef.current!.changeObjects(scene.sweepPoints.points);
         }
     }, [sweepObjectMesh]);
+
+    useEffect(() => {
+        const sweepLine = sweepObjectState.getSweepLine().getSegments(h);
+        if (imports) {
+            scene.sweepPoints.updatePoints(sweepLine, true);
+        } else {
+            scene.sweepPoints.updatePoints(sweepLine);
+        }
+    }, [imports]);
 
     // this div decides the size of the canvas
     return (
