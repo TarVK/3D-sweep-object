@@ -1,15 +1,6 @@
 import {DataCacher, Field, IDataHook} from "model-react";
-import {approximateBezier} from "../../util/bezier/approximateBezier";
-import {getPointOnBezier} from "../../util/bezier/getPointOnBezier";
-import {getTangentOnBezier} from "../../util/bezier/getTangentOnBezier";
-import {projectOnBezier} from "../../util/bezier/projectOnBezier";
-import {sampleBezier} from "../../util/bezier/sampleBezier";
-import {IBezier} from "../../util/bezier/_types/IBezier";
-import {IBezierApproximationConfig} from "../../util/bezier/_types/IBezierApproximationConfig";
-import {IBezierNode} from "../../util/bezier/_types/IBezierNode";
 import {getCircleThroughPoints} from "../../util/geometry/getCircleThroughPoints";
 import {Vec2} from "../../util/Vec2";
-import {Vec3} from "../../util/Vec3";
 import {IBoundingBox} from "../_types/IBoundingBox";
 import {ISegment} from "../_types/ISegment";
 

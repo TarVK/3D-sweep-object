@@ -15,6 +15,7 @@ export function getLineIntersection(
         (a.start.x - a.end.x) * (b.start.y - b.end.y) -
         (a.start.y - a.end.y) * (b.start.x - b.end.x);
     if (D == 0) return undefined;
+    if (Math.abs(D) <= 1e-10) return undefined;
 
     const ai = a.start.x * a.end.y - a.start.y * a.end.x;
     const bi = b.start.x * b.end.y - b.start.y * b.end.x;
