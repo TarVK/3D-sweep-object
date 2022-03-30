@@ -190,8 +190,8 @@ export class StraightSegmentState<D extends Vec2 | Vec3> implements ISegment<D> 
     }
 
     public moveHandle(handle: string, to: D): void {
-        if (handle == "end") this.setEnd(to);
-        else this.setStart(to);
+        if (handle == "start") this.setStart(to);
+        else if (handle == "end") this.setEnd(to);
     }
 
     public getHandle(

@@ -130,8 +130,9 @@ export class CrossSectionState {
     /**
      * Adds a new segment to the cross section, such that it contains the given point
      * @param point The point to be added
+     * @returns The newly added segment
      */
-    public addPoint(point: Vec2): void {
+    public addPoint(point: Vec2): ISegment<Vec2> {
         const segments = this.segments.get();
         const closestSegment = segments.reduce(
             (best, segment, index) => {
@@ -159,6 +160,8 @@ export class CrossSectionState {
             replacement2,
             ...segments.slice(closestSegment.index + 1),
         ]);
+
+        return replacement2;
     }
 
     /**
@@ -190,6 +193,37 @@ export class CrossSectionState {
                     ...segments.slice(index + 1),
                 ]);
             }
+
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Replaces the given segment by the specified segment
+     * @param replace The segment to be replaced
+     * @param replacement The replacement segment
+     * @returns Whether the segment to replace was part of this cross section
+     */
+    public replaceSegment(replace: ISegment<Vec2>, replacement: ISegment<Vec2>): boolean {
+        const segments = this.segments.get();
+        if (segments.length <= 2) return false;
+
+        const index = segments.indexOf(replace);
+        if (index != -1) {
+            const prevSegment = segments[(index + segments.length - 1) % segments.length];
+            const nextSegment = segments[(index + 1) % segments.length];
+
+            // Chain the new segments together
+            prevSegment.setNextSegment(replacement, true, false);
+            replacement.setNextSegment(nextSegment, true, false);
+
+            // Store the new list of segments
+            this.segments.set([
+                ...segments.slice(0, index),
+                replacement,
+                ...segments.slice(index + 1),
+            ]);
 
             return true;
         }

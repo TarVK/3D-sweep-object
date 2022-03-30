@@ -18,7 +18,7 @@ export function createEditHandler(
         onMouseDown: (e, p) => {
             const segments = state.getSelectedCrossSection().getSegments();
             const {scale} = state.getTransformation();
-            const closest = segments.reduce(
+            const closestHandle = segments.reduce(
                 (best, segment) => {
                     const handle = segment.getHandle(p);
                     if (handle.distance < best.distance) return {...handle, segment};
@@ -28,11 +28,25 @@ export function createEditHandler(
             );
 
             if (
-                closest.distance * scale < reachDistance &&
-                closest.segment &&
-                closest.handle
-            )
-                state.selectHandle(closest);
+                closestHandle.segment &&
+                closestHandle.handle &&
+                closestHandle.distance * scale < reachDistance
+            ) {
+                state.selectHandle(closestHandle);
+                return;
+            }
+
+            // If the handle is out of reach, select the closest segment
+            const closestSegment = segments.reduce(
+                (best, segment) => {
+                    const distance = segment.getDistance(p);
+                    if (distance < best.distance) return {distance, segment};
+                    return best;
+                },
+                {distance: Infinity, segment: null}
+            );
+            if (closestSegment.segment && closestSegment.distance * scale < reachDistance)
+                state.selectHandle({...closestSegment, handle: "none"});
         },
         onMouseMove: (e, p) => {
             if (e.buttons != 1) return;
@@ -44,8 +58,6 @@ export function createEditHandler(
             const target = state.snap(p);
             segment.moveHandle(handle, target);
         },
-        onMouseUp: (s, p) => {
-            state.selectHandle(null);
-        },
+        onMouseUp: (s, p) => {},
     };
 }

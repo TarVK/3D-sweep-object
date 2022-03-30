@@ -43,14 +43,18 @@ export const CrossSection: FC = () => {
     const [segments] = useMemoDataHook(
         h => {
             const segments = state.getSelectedCrossSection(h).getSegments(h);
+            const selectedHandle = state.getSelectedHandle(h);
+            const selectedSegment = selectedHandle?.segment;
             return segments
                 .map((segment, i) => {
+                    const selected = selectedSegment == segment;
+                    const props = {key: i, selected};
                     if (segment instanceof StraightSegmentState)
-                        return <StraightLineSegment key={i} segment={segment} />;
+                        return <StraightLineSegment {...props} segment={segment} />;
                     if (segment instanceof BezierSegmentState)
-                        return <BezierLineSegment key={i} segment={segment} />;
+                        return <BezierLineSegment {...props} segment={segment} />;
                     if (segment instanceof ArcSegmentState)
-                        return <ArcLineSegment key={i} segment={segment} />;
+                        return <ArcLineSegment {...props} segment={segment} />;
                     return undefined;
                 })
                 .filter(Boolean);

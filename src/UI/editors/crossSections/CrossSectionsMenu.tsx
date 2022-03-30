@@ -1,11 +1,11 @@
 import {AddBox, IndeterminateCheckBox} from "@mui/icons-material";
 import {Button} from "@mui/material";
-import { useTheme } from "@mui/system";
+import {useTheme} from "@mui/system";
 import {useDataHook} from "model-react";
 import {FC, useCallback} from "react";
-import {CrossSectionState} from "../../state/CrossSectionState";
-import {CustomSvg} from "../CustomSvg";
-import {useCrossSectionEditorState} from "./crossSections/CrossSectionEditorStateContext";
+import {CrossSectionState} from "../../../state/CrossSectionState";
+import {CustomSvg} from "../../CustomSvg";
+import {useCrossSectionEditorState} from "./CrossSectionEditorStateContext";
 
 export const CrossSectionsMenu: FC = () => {
     const theme = useTheme();
@@ -83,10 +83,14 @@ export const CrossSectionsMenu: FC = () => {
                     <CustomSvg
                         key={index}
                         backgroundColor={
-                            selectedCrossSection === crossSection ? theme.palette.primaryColor : theme.palette.lightBlue
+                            selectedCrossSection === crossSection
+                                ? theme.palette.primaryColor
+                                : theme.palette.lightBlue
                         }
                         strokeColor={
-                            selectedCrossSection === crossSection ? "#FFF" : theme.palette.primaryColor
+                            selectedCrossSection === crossSection
+                                ? "#FFF"
+                                : theme.palette.primaryColor
                         }
                         index={index}
                         crossSection={crossSection}

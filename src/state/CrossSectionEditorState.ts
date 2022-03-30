@@ -119,6 +119,7 @@ export class CrossSectionEditorState {
      */
     public selectCrossSection(index: number): void {
         this.selectedCrossSectionIndex.set(Math.max(0, index));
+        this.selectedHandle.set(null);
     }
 
     /**

@@ -8,8 +8,7 @@ import {SweepObjectState} from "../state/SweepObjectState";
 import {Vec2} from "../util/Vec2";
 import {Vec3} from "../util/Vec3";
 import {Canvas} from "./editors/3D/Canvas";
-import {useRefLazy} from "./hooks/useRefLazy";
-import {CrossSectionCanvas} from "./editors/CrossSectionCanvas";
+import {CrossSectionCanvas} from "./editors/crossSections/CrossSectionCanvas";
 import {InputMenu} from "./header/InputMenu";
 import {FileType} from "./editors/ExportModel";
 import {OBJExporter} from "../exporters/OBJExporter";
@@ -20,8 +19,8 @@ import {Scene} from "three";
 import {useStateLazy} from "./hooks/useStateLazy";
 import {sweepObjectToJSON} from "../state/JSON/sweepObjectToJSON";
 import {ArcSegmentState} from "../state/segments/ArcSegmentState";
-import { theme } from "../themes/MUITheme";
-import { ThemeProvider } from "@mui/system";
+import {theme} from "../themes/MUITheme";
+import {ThemeProvider} from "@mui/system";
 
 export const App: FC = () => {
     const [h] = useDataHook();
@@ -106,56 +105,56 @@ export const App: FC = () => {
 
     return (
         <ThemeProvider theme={theme}>
-        <div
-            css={{
-                background: "#C3E0E5",
-                minHeight: "100vh",
-            }}>
-            <div
-                className="input-menu-holder"
-                css={{
-                    width: "100%",
-                    margin: "0px 0px 25px",
-                    background: theme.palette.primaryColor,
-                    color: "#FFF",
-                }}>
-                <InputMenu
-                    sweepObjectState={sweepObject}
-                    onSweepObjectChange={setSweepObjectState}
-                    openExportModel={() => setExportModelOpen(true)}
-                    open
-                    exportToFile={exportToFile}
-                />
-            </div>
             <div
                 css={{
-                    display: "flex",
-                    justifyContent: "space-around",
-                    margin: "auto auto",
-                    userSelect: "none",
+                    background: "#C3E0E5",
+                    minHeight: "100vh",
                 }}>
-                <Canvas
+                <div
+                    className="input-menu-holder"
                     css={{
-                        minHeight: 450,
-                        maxWidth: "45%",
-                        margin: "auto auto",
-                        flex: 1,
-                    }}
-                    sweepObjectState={sweepObject}
-                    updateScene={(sceneRef: Scene) => setScene(sceneRef)}
-                />
-                <CrossSectionCanvas
+                        width: "100%",
+                        margin: "0px 0px 25px",
+                        background: theme.palette.primaryColor,
+                        color: "#FFF",
+                    }}>
+                    <InputMenu
+                        sweepObjectState={sweepObject}
+                        onSweepObjectChange={setSweepObjectState}
+                        openExportModel={() => setExportModelOpen(true)}
+                        open
+                        exportToFile={exportToFile}
+                    />
+                </div>
+                <div
                     css={{
-                        height: 450,
-                        maxWidth: "45%",
+                        display: "flex",
+                        justifyContent: "space-around",
                         margin: "auto auto",
-                        flex: 1,
-                        backgroundColor: "white",
-                    }}
-                    sweepObjectState={sweepObject}
-                />
+                        userSelect: "none",
+                    }}>
+                    <Canvas
+                        css={{
+                            minHeight: 450,
+                            maxWidth: "45%",
+                            margin: "auto auto",
+                            flex: 1,
+                        }}
+                        sweepObjectState={sweepObject}
+                        updateScene={(sceneRef: Scene) => setScene(sceneRef)}
+                    />
+                    <CrossSectionCanvas
+                        css={{
+                            height: 450,
+                            maxWidth: "45%",
+                            margin: "auto auto",
+                            flex: 1,
+                            backgroundColor: "white",
+                        }}
+                        sweepObjectState={sweepObject}
+                    />
+                </div>
             </div>
-        </div>
         </ThemeProvider>
     );
 };

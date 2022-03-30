@@ -124,7 +124,7 @@ export const CrossSectionPlane: FC<ICrossSectionPlaneProps> = ({
 
     const onWheel = useCallback((evt: React.WheelEvent<HTMLDivElement>) => {
         // TODO: also handle pinch events: https://stackoverflow.com/a/11183333/8521718
-        const dir = evt.deltaY < 0 ? -1 : evt.deltaY > 0 ? 1 : 0;
+        const dir = evt.deltaY < 0 ? 1 : evt.deltaY > 0 ? -1 : 0;
         if (dir != 0) {
             const el = containerRef.current;
             if (!el) return;

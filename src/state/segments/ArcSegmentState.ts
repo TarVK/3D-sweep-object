@@ -331,9 +331,9 @@ export class ArcSegmentState implements ISegment<Vec2> {
     }
 
     public moveHandle(handle: string, to: Vec2): void {
-        if (handle == "end") this.setEnd(to);
+        if (handle == "start") this.setStart(to);
         else if (handle == "control") this.setControl(to);
-        else this.setStart(to);
+        else if (handle == "end") this.setEnd(to);
     }
 
     public getHandle(

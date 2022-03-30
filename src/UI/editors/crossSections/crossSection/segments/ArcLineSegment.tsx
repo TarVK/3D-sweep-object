@@ -4,16 +4,16 @@ import {FC, useMemo} from "react";
 import {ArcSegmentState} from "../../../../../state/segments/ArcSegmentState";
 import {useCrossSectionEditorState} from "../../CrossSectionEditorStateContext";
 import {getSegmentSVGSpec} from "../getSegmentSVGSpec";
+import {ISegmentProps} from "../_types/ISegmentProps";
+import {getSegmentStyle} from "./getSegmentStyle";
 
-export const ArcLineSegment: FC<{
-    segment: ArcSegmentState;
-    includeLastPoint?: boolean;
-}> = ({segment, includeLastPoint}) => {
-    const handleSize = 5;
-    const edgeWidth = 2;
-    const handleOpacity = 0.8;
-    const controlHandleOpacity = 0.6;
-    const edgeOpacity = 0.8;
+export const ArcLineSegment: FC<ISegmentProps<ArcSegmentState>> = ({
+    segment,
+    includeLastPoint,
+    selected,
+}) => {
+    const {handleSize, edgeWidth, handleOpacity, edgeOpacity, controlHandleOpacity} =
+        getSegmentStyle(selected ?? false);
 
     const theme = useTheme();
     const [h] = useDataHook();
@@ -47,7 +47,7 @@ export const ArcLineSegment: FC<{
                 fill={theme.palette.primaryColor}
                 opacity={controlHandleOpacity}
             />
-            {includeLastPoint && (
+            {(includeLastPoint || selected) && (
                 <circle
                     cx={end.x}
                     cy={-end.y}

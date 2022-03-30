@@ -379,10 +379,10 @@ export class BezierSegmentState<D extends Vec2 | Vec3> implements ISegment<D> {
     }
 
     public moveHandle(handle: string, to: D): void {
-        if (handle == "end") this.setEnd(to);
+        if (handle == "start") this.setStart(to);
         else if (handle == "startControl") this.setStartControl(to);
         else if (handle == "endControl") this.setEndControl(to);
-        else this.setStart(to);
+        else if (handle == "end") this.setEnd(to);
     }
 
     public getHandle(

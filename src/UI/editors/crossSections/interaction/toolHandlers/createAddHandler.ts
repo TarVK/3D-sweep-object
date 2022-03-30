@@ -15,7 +15,9 @@ export function createAddHandler(
         onMouseDown: (e, p) => {
             const crossSection = state.getSelectedCrossSection();
             const target = state.snap(p);
-            crossSection.addPoint(target);
+            const segment = crossSection.addPoint(target);
+
+            state.selectHandle({segment, handle: "none"});
         },
         onMouseMove: (e, p) => {},
         onMouseUp: (s, p) => {},

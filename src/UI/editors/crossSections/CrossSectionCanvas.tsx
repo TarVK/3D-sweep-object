@@ -1,21 +1,13 @@
-import {FC, useEffect, useMemo, useRef, useState} from "react";
-import {Menu} from "./Menu";
-import {ICanvasProps} from "./3D/_types/ICanvasProps";
-import {
-    AddCircleOutlineSharp,
-    ClearOutlined,
-    FileDownloadOutlined,
-    FileUploadOutlined,
-    MouseOutlined,
-} from "@mui/icons-material";
+import {FC, useMemo} from "react";
+import {Menu} from "../Menu";
+import {ICanvasProps} from "../3D/_types/ICanvasProps";
+import {AddCircleOutlineSharp, ClearOutlined, MouseOutlined} from "@mui/icons-material";
 import {CrossSectionsMenu} from "./CrossSectionsMenu";
-import {RotationScaleMenu} from "./RotationScaleMenu";
-import {CrossSectionEditor} from "./crossSections/CrossSectionEditor";
-import {useCrossSectionEditorState} from "./crossSections/CrossSectionEditorStateContext";
+import {RotationScaleMenu} from "../RotationScaleMenu";
+import {CrossSectionEditor} from "./CrossSectionEditor";
+import {useCrossSectionEditorState} from "./CrossSectionEditorStateContext";
 import {useMemoDataHook} from "model-react";
-import {CustomArcIcon} from "../custom/CustomArcIcon";
-import {CustomBezierIcon} from "../custom/CustomBezierIcon";
-import {CustomStraightLineIcon} from "../custom/CustomStraightIcon";
+import {LineTypeMenu} from "./LineTypeMenu";
 
 export const CrossSectionCanvas: FC<ICanvasProps> = ({sweepObjectState, ...props}) => {
     const editorState = useCrossSectionEditorState();
@@ -45,29 +37,6 @@ export const CrossSectionCanvas: FC<ICanvasProps> = ({sweepObjectState, ...props
             },
         ];
     }, []);
-    const lineTypeMenu = useMemo(
-        () => [
-            {
-                icon: CustomStraightLineIcon,
-                hoverText: "Straight Line",
-                isSelected: true,
-                onClick: () => {},
-            },
-            {
-                icon: CustomArcIcon,
-                hoverText: "Arc Line",
-                isSelected: false,
-                onClick: () => {},
-            },
-            {
-                icon: CustomBezierIcon,
-                hoverText: "Bezier Line",
-                isSelected: false,
-                onClick: () => {},
-            },
-        ],
-        []
-    );
     return (
         <div
             {...props}
@@ -82,7 +51,7 @@ export const CrossSectionCanvas: FC<ICanvasProps> = ({sweepObjectState, ...props
                 height="100%"
             />
             <Menu items={pointMenuItems} position={{top: 0, left: 0}} />
-            <Menu items={lineTypeMenu} position={{top: 0, right: 0}} />
+            <LineTypeMenu />
             <CrossSectionsMenu />
             <RotationScaleMenu />
         </div>

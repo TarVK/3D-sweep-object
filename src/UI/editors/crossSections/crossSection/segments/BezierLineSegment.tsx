@@ -5,16 +5,16 @@ import {BezierSegmentState} from "../../../../../state/segments/BezierSegmentSta
 import {Vec2} from "../../../../../util/Vec2";
 import {useCrossSectionEditorState} from "../../CrossSectionEditorStateContext";
 import {getSegmentSVGSpec} from "../getSegmentSVGSpec";
+import {ISegmentProps} from "../_types/ISegmentProps";
+import {getSegmentStyle} from "./getSegmentStyle";
 
-export const BezierLineSegment: FC<{
-    segment: BezierSegmentState<Vec2>;
-    includeLastPoint?: boolean;
-}> = ({segment, includeLastPoint}) => {
-    const handleSize = 5;
-    const edgeWidth = 2;
-    const handleOpacity = 0.8;
-    const controlHandleOpacity = 0.6;
-    const edgeOpacity = 0.8;
+export const BezierLineSegment: FC<ISegmentProps<BezierSegmentState<Vec2>>> = ({
+    segment,
+    includeLastPoint,
+    selected,
+}) => {
+    const {handleSize, edgeWidth, handleOpacity, edgeOpacity, controlHandleOpacity} =
+        getSegmentStyle(selected ?? false);
 
     const theme = useTheme();
     const [h] = useDataHook();
@@ -77,7 +77,7 @@ export const BezierLineSegment: FC<{
                 fill={theme.palette.primaryColor}
                 opacity={controlHandleOpacity}
             />
-            {includeLastPoint && (
+            {(includeLastPoint || selected) && (
                 <circle
                     cx={end.x}
                     cy={-end.y}
