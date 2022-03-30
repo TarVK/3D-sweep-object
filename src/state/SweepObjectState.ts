@@ -18,6 +18,7 @@ export class SweepObjectState {
     // TODO: add getter/setters
     protected sweepLineInterpolationPoints = new Field(20);
     protected crossSectionInterpolationPoints = new Field(30);
+    public forceRerender = true;
 
     /**
      * Creates a new sweep object from the given cross sections and sweepline

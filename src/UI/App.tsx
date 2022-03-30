@@ -61,10 +61,8 @@ export const App: FC = () => {
         );
     });
     const [scene, setScene] = useState<Scene>();
-    const [imports, setImports] = useState<boolean>(false);
 
     const setSweepObj = (object: SweepObjectState) => {
-        setImports(true);
         sweepObjectState.setCrossSections(object.getCrossSections());
         sweepObjectState.getSweepLine().setSegments(object.getSweepLine().getSegments());
         sweepObjectState.setCrossSectionInterpolationPointCount(
@@ -73,7 +71,7 @@ export const App: FC = () => {
         sweepObjectState.setSweepLineInterpolationPointCount(
             object.getSweepLineInterpolationPointCount()
         );
-        setImports(false);
+        sweepObjectState.forceRerender = true;
     };
 
     const convertIMeshToThreeMesh = (iMesh: IMesh) => {
@@ -157,7 +155,6 @@ export const App: FC = () => {
                         }}
                         sweepObjectState={sweepObjectState}
                         updateScene={(sceneRef: Scene) => setScene(sceneRef)}
-                        imports={imports}
                     />
                     <CrossSectionCanvas
                         css={{

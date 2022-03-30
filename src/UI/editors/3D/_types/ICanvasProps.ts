@@ -4,5 +4,4 @@ export type ICanvasProps = {
     sweepObjectState: SweepObjectState;
     className?: string;
     updateScene?: Function;
-    imports?: boolean;
 };
