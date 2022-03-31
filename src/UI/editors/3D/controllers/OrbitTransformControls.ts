@@ -4,7 +4,7 @@ import {colors} from "../ColorSchema";
 import CameraControls from "camera-controls";
 
 type Camera = THREE.PerspectiveCamera | THREE.OrthographicCamera;
-type Modes = "add" | "delete" | "transform" | "move";
+export type Modes = "add" | "delete" | "transform" | "move";
 
 //Thanks https://sbcode.net/threejs/multi-controls-example/#video-lecture
 export class OrbitTransformControls {
@@ -321,5 +321,9 @@ export class OrbitTransformControls {
     public resetCamera(smooth = false) {
         this.orbitControls.reset(smooth);
         this.orbitListeners.forEach(cb => cb());
+    }
+
+    public getMode(): Modes {
+        return this.mode;
     }
 }

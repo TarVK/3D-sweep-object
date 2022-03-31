@@ -15,10 +15,9 @@ import {
 } from "@mui/icons-material";
 import {Menu} from "../Menu";
 import {useDataHook} from "model-react";
-import {OrbitTransformControls} from "./controllers/OrbitTransformControls";
+import {OrbitTransformControls, Modes} from "./controllers/OrbitTransformControls";
 import editSweepPoints from "./EditSweepPoints";
 import {Object3D} from "three";
-import {useWindowSize} from "../../hooks/useWindowSize";
 
 export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...props}) => {
     const [h] = useDataHook();
@@ -35,6 +34,8 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
     const cubeSize = 100; //px
     const scene = sceneRef.current;
     const [selectedObj, setSelectedObj] = useState<Object3D>();
+
+    const [selectedMode, setSelectedMode] = useState<Modes>("transform");
 
     // TODO: place this somewhere
     function toggleMeshDisplaying() {
@@ -53,37 +54,45 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
         {
             icon: AddCircleOutlineSharp,
             hoverText: "Add point",
+            isSelected: selectedMode === "add",
             onClick: () => {
                 controlsRef.current!.setMode("add");
                 scene.sweepPoints.visible = true;
                 scene.sweepLine.visible = true;
+                setSelectedMode(controlsRef.current!.getMode());
             },
         },
         {
             icon: MouseOutlined,
             hoverText: "Select point",
+            isSelected: selectedMode === "transform",
             onClick: () => {
                 controlsRef.current!.setMode("transform");
                 scene.sweepPoints.visible = true;
                 scene.sweepLine.visible = true;
+                setSelectedMode(controlsRef.current!.getMode());
             },
         },
         {
             icon: ClearOutlined,
             hoverText: "Delete point",
+            isSelected: selectedMode === "delete",
             onClick: () => {
                 controlsRef.current!.setMode("delete");
                 scene.sweepPoints.visible = true;
                 scene.sweepLine.visible = true;
+                setSelectedMode(controlsRef.current!.getMode());
             },
         },
         {
             icon: ZoomOutMapOutlined,
             hoverText: "Change camera position",
+            isSelected: selectedMode === "move",
             onClick: () => {
                 controlsRef.current!.setMode("move");
                 scene.sweepPoints.visible = true;
                 scene.sweepLine.visible = true;
+                setSelectedMode(controlsRef.current!.getMode());
             },
         },
     ];
@@ -154,6 +163,8 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
                 sweepObjectState.getSweepLine().setSegments(segments, true);
                 scene.sweepPoints.updatePoints(segments, true);
             });
+
+            setSelectedMode(controls.getMode());
 
             return () => renderer.destroy();
         }
