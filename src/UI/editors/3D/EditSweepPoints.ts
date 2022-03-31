@@ -18,13 +18,24 @@ export default (sweepPointsContainer: {points: THREE.Object3D[]}) => {
         line.set(A, B).closestPointToPoint(point, true, closestPoint);
         return point.distanceTo(closestPoint);
     };
-    const createBezierSegment = (start: THREE.Vector3, end: THREE.Vector3) => {
+    const createBezierSegment = (
+        start: THREE.Vector3,
+        end: THREE.Vector3,
+        startControl: false | THREE.Vector3 = false,
+        endControl: false | THREE.Vector3 = false
+    ) => {
         // const fourth = start.clone().add(end).multiplyScalar(0.25);
-        const fourth = new THREE.Vector3(0, 0, 5);
+        let fourth = new THREE.Vector3(0, 5, 0);
+        const scale = 0.5;
+        if (startControl) {
+            fourth = startControl.clone().sub(start).multiplyScalar(scale);
+        } else if (endControl) {
+            fourth = endControl.clone().sub(end).multiplyScalar(-scale);
+        }
         return new BezierSegmentState(
             threeVectorToVec3(start),
-            threeVectorToVec3(start.clone().add(fourth)),
-            threeVectorToVec3(end.clone().sub(fourth)),
+            threeVectorToVec3(startControl ? startControl : start.clone().add(fourth)),
+            threeVectorToVec3(endControl ? endControl : end.clone().sub(fourth)),
             threeVectorToVec3(end)
         );
     };
@@ -82,17 +93,18 @@ export default (sweepPointsContainer: {points: THREE.Object3D[]}) => {
             const end = pointVec;
             segments.push(createBezierSegment(start, end));
         } else {
-            // we are between points with
-            // index and index + 3
+            // we are between points
 
             const start = segments[index].getStart().toThreeJsVector();
+            const startControl = segments[index].getStartControl().toThreeJsVector();
             const mid = pointVec;
+            const endControl = segments[index].getEndControl().toThreeJsVector();
             const end = segments[index].getEnd().toThreeJsVector();
             segments.splice(
                 index,
                 1,
-                createBezierSegment(start, mid),
-                createBezierSegment(mid, end)
+                createBezierSegment(start, mid, startControl, false),
+                createBezierSegment(mid, end, false, endControl)
             );
         }
 
