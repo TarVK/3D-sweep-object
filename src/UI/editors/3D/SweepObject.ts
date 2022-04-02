@@ -5,6 +5,7 @@ import {IMateriable} from "./_types/IMateriable";
 
 export class SweepObject extends THREE.Object3D implements IMateriable {
     protected mesh: THREE.Mesh;
+    protected wireframe = false;
 
     /**
      * Updates the mesh of the object
@@ -21,9 +22,11 @@ export class SweepObject extends THREE.Object3D implements IMateriable {
         );
         geometry.setIndex(newMesh.faces.flat());
         geometry.computeVertexNormals();
-        const material = new THREE.MeshPhongMaterial({
+        const material = new THREE.MeshStandardMaterial({
             color: colors.SWEEP_OBJECT,
-            // wireframe: true,
+            roughness: 0.2,
+            metalness: 0.8,
+            wireframe: this.wireframe,
             // side: THREE.DoubleSide,
         });
         if (!this.mesh) {
@@ -36,6 +39,12 @@ export class SweepObject extends THREE.Object3D implements IMateriable {
     }
 
     public updateMaterial(material: THREE.Material): void {}
+
+    public toggleWireframe() {
+        this.wireframe = !this.wireframe;
+        //@ts-ignore
+        this.mesh.material.wireframe = this.wireframe;
+    }
 
     public getMesh(): THREE.Mesh {
         return this.mesh;

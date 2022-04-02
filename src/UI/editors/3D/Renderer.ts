@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import {colors} from "./ColorSchema";
 import {OrbitTransformControls} from "./controllers/OrbitTransformControls";
 
 export class Renderer {
@@ -62,7 +63,16 @@ export class Renderer {
         this.height = this.container.offsetHeight;
         this.renderer.setSize(this.width, this.height);
 
-        this.isOrthographic ? this.setOrthographicCamera() : this.setPerspectiveCamera();
+        if (this.camera instanceof THREE.OrthographicCamera) {
+            const {size_x, size_y} = this.calculateOrthograhicProjection();
+            this.camera.left = -size_x / 2;
+            this.camera.right = size_x / 2;
+            this.camera.top = size_y / 2;
+            this.camera.bottom = -size_y / 2;
+        } else if (this.camera instanceof THREE.PerspectiveCamera) {
+            this.camera.aspect = this.width / this.height;
+        }
+        this.camera.updateProjectionMatrix();
     };
 
     /**
@@ -115,6 +125,15 @@ export class Renderer {
         this.camera.updateProjectionMatrix();
 
         this.controls?.changeCamera(this.camera);
+        this.setLightToCamera();
+        this.scene.add(this.camera);
+    }
+
+    private setLightToCamera() {
+        const pointLight = new THREE.PointLight(colors.LIGHT, 5, 0, 2);
+        pointLight.castShadow = true;
+        pointLight.position.set(0, 0, -10);
+        this.camera.add(pointLight);
     }
 
     public destroy() {

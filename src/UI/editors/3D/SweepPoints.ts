@@ -8,7 +8,7 @@ export class SweepPoints extends THREE.Object3D implements IMateriable {
     public updateMaterial(material: THREE.Material): void {}
 
     public points: THREE.Mesh[] = [];
-    readonly pointRadius = 0.7;
+    readonly pointRadius = 1;
 
     public constructor(visible = true) {
         super();
