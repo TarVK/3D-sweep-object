@@ -1,5 +1,5 @@
 import {Field, IDataHook} from "model-react";
-import {Vec2} from "../util/Vec2";
+import {Vec2} from "../util/linearAlgebra/Vec2";
 import {CrossSectionState} from "./CrossSectionState";
 import {SweepObjectState} from "./SweepObjectState";
 import {ICrossSectionEditorConfig} from "./_types/ICrossSectionEditorConfig";
@@ -32,7 +32,7 @@ export class CrossSectionEditorState {
     protected sweepObject: Field<SweepObjectState>;
     protected selectedCrossSectionIndex = new Field(0);
     protected selectedHandle = new Field<ICrossSectionHandleSelection | null>(null);
-    protected tool = new Field<ICrossSectionEditorTool>("add");
+    protected tool = new Field<ICrossSectionEditorTool>("edit");
 
     /**
      * Creates a new cross section editor state

@@ -1,4 +1,4 @@
-import {Vec2} from "../Vec2";
+import {Vec2} from "../linearAlgebra/Vec2";
 
 /**
  * Finds teh intersection by two lines

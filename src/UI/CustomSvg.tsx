@@ -1,8 +1,8 @@
-import { useTheme } from "@mui/system";
+import {useTheme} from "@mui/system";
 import {useMemoDataHook} from "model-react";
 import {FC, useEffect, useState} from "react";
 import {CrossSectionState} from "../state/CrossSectionState";
-import {Vec2} from "../util/Vec2";
+import {Vec2} from "../util/linearAlgebra/Vec2";
 import {getSegmentSVGSpec} from "./editors/crossSections/crossSection/getSegmentSVGSpec";
 
 interface ICustomSvg {

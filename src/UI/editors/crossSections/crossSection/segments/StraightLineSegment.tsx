@@ -2,7 +2,7 @@ import {useTheme} from "@mui/material";
 import {useDataHook, useMemoDataHook} from "model-react";
 import {FC, useMemo} from "react";
 import {StraightSegmentState} from "../../../../../state/segments/StraightSegmentState";
-import {Vec2} from "../../../../../util/Vec2";
+import {Vec2} from "../../../../../util/linearAlgebra/Vec2";
 import {useCrossSectionEditorState} from "../../CrossSectionEditorStateContext";
 import {getSegmentSVGSpec} from "../getSegmentSVGSpec";
 import {ISegmentProps} from "../_types/ISegmentProps";

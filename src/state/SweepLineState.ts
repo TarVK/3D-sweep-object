@@ -2,7 +2,7 @@ import {DataCacher, Field, IDataHook} from "model-react";
 import {ISweepLineNode} from "../sweepOperation/_types/spec/ISweepLineNode";
 import {sampleBezier} from "../util/bezier/sampleBezier";
 import {IBezierNode} from "../util/bezier/_types/IBezierNode";
-import {Vec3} from "../util/Vec3";
+import {Vec3} from "../util/linearAlgebra/Vec3";
 import {BezierSegmentState} from "./segments/BezierSegmentState";
 
 /**

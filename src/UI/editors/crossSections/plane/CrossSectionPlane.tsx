@@ -1,6 +1,6 @@
 import {useDataHook} from "model-react";
 import {FC, useCallback, useEffect, useRef, useState} from "react";
-import {Vec2} from "../../../../util/Vec2";
+import {Vec2} from "../../../../util/linearAlgebra/Vec2";
 import {useStateLazy} from "../../../hooks/useStateLazy";
 import {useWindowSize} from "../../../hooks/useWindowSize";
 import {useCrossSectionEditorState} from "../CrossSectionEditorStateContext";

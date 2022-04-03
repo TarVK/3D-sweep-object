@@ -57,7 +57,7 @@ export const Canvas: FC<ICanvasProps> = ({
     const [meshIconDisabled, setMeshIconDisabled] = useState<boolean>(false);
 
     useEffect(() => {
-        updateScene!(sceneRef);
+        updateScene?.(sceneRef);
     }, [sceneRef]);
 
     useEffect(() => {

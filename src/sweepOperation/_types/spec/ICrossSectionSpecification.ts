@@ -1,4 +1,4 @@
-import {Vec2} from "../../../util/Vec2";
+import {Vec2} from "../../../util/linearAlgebra/Vec2";
 
 /** The generic part of the sweep object specification concerning a cross section */
 export type ICrossSectionSpecification = {

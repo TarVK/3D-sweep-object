@@ -3,7 +3,7 @@ import {FC, useCallback, useEffect, useRef, useState} from "react";
 import {ArcSegmentState} from "../../../../state/segments/ArcSegmentState";
 import {BezierSegmentState} from "../../../../state/segments/BezierSegmentState";
 import {StraightSegmentState} from "../../../../state/segments/StraightSegmentState";
-import {Vec2} from "../../../../util/Vec2";
+import {Vec2} from "../../../../util/linearAlgebra/Vec2";
 import {useWindowSize} from "../../../hooks/useWindowSize";
 import {useCrossSectionEditorState} from "../CrossSectionEditorStateContext";
 import {CrossSectionApproximationPoints} from "./CrossSectionApproximationPoints";

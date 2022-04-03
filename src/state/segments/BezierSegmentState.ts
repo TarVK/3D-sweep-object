@@ -7,8 +7,8 @@ import {sampleBezier} from "../../util/bezier/sampleBezier";
 import {IBezier} from "../../util/bezier/_types/IBezier";
 import {IBezierApproximationConfig} from "../../util/bezier/_types/IBezierApproximationConfig";
 import {IBezierNode} from "../../util/bezier/_types/IBezierNode";
-import {Vec2} from "../../util/Vec2";
-import {Vec3} from "../../util/Vec3";
+import {Vec2} from "../../util/linearAlgebra/Vec2";
+import {Vec3} from "../../util/linearAlgebra/Vec3";
 import {IBoundingBox} from "../_types/IBoundingBox";
 import {ISegment} from "../_types/ISegment";
 

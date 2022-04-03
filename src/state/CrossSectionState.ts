@@ -1,7 +1,7 @@
 import {Field, IDataHook} from "model-react";
 import {ICrossSection} from "../sweepOperation/core/_types/ICrossSection";
 import {makePolygonCCW} from "../util/geometry/makePolygonCCW";
-import {Vec2} from "../util/Vec2";
+import {Vec2} from "../util/linearAlgebra/Vec2";
 import {ISegment} from "./_types/ISegment";
 
 /**

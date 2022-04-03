@@ -1,12 +1,12 @@
 import {useDataHook} from "model-react";
-import {FC, useState} from "react";
+import {FC, MutableRefObject, useState} from "react";
 import {BezierSegmentState} from "../state/segments/BezierSegmentState";
 import {CrossSectionState} from "../state/CrossSectionState";
 import {StraightSegmentState} from "../state/segments/StraightSegmentState";
 import {SweepLineState} from "../state/SweepLineState";
 import {SweepObjectState} from "../state/SweepObjectState";
-import {Vec2} from "../util/Vec2";
-import {Vec3} from "../util/Vec3";
+import {Vec2} from "../util/linearAlgebra/Vec2";
+import {Vec3} from "../util/linearAlgebra/Vec3";
 import {Canvas} from "./editors/3D/Canvas";
 import {CrossSectionCanvas} from "./editors/crossSections/CrossSectionCanvas";
 import {InputMenu} from "./header/InputMenu";
@@ -15,17 +15,16 @@ import {OBJExporter} from "../exporters/OBJExporter";
 import {IMesh} from "../sweepOperation/_types/IMesh";
 import {SweepObject} from "./editors/3D/SweepObject";
 import {STLExporter} from "../exporters/STLExporter";
-import {Scene} from "three";
 import {useStateLazy} from "./hooks/useStateLazy";
 import {sweepObjectToJSON} from "../state/JSON/sweepObjectToJSON";
 import {ArcSegmentState} from "../state/segments/ArcSegmentState";
 import {theme} from "../themes/MUITheme";
 import {ThemeProvider} from "@mui/system";
 import {Renderer} from "./editors/3D/Renderer";
+import {download} from "../util/download";
+import {Scene} from "./editors/3D/Scene";
 
 export const App: FC = () => {
-    const [h] = useDataHook();
-    const [exportModelOpen, setExportModelOpen] = useState<boolean>(false);
     const [sweepObjectState, setSweepObjectState] = useStateLazy(() => {
         const crossSection1 = new CrossSectionState([
             new StraightSegmentState(new Vec2(-3, 0), new Vec2(3, -3)),
@@ -60,7 +59,7 @@ export const App: FC = () => {
             [crossSection1, crossSection2]
         );
     });
-    const [scene, setScene] = useState<Scene>();
+    const [scene, setScene] = useState<MutableRefObject<Scene>>();
     const [renderer, setRenderer] = useState<Renderer>();
 
     const convertIMeshToThreeMesh = (iMesh: IMesh) => {
@@ -72,8 +71,6 @@ export const App: FC = () => {
     const sweepObject = sweepObjectState;
 
     const exportToFile = (fileType: FileType) => {
-        if (!sweepObjectState) return;
-
         if (fileType === FileType.OBJ) {
             const mesh = convertIMeshToThreeMesh(sweepObjectState.getMesh()!);
             const exporter = new OBJExporter();
@@ -81,7 +78,9 @@ export const App: FC = () => {
             download(exportedString, "3DSweepObject.obj", "obj");
         } else if (fileType === FileType.STL) {
             const exporter = new STLExporter();
-            const exportedString = exporter.parse((scene as any).current!, {});
+            const mesh = scene?.current.sweepObject;
+            if (!mesh) return;
+            const exportedString = exporter.parse(mesh, {});
             download(exportedString, "3DSweepObject.stl", "stl");
         } else if (fileType === FileType.JSON) {
             const json = sweepObjectToJSON(sweepObjectState);
@@ -99,69 +98,50 @@ export const App: FC = () => {
         }
     };
 
-    const download = (data: string, filename: string, type: string) => {
-        const file = new Blob([data], {type: type});
-
-        const a = document.createElement("a"),
-            url = URL.createObjectURL(file);
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(function () {
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-        }, 0);
-    };
-
     return (
         <ThemeProvider theme={theme}>
             <div
                 css={{
                     background: "#C3E0E5",
-                    minHeight: "100vh",
+                    height: "100vh",
+                    display: "flex",
+                    flexDirection: "column",
                 }}>
                 <div
                     className="input-menu-holder"
                     css={{
                         width: "100%",
-                        margin: "0px 0px 25px",
                         background: theme.palette.primaryColor,
                         color: "#FFF",
                     }}>
                     <InputMenu
                         sweepObjectState={sweepObject}
                         onSweepObjectChange={setSweepObjectState}
-                        openExportModel={() => setExportModelOpen(true)}
-                        open
                         exportToFile={exportToFile}
                     />
                 </div>
                 <div
                     css={{
+                        flexGrow: 1,
+                        gap: 20,
+                        padding: 20,
+                        minHeight: 0,
                         display: "flex",
                         justifyContent: "space-evenly",
-                        margin: "auto auto",
                         userSelect: "none",
                     }}>
                     <Canvas
                         css={{
-                            minHeight: "80vh",
-                            maxWidth: "45%",
-                            width: "45%",
+                            height: "100%",
                             flex: 1,
                         }}
                         sweepObjectState={sweepObject}
-                        updateScene={(sceneRef: Scene) => setScene(sceneRef)}
-                        updateRenderer={(rendererRef: Renderer) =>
-                            setRenderer(rendererRef)
-                        }
+                        updateScene={setScene}
+                        updateRenderer={setRenderer}
                     />
                     <CrossSectionCanvas
                         css={{
-                            minHeight: "60vh",
-                            maxWidth: "45%",
-                            width: "45%",
+                            height: "100%",
                             flex: 1,
                             backgroundColor: "white",
                         }}

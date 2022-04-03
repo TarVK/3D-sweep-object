@@ -1,7 +1,7 @@
-import {Mat4} from "../../util/Mat4";
-import {Rotate} from "../../util/Point3D";
-import {Vec3} from "../../util/Vec3";
-import {Vec4} from "../../util/Vec4";
+import {Mat4} from "../../util/linearAlgebra/Mat4";
+import {Rotate} from "../../util/linearAlgebra/Point3D";
+import {Vec3} from "../../util/linearAlgebra/Vec3";
+import {Vec4} from "../../util/linearAlgebra/Vec4";
 
 /**
  * Rotates the given rotation matrix to point in the new direction
