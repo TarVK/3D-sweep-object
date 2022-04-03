@@ -5,7 +5,7 @@ import {ICrossSectionSpecification} from "../sweepOperation/_types/spec/ICrossSe
 import {ISweepLineNode} from "../sweepOperation/_types/spec/ISweepLineNode";
 import {ISweepLineSpecification} from "../sweepOperation/_types/spec/ISweepLineSpecification";
 import {ISweepObjectSpecification} from "../sweepOperation/_types/spec/ISweepObjectSpecification";
-import {Vec2} from "../util/Vec2";
+import {Vec2} from "../util/linearAlgebra/Vec2";
 import {CrossSectionState} from "./CrossSectionState";
 import {SweepLineState} from "./SweepLineState";
 

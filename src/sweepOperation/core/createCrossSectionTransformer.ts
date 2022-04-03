@@ -1,5 +1,5 @@
-import {Point3D, RotateZ, Scale, Translate} from "../../util/Point3D";
-import {Vec3} from "../../util/Vec3";
+import {Point3D, RotateZ, Scale, Translate} from "../../util/linearAlgebra/Point3D";
+import {Vec3} from "../../util/linearAlgebra/Vec3";
 import {transformRotationMatrix} from "./transformRotationMatrix";
 import {ICrossSectionTransformer} from "./_types/ICrossSectionTransformer";
 

@@ -5,8 +5,8 @@ import {CrossSectionState} from "../state/CrossSectionState";
 import {StraightSegmentState} from "../state/segments/StraightSegmentState";
 import {SweepLineState} from "../state/SweepLineState";
 import {SweepObjectState} from "../state/SweepObjectState";
-import {Vec2} from "../util/Vec2";
-import {Vec3} from "../util/Vec3";
+import {Vec2} from "../util/linearAlgebra/Vec2";
+import {Vec3} from "../util/linearAlgebra/Vec3";
 import {Canvas} from "./editors/3D/Canvas";
 import {CrossSectionCanvas} from "./editors/crossSections/CrossSectionCanvas";
 import {InputMenu} from "./header/InputMenu";
@@ -22,10 +22,9 @@ import {ArcSegmentState} from "../state/segments/ArcSegmentState";
 import {theme} from "../themes/MUITheme";
 import {ThemeProvider} from "@mui/system";
 import {Renderer} from "./editors/3D/Renderer";
+import {download} from "../util/download";
 
 export const App: FC = () => {
-    const [h] = useDataHook();
-    const [exportModelOpen, setExportModelOpen] = useState<boolean>(false);
     const [sweepObjectState, setSweepObjectState] = useStateLazy(() => {
         const crossSection1 = new CrossSectionState([
             new StraightSegmentState(new Vec2(-3, 0), new Vec2(3, -3)),
@@ -99,21 +98,6 @@ export const App: FC = () => {
         }
     };
 
-    const download = (data: string, filename: string, type: string) => {
-        const file = new Blob([data], {type: type});
-
-        const a = document.createElement("a"),
-            url = URL.createObjectURL(file);
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(function () {
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-        }, 0);
-    };
-
     return (
         <ThemeProvider theme={theme}>
             <div
@@ -132,8 +116,6 @@ export const App: FC = () => {
                     <InputMenu
                         sweepObjectState={sweepObject}
                         onSweepObjectChange={setSweepObjectState}
-                        openExportModel={() => setExportModelOpen(true)}
-                        open
                         exportToFile={exportToFile}
                     />
                 </div>

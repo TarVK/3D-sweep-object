@@ -1,4 +1,4 @@
-import {Vec2} from "../Vec2";
+import {Vec2} from "../linearAlgebra/Vec2";
 import {getLineIntersection} from "./getLineIntersection";
 
 /**

@@ -1,4 +1,4 @@
-import {Vec2} from "../Vec2";
+import {Vec2} from "../linearAlgebra/Vec2";
 
 /**
  * Checks whether c lies to the left (-1), right (1) or on (0) segment ab.

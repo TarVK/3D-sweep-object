@@ -1,4 +1,4 @@
-import {Vec3} from "../../util/Vec3";
+import {Vec3} from "../../util/linearAlgebra/Vec3";
 
 /** The data specifying a 3d mesh */
 export type IMesh = {

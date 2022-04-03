@@ -1,5 +1,5 @@
-import {Vec2} from "../Vec2";
-import {Vec3} from "../Vec3";
+import {Vec2} from "../linearAlgebra/Vec2";
+import {Vec3} from "../linearAlgebra/Vec3";
 import {getPointOnBezier} from "./getPointOnBezier";
 import {IBezier} from "./_types/IBezier";
 

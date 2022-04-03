@@ -1,4 +1,4 @@
-import {Vec2} from "../../util/Vec2";
+import {Vec2} from "../../util/linearAlgebra/Vec2";
 
 export type ITransformation = {
     offset: Vec2;

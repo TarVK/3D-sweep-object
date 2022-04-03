@@ -1,5 +1,5 @@
 import React from "react";
-import {Vec2} from "../../../../../util/Vec2";
+import {Vec2} from "../../../../../util/linearAlgebra/Vec2";
 
 /**
  * An event handler to handle interactions with the plane

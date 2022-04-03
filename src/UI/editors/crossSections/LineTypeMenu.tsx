@@ -9,7 +9,7 @@ import {StraightSegmentState} from "../../../state/segments/StraightSegmentState
 import {ArcSegmentState} from "../../../state/segments/ArcSegmentState";
 import {BezierSegmentState} from "../../../state/segments/BezierSegmentState";
 import {ISegment} from "../../../state/_types/ISegment";
-import {Vec2} from "../../../util/Vec2";
+import {Vec2} from "../../../util/linearAlgebra/Vec2";
 
 export const LineTypeMenu: FC = ({}) => {
     const editorState = useCrossSectionEditorState();

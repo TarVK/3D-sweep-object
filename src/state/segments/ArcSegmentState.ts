@@ -1,7 +1,7 @@
 import {DataCacher, Field, IDataHook} from "model-react";
 import {getCircleThroughPoints} from "../../util/geometry/getCircleThroughPoints";
-import {Point2D, Rotate, Scale} from "../../util/Point2D";
-import {Vec2} from "../../util/Vec2";
+import {Point2D, Rotate, Scale} from "../../util/linearAlgebra/Point2D";
+import {Vec2} from "../../util/linearAlgebra/Vec2";
 import {IBoundingBox} from "../_types/IBoundingBox";
 import {ISegment} from "../_types/ISegment";
 

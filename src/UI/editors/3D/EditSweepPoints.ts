@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import {BezierSegmentState} from "../../../state/segments/BezierSegmentState";
-import {Vec3} from "../../../util/Vec3";
+import {Vec3} from "../../../util/linearAlgebra/Vec3";
 
 export default (sweepPointsContainer: {points: THREE.Object3D[]}) => {
     const getSweepPoints = () => sweepPointsContainer.points;

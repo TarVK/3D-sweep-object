@@ -1,9 +1,12 @@
-import {DataObjectOutlined, InsertPhotoOutlined, ViewInArOutlined} from "@mui/icons-material";
+import {
+    DataObjectOutlined,
+    InsertPhotoOutlined,
+    ViewInArOutlined,
+} from "@mui/icons-material";
 import {Button, Menu, MenuItem, Modal} from "@mui/material";
 import {FC, useState} from "react";
 
 interface IExportModelProps {
-    open: boolean;
     exportToFile: Function;
 }
 
@@ -15,7 +18,7 @@ export enum FileType {
     NONE = "none",
 }
 
-export const ExportModel: FC<IExportModelProps> = props => {
+export const ExportModel: FC<IExportModelProps> = ({exportToFile}) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
     const handleClick = (event: any) => {
@@ -29,7 +32,7 @@ export const ExportModel: FC<IExportModelProps> = props => {
     const selectFileType = (type: FileType) => {
         setAnchorEl(null);
 
-        props.exportToFile(type);
+        exportToFile(type);
     };
 
     return (

@@ -1,4 +1,4 @@
-import {Vec2} from "../../../../../util/Vec2";
+import {Vec2} from "../../../../../util/linearAlgebra/Vec2";
 
 /**
  * An event handler to handle keyboard interactions while the mouse is on the plane

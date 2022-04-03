@@ -1,5 +1,5 @@
-import {Vec2} from "../../../util/Vec2";
-import {Vec3} from "../../../util/Vec3";
+import {Vec2} from "../../../util/linearAlgebra/Vec2";
+import {Vec3} from "../../../util/linearAlgebra/Vec3";
 import {I2DPointJSON} from "./I2DPointJSON";
 import {I3DPointJSON} from "./I3DPointJSON";
 

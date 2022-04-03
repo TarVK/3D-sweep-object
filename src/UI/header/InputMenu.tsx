@@ -5,11 +5,7 @@ import {ExportModel} from "../editors/ExportModel";
 import {IInputMenuProps} from "../_types/IInputMenuProps";
 import {ImportButton} from "./ImportButton";
 
-export const InputMenu: FC<IInputMenuProps> = ({
-    open,
-    exportToFile,
-    onSweepObjectChange,
-}) => {
+export const InputMenu: FC<IInputMenuProps> = ({exportToFile, onSweepObjectChange}) => {
     const theme = useTheme();
 
     return (
@@ -33,7 +29,7 @@ export const InputMenu: FC<IInputMenuProps> = ({
                 <ImportButton onInput={onSweepObjectChange} />
                 Import model
             </Button>
-            <ExportModel open={open} exportToFile={exportToFile} />
+            <ExportModel exportToFile={exportToFile} />
             <TextField
                 label="Intersections"
                 type="number"

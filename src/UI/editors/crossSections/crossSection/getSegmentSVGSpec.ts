@@ -2,7 +2,7 @@ import {IDataHook} from "model-react";
 import {ArcSegmentState} from "../../../../state/segments/ArcSegmentState";
 import {BezierSegmentState} from "../../../../state/segments/BezierSegmentState";
 import {ISegment} from "../../../../state/_types/ISegment";
-import {Vec2} from "../../../../util/Vec2";
+import {Vec2} from "../../../../util/linearAlgebra/Vec2";
 
 /**
  * Retrieves the SVG specification of a given segment.

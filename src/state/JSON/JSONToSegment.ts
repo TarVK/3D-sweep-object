@@ -1,5 +1,5 @@
-import {Vec2} from "../../util/Vec2";
-import {Vec3} from "../../util/Vec3";
+import {Vec2} from "../../util/linearAlgebra/Vec2";
+import {Vec3} from "../../util/linearAlgebra/Vec3";
 import {ArcSegmentState} from "../segments/ArcSegmentState";
 import {BezierSegmentState} from "../segments/BezierSegmentState";
 import {StraightSegmentState} from "../segments/StraightSegmentState";

@@ -5,8 +5,8 @@ import {CrossSectionState} from "../../../state/CrossSectionState";
 import {StraightSegmentState} from "../../../state/segments/StraightSegmentState";
 import {SweepLineState} from "../../../state/SweepLineState";
 import {SweepObjectState} from "../../../state/SweepObjectState";
-import {Vec2} from "../../../util/Vec2";
-import {Vec3} from "../../../util/Vec3";
+import {Vec2} from "../../../util/linearAlgebra/Vec2";
+import {Vec3} from "../../../util/linearAlgebra/Vec3";
 
 export const CrossSectionEditorStateContext = createContext(
     new CrossSectionEditorState(

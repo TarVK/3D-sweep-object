@@ -1,6 +1,6 @@
 import {IDataHook} from "model-react";
-import {Vec2} from "../../util/Vec2";
-import {Vec3} from "../../util/Vec3";
+import {Vec2} from "../../util/linearAlgebra/Vec2";
+import {Vec3} from "../../util/linearAlgebra/Vec3";
 import {IBoundingBox} from "./IBoundingBox";
 
 export type ISegment<D extends Vec2 | Vec3> = {

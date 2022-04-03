@@ -1,4 +1,4 @@
-import {Vec3} from "../../../util/Vec3";
+import {Vec3} from "../../../util/linearAlgebra/Vec3";
 import {ICrossSection} from "./ICrossSection";
 
 export type ICrossSectionNode = {
