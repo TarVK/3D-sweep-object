@@ -1,6 +1,6 @@
 import {SvgIconComponent} from "@mui/icons-material";
 import {Button, Tooltip} from "@mui/material";
-import { useTheme } from "@mui/system";
+import {useTheme} from "@mui/system";
 import {FC} from "react";
 
 export interface IMenuButtonProps {
@@ -8,6 +8,8 @@ export interface IMenuButtonProps {
     icon: SvgIconComponent;
     hoverText: string;
     isSelected?: boolean;
+    isCustomIcon?: boolean;
+    isDisabled?: boolean;
     onClick: () => void;
 }
 
@@ -16,6 +18,8 @@ export const MenuButton: FC<IMenuButtonProps> = ({
     hoverText,
     onClick,
     icon: Icon,
+    isCustomIcon,
+    isDisabled,
 }) => {
     const theme = useTheme();
 
@@ -26,7 +30,9 @@ export const MenuButton: FC<IMenuButtonProps> = ({
                 minWidth: "50px",
                 display: "flex",
                 justifyContent: "center",
-                backgroundColor: isSelected ? theme.palette.primaryColor : theme.palette.lightBlue,
+                backgroundColor: isSelected
+                    ? theme.palette.primaryColor
+                    : theme.palette.lightBlue,
                 borderRadius: "4px",
             }}>
             <Tooltip title={hoverText}>
@@ -37,9 +43,16 @@ export const MenuButton: FC<IMenuButtonProps> = ({
                         maxWidth: "50px",
                         color: isSelected ? "#FFF" : theme.palette.primaryColor,
                     }}>
-                    <Icon sx={{
-                        stroke: isSelected ? "#FFF" : theme.palette.primaryColor
-                    }} />
+                    {isCustomIcon ? (
+                        <Icon
+                            color={isDisabled ? "disabled" : "inherit"}
+                            sx={{
+                                stroke: isSelected ? "#FFF" : theme.palette.primaryColor,
+                            }}
+                        />
+                    ) : (
+                        <Icon color={isDisabled ? "disabled" : "inherit"} />
+                    )}
                 </Button>
             </Tooltip>
         </div>

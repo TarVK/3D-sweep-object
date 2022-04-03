@@ -38,6 +38,7 @@ export const LineTypeMenu: FC = ({}) => {
                 icon: CustomStraightLineIcon,
                 hoverText: "Straight Line",
                 isSelected: segment instanceof StraightSegmentState,
+                isCustomIcon: true,
                 onClick: createReplacer(
                     segment =>
                         new StraightSegmentState(segment.getStart(), segment.getEnd())
@@ -47,6 +48,7 @@ export const LineTypeMenu: FC = ({}) => {
                 icon: CustomArcIcon,
                 hoverText: "Arc Line",
                 isSelected: segment instanceof ArcSegmentState,
+                isCustomIcon: true,
                 onClick: createReplacer(segment => {
                     const start = segment.getStart();
                     const end = segment.getEnd();
@@ -58,6 +60,7 @@ export const LineTypeMenu: FC = ({}) => {
                 icon: CustomBezierIcon,
                 hoverText: "Bezier Line",
                 isSelected: segment instanceof BezierSegmentState,
+                isCustomIcon: true,
                 onClick: createReplacer(segment => {
                     const start = segment.getStart();
                     const end = segment.getEnd();

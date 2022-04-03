@@ -21,6 +21,7 @@ import {sweepObjectToJSON} from "../state/JSON/sweepObjectToJSON";
 import {ArcSegmentState} from "../state/segments/ArcSegmentState";
 import {theme} from "../themes/MUITheme";
 import {ThemeProvider} from "@mui/system";
+import {Renderer} from "./editors/3D/Renderer";
 
 export const App: FC = () => {
     const [h] = useDataHook();
@@ -60,6 +61,7 @@ export const App: FC = () => {
         );
     });
     const [scene, setScene] = useState<Scene>();
+    const [renderer, setRenderer] = useState<Renderer>();
 
     const convertIMeshToThreeMesh = (iMesh: IMesh) => {
         const sweepObj = new SweepObject();
@@ -85,6 +87,15 @@ export const App: FC = () => {
             const json = sweepObjectToJSON(sweepObjectState);
             const jsonSting = JSON.stringify(json, null, 4);
             download(jsonSting, "3DSweepObject.json", "json");
+        } else if (fileType === FileType.PNG) {
+            let a = document.createElement("a");
+            a.href =
+                renderer
+                    ?.getRendererDomElem()
+                    .toDataURL()
+                    .replace("image/png", "image/octet-stream") || "";
+            a.download = "canvas.png";
+            a.click();
         }
     };
 
@@ -129,25 +140,28 @@ export const App: FC = () => {
                 <div
                     css={{
                         display: "flex",
-                        justifyContent: "space-around",
+                        justifyContent: "space-evenly",
                         margin: "auto auto",
                         userSelect: "none",
                     }}>
                     <Canvas
                         css={{
-                            minHeight: 450,
+                            minHeight: "80vh",
                             maxWidth: "45%",
-                            margin: "auto auto",
+                            width: "45%",
                             flex: 1,
                         }}
                         sweepObjectState={sweepObject}
                         updateScene={(sceneRef: Scene) => setScene(sceneRef)}
+                        updateRenderer={(rendererRef: Renderer) =>
+                            setRenderer(rendererRef)
+                        }
                     />
                     <CrossSectionCanvas
                         css={{
-                            height: 450,
+                            minHeight: "60vh",
                             maxWidth: "45%",
-                            margin: "auto auto",
+                            width: "45%",
                             flex: 1,
                             backgroundColor: "white",
                         }}
