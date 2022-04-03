@@ -182,14 +182,21 @@ export const Canvas: FC<ICanvasProps> = ({
                 getSweeplineAsBezierSegments: getBezierSegments,
                 addPointToSweepline: addPoint,
                 deletePointFromSweepline: deletePoint,
+                movePointFromSweepline: movePoint,
             } = editSweepPoints(scene.sweepPoints);
             controls.onTransform(() => {
-                const segments = getBezierSegments();
-                sweepObjectState.getSweepLine().setSegments(segments, true);
-                scene.sweepPoints.updatePoints(segments);
+                if (controls.currObj) {
+                    movePoint(
+                        sweepObjectState.getSweepLine().getSegments(),
+                        controls.currObj
+                    );
+                }
             });
             controls.onAdd(pointVec => {
-                const segments = addPoint(pointVec);
+                const segments = addPoint(
+                    sweepObjectState.getSweepLine().getSegments(),
+                    pointVec
+                );
                 sweepObjectState.getSweepLine().setSegments(segments, true);
                 scene.sweepPoints.updatePoints(segments, true);
             });

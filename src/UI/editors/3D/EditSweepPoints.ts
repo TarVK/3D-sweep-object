@@ -59,9 +59,10 @@ export default (sweepPointsContainer: {points: THREE.Object3D[]}) => {
         return segments;
     };
 
-    const addPointToSweepline = (pointVec: THREE.Vector3) => {
-        const segments = getSweeplineAsBezierSegments();
-
+    const addPointToSweepline = (
+        segments: BezierSegmentState<Vec3>[],
+        pointVec: THREE.Vector3
+    ) => {
         let min = Infinity;
         let index = 0;
         for (var i = 0; i < segments.length; i++) {
@@ -94,17 +95,11 @@ export default (sweepPointsContainer: {points: THREE.Object3D[]}) => {
             segments.push(createBezierSegment(start, end));
         } else {
             // we are between points
-
-            const start = segments[index].getStart().toThreeJsVector();
-            const startControl = segments[index].getStartControl().toThreeJsVector();
-            const mid = pointVec;
-            const endControl = segments[index].getEndControl().toThreeJsVector();
-            const end = segments[index].getEnd().toThreeJsVector();
+            const newSegments = segments[index].split(threeVectorToVec3(pointVec));
             segments.splice(
                 index,
                 1,
-                createBezierSegment(start, mid, startControl, false),
-                createBezierSegment(mid, end, false, endControl)
+                ...(newSegments as unknown as BezierSegmentState<Vec3>[])
             );
         }
 
@@ -134,5 +129,72 @@ export default (sweepPointsContainer: {points: THREE.Object3D[]}) => {
         return segments;
     };
 
-    return {addPointToSweepline, deletePointFromSweepline, getSweeplineAsBezierSegments};
+    const movePointFromSweepline = (
+        segments: BezierSegmentState<Vec3>[],
+        pointObj: THREE.Object3D,
+        sync = true,
+        move = true
+    ) => {
+        const points = getSweepPoints();
+        const pointIndex = points.indexOf(pointObj);
+
+        let segmentIndex: number;
+        if (pointIndex == points.length - 1) {
+            const segment = segments.at(-1)!;
+            segmentIndex = segments.length - 1;
+            segment.setEnd(threeVectorToVec3(pointObj.position));
+            points.at(-2)!.position.copy(segment.getEndControl().toThreeJsVector());
+            points.at(-3)!.position.copy(segment.getStartControl().toThreeJsVector());
+        } else {
+            segmentIndex = Math.floor(pointIndex / 3);
+            const segment = segments[segmentIndex];
+            const prevSegment = segments[segmentIndex - 1];
+            const nextSegment = segments[segmentIndex + 1];
+
+            switch (pointIndex % 3) {
+                case 0:
+                    segment.setStart(threeVectorToVec3(pointObj.position), sync, move);
+                    points
+                        .at(pointIndex + 1)
+                        ?.position.copy(segment.getStartControl().toThreeJsVector());
+                    if (prevSegment) {
+                        points
+                            .at(pointIndex - 1)
+                            ?.position.copy(
+                                prevSegment.getEndControl().toThreeJsVector()
+                            );
+                    }
+                    break;
+                case 1:
+                    segment.setStartControl(threeVectorToVec3(pointObj.position), sync);
+                    if (prevSegment) {
+                        points
+                            .at(pointIndex - 2)
+                            ?.position.copy(
+                                prevSegment.getEndControl().toThreeJsVector()
+                            );
+                    }
+                    break;
+                case 2:
+                    segment.setEndControl(threeVectorToVec3(pointObj.position), sync);
+                    if (nextSegment) {
+                        points
+                            .at(pointIndex + 2)
+                            ?.position.copy(
+                                nextSegment.getStartControl().toThreeJsVector()
+                            );
+                    }
+                    break;
+            }
+        }
+
+        return segments;
+    };
+
+    return {
+        addPointToSweepline,
+        deletePointFromSweepline,
+        getSweeplineAsBezierSegments,
+        movePointFromSweepline,
+    };
 };
