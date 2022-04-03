@@ -71,8 +71,6 @@ export const App: FC = () => {
     const sweepObject = sweepObjectState;
 
     const exportToFile = (fileType: FileType) => {
-        if (!sweepObjectState) return;
-
         if (fileType === FileType.OBJ) {
             const mesh = convertIMeshToThreeMesh(sweepObjectState.getMesh()!);
             const exporter = new OBJExporter();
