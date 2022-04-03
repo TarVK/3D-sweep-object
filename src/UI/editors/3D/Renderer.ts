@@ -28,7 +28,7 @@ export class Renderer {
         this.height = target.offsetHeight;
         this.container = target;
         this.scene = scene;
-        this.renderer = new THREE.WebGLRenderer({antialias: true});
+        this.renderer = new THREE.WebGLRenderer({antialias: true, preserveDrawingBuffer: true});
         this.renderer.shadowMap.enabled = true;
         this.renderer.setSize(this.width, this.height);
         this.renderer.autoClear = false;

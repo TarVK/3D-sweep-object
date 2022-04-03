@@ -11,6 +11,10 @@ import {
     ClearOutlined,
     MouseOutlined,
     RestartAltOutlined,
+    SvgIconComponent,
+    ViewInArOutlined,
+    VisibilityOffOutlined,
+    VisibilityOutlined,
     ZoomOutMapOutlined,
 } from "@mui/icons-material";
 import {Menu} from "../Menu";
@@ -19,7 +23,7 @@ import {OrbitTransformControls, Modes} from "./controllers/OrbitTransformControl
 import editSweepPoints from "./EditSweepPoints";
 import {Object3D} from "three";
 
-export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...props}) => {
+export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, updateRenderer, ...props}) => {
     const [h] = useDataHook();
     const sweepObjectRef = useRef(sweepObjectState);
     sweepObjectRef.current = sweepObjectState; // Keep a reference to the latest state
@@ -37,6 +41,14 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
 
     const [selectedMode, setSelectedMode] = useState<Modes>("transform");
 
+    const [skeletonVisibilityIcon, setSkeletonVisibilityIcon] = useState<SvgIconComponent>(VisibilityOffOutlined);
+    const [skeletonVisibilityText, setSkeletonVisibilityText] = useState<string>("Hide object skeleton");
+    const [skeletonIconDisabled, setSkeletonIconDisabled] = useState<boolean>(false);
+
+    const [meshVisibilityText, setMeshVisibilityText] = useState<string>("Hide object mesh");
+    const [meshIconDisabled, setMeshIconDisabled] = useState<boolean>(false);
+
+
     // TODO: place this somewhere
     function toggleMeshDisplaying() {
         scene.sweepObject.visible = !scene.sweepObject.visible;
@@ -45,6 +57,12 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
     useEffect(() => {
         updateScene!(sceneRef);
     }, [sceneRef]);
+
+    useEffect(() => {
+        if (rendererRef){ 
+            updateRenderer!(rendererRef.current);
+        }
+    }, [rendererRef.current]);
 
     useEffect(() => {
         setSelectedObj(controlsRef.current?.currObj);
@@ -114,6 +132,21 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
         },
     ];
 
+    const visibilityMenuItems = [
+        {
+            icon: skeletonVisibilityIcon,
+            hoverText: skeletonVisibilityText,
+            isDisabled: skeletonIconDisabled,
+            onClick: () => handleSkeletonVisibilityOnClick(),
+        },
+        {
+            icon: ViewInArOutlined,
+            hoverText: meshVisibilityText,
+            isDisabled: meshIconDisabled,
+            onClick: () => handleMeshVisibilityOnClick(),
+        },
+    ];
+
     useEffect(() => {
         const cubeEl = cubeRef.current;
         const el = elementRef.current;
@@ -180,6 +213,32 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
         scene.sweepPoints.updatePoints(segments);
     };
 
+    const handleSkeletonVisibilityOnClick = () => {
+        if (skeletonIconDisabled === false) {
+            setSkeletonVisibilityIcon(VisibilityOutlined);
+            setSkeletonVisibilityText("Show object skeleton");
+            setSkeletonIconDisabled(true);
+            sceneRef.current.sweepLine.visible = false;
+        } else {
+            setSkeletonVisibilityIcon(VisibilityOffOutlined);
+            setSkeletonVisibilityText("Hide object skeleton");
+            setSkeletonIconDisabled(false);
+            sceneRef.current.sweepLine.visible = true;
+        }
+    };
+
+    const handleMeshVisibilityOnClick = () => {
+        if (meshIconDisabled === false) {
+            setMeshVisibilityText("Show object mesh");
+            setMeshIconDisabled(true);
+            sceneRef.current.sweepObject.visible = false;
+        } else {
+            setMeshVisibilityText("Hide object mesh");
+            setMeshIconDisabled(false);
+            sceneRef.current.sweepObject.visible = true;
+        }
+    }
+
     const sweepObjectMesh = sweepObjectState.getMesh(h);
 
     useEffect(() => {
@@ -206,6 +265,8 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, ...prop
             }}>
             <Menu items={pointMenuItems} position={{top: 0, left: 0}} />
             <Menu items={cameraMenuItems} position={{top: 0, right: 0}} />
+            <Menu items={visibilityMenuItems} position={{bottom: 0, left: 0}} />
+
             {selectedObj ? (
                 <SelectedPoint triggerUpdate={triggerUpdate} point={selectedObj} />
             ) : null}
