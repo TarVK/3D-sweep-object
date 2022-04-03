@@ -112,17 +112,18 @@ export default (sweepPointsContainer: {points: THREE.Object3D[]}) => {
             if (points[i].position.equals(pointObj.position)) {
                 if (i == 0 && points.length > 4) {
                     points.splice(0, 3);
+                    break;
                 } else if (i == points.length - 1 && points.length > 4) {
                     points.splice(i - 2, 3);
+                    break;
                 } else if (i % 3 == 0 && points.length > 4) {
                     points.splice(i - 1, 3);
+                    break;
                 } else if (i % 3 == 1) {
                     points[i].position.copy(points[i - 1].position);
                 } else if (i % 3 == 2) {
                     points[i].position.copy(points[i + 1].position);
                 }
-
-                break;
             }
         }
         const segments = getSweeplineAsBezierSegments(points);
