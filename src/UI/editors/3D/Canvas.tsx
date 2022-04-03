@@ -23,7 +23,12 @@ import {OrbitTransformControls, Modes} from "./controllers/OrbitTransformControl
 import editSweepPoints from "./EditSweepPoints";
 import {Object3D} from "three";
 
-export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, updateRenderer, ...props}) => {
+export const Canvas: FC<ICanvasProps> = ({
+    sweepObjectState,
+    updateScene,
+    updateRenderer,
+    ...props
+}) => {
     const [h] = useDataHook();
     const sweepObjectRef = useRef(sweepObjectState);
     sweepObjectRef.current = sweepObjectState; // Keep a reference to the latest state
@@ -41,25 +46,22 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, updateR
 
     const [selectedMode, setSelectedMode] = useState<Modes>("transform");
 
-    const [skeletonVisibilityIcon, setSkeletonVisibilityIcon] = useState<SvgIconComponent>(VisibilityOffOutlined);
-    const [skeletonVisibilityText, setSkeletonVisibilityText] = useState<string>("Hide object skeleton");
+    const [skeletonVisibilityIcon, setSkeletonVisibilityIcon] =
+        useState<SvgIconComponent>(VisibilityOffOutlined);
+    const [skeletonVisibilityText, setSkeletonVisibilityText] =
+        useState<string>("Hide object skeleton");
     const [skeletonIconDisabled, setSkeletonIconDisabled] = useState<boolean>(false);
 
-    const [meshVisibilityText, setMeshVisibilityText] = useState<string>("Hide object mesh");
+    const [meshVisibilityText, setMeshVisibilityText] =
+        useState<string>("Hide object mesh");
     const [meshIconDisabled, setMeshIconDisabled] = useState<boolean>(false);
-
-
-    // TODO: place this somewhere
-    function toggleMeshDisplaying() {
-        scene.sweepObject.visible = !scene.sweepObject.visible;
-    }
 
     useEffect(() => {
         updateScene!(sceneRef);
     }, [sceneRef]);
 
     useEffect(() => {
-        if (rendererRef){ 
+        if (rendererRef) {
             updateRenderer!(rendererRef.current);
         }
     }, [rendererRef.current]);
@@ -219,11 +221,13 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, updateR
             setSkeletonVisibilityText("Show object skeleton");
             setSkeletonIconDisabled(true);
             sceneRef.current.sweepLine.visible = false;
+            sceneRef.current.sweepPoints.visible = false;
         } else {
             setSkeletonVisibilityIcon(VisibilityOffOutlined);
             setSkeletonVisibilityText("Hide object skeleton");
             setSkeletonIconDisabled(false);
             sceneRef.current.sweepLine.visible = true;
+            sceneRef.current.sweepPoints.visible = true;
         }
     };
 
@@ -237,7 +241,7 @@ export const Canvas: FC<ICanvasProps> = ({sweepObjectState, updateScene, updateR
             setMeshIconDisabled(false);
             sceneRef.current.sweepObject.visible = true;
         }
-    }
+    };
 
     const sweepObjectMesh = sweepObjectState.getMesh(h);
 
