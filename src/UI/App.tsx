@@ -101,13 +101,14 @@ export const App: FC = () => {
             <div
                 css={{
                     background: "#C3E0E5",
-                    minHeight: "100vh",
+                    height: "100vh",
+                    display: "flex",
+                    flexDirection: "column",
                 }}>
                 <div
                     className="input-menu-holder"
                     css={{
                         width: "100%",
-                        margin: "0px 0px 25px",
                         background: theme.palette.primaryColor,
                         color: "#FFF",
                     }}>
@@ -119,16 +120,17 @@ export const App: FC = () => {
                 </div>
                 <div
                     css={{
+                        flexGrow: 1,
+                        gap: 20,
+                        padding: 20,
+                        minHeight: 0,
                         display: "flex",
                         justifyContent: "space-evenly",
-                        margin: "auto auto",
                         userSelect: "none",
                     }}>
                     <Canvas
                         css={{
-                            minHeight: "80vh",
-                            maxWidth: "45%",
-                            width: "45%",
+                            height: "100%",
                             flex: 1,
                         }}
                         sweepObjectState={sweepObject}
@@ -139,9 +141,7 @@ export const App: FC = () => {
                     />
                     <CrossSectionCanvas
                         css={{
-                            minHeight: "60vh",
-                            maxWidth: "45%",
-                            width: "45%",
+                            height: "100%",
                             flex: 1,
                             backgroundColor: "white",
                         }}
