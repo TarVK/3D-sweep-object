@@ -1,9 +1,10 @@
+import {MutableRefObject} from "react";
 import {SweepObjectState} from "../../../../state/SweepObjectState";
-import { Renderer } from "../Renderer";
+import {Scene} from "../Scene";
 
 export type ICanvasProps = {
     sweepObjectState: SweepObjectState;
     className?: string;
-    updateScene?: Function;
-    updateRenderer?: Function
+    updateScene?: (scene: MutableRefObject<Scene>) => void;
+    updateRenderer?: Function;
 };

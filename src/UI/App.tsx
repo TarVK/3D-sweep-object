@@ -1,5 +1,5 @@
 import {useDataHook} from "model-react";
-import {FC, useState} from "react";
+import {FC, MutableRefObject, useState} from "react";
 import {BezierSegmentState} from "../state/segments/BezierSegmentState";
 import {CrossSectionState} from "../state/CrossSectionState";
 import {StraightSegmentState} from "../state/segments/StraightSegmentState";
@@ -15,7 +15,6 @@ import {OBJExporter} from "../exporters/OBJExporter";
 import {IMesh} from "../sweepOperation/_types/IMesh";
 import {SweepObject} from "./editors/3D/SweepObject";
 import {STLExporter} from "../exporters/STLExporter";
-import {Scene} from "three";
 import {useStateLazy} from "./hooks/useStateLazy";
 import {sweepObjectToJSON} from "../state/JSON/sweepObjectToJSON";
 import {ArcSegmentState} from "../state/segments/ArcSegmentState";
@@ -23,6 +22,7 @@ import {theme} from "../themes/MUITheme";
 import {ThemeProvider} from "@mui/system";
 import {Renderer} from "./editors/3D/Renderer";
 import {download} from "../util/download";
+import {Scene} from "./editors/3D/Scene";
 
 export const App: FC = () => {
     const [sweepObjectState, setSweepObjectState] = useStateLazy(() => {
@@ -59,7 +59,7 @@ export const App: FC = () => {
             [crossSection1, crossSection2]
         );
     });
-    const [scene, setScene] = useState<Scene>();
+    const [scene, setScene] = useState<MutableRefObject<Scene>>();
     const [renderer, setRenderer] = useState<Renderer>();
 
     const convertIMeshToThreeMesh = (iMesh: IMesh) => {
@@ -78,7 +78,9 @@ export const App: FC = () => {
             download(exportedString, "3DSweepObject.obj", "obj");
         } else if (fileType === FileType.STL) {
             const exporter = new STLExporter();
-            const exportedString = exporter.parse((scene as any).current!, {});
+            const mesh = scene?.current.sweepObject;
+            if (!mesh) return;
+            const exportedString = exporter.parse(mesh, {});
             download(exportedString, "3DSweepObject.stl", "stl");
         } else if (fileType === FileType.JSON) {
             const json = sweepObjectToJSON(sweepObjectState);
@@ -134,10 +136,8 @@ export const App: FC = () => {
                             flex: 1,
                         }}
                         sweepObjectState={sweepObject}
-                        updateScene={(sceneRef: Scene) => setScene(sceneRef)}
-                        updateRenderer={(rendererRef: Renderer) =>
-                            setRenderer(rendererRef)
-                        }
+                        updateScene={setScene}
+                        updateRenderer={setRenderer}
                     />
                     <CrossSectionCanvas
                         css={{
