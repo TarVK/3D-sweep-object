@@ -9,6 +9,7 @@ import {
     AddCircleOutlineSharp,
     CameraAltOutlined,
     ClearOutlined,
+    Grid4x4Outlined,
     MouseOutlined,
     RestartAltOutlined,
     SvgIconComponent,
@@ -55,6 +56,10 @@ export const Canvas: FC<ICanvasProps> = ({
     const [meshVisibilityText, setMeshVisibilityText] =
         useState<string>("Hide object mesh");
     const [meshIconDisabled, setMeshIconDisabled] = useState<boolean>(false);
+
+    const [wireframeVisibilityText, setWireframeVisibilityText] =
+        useState<string>("Show object wireframe");
+    const [wireframeIconDisabled, setWireFrameIconDisabled] = useState<boolean>(true);
 
     useEffect(() => {
         updateScene?.(sceneRef);
@@ -147,6 +152,12 @@ export const Canvas: FC<ICanvasProps> = ({
             isDisabled: meshIconDisabled,
             onClick: () => handleMeshVisibilityOnClick(),
         },
+        {
+            icon: Grid4x4Outlined,
+            hoverText: wireframeVisibilityText,
+            isDisabled: wireframeIconDisabled,
+            onClick: () => handleWireframeVisibilityOnClick(),
+        }
     ];
 
     useEffect(() => {
@@ -247,6 +258,18 @@ export const Canvas: FC<ICanvasProps> = ({
             setMeshVisibilityText("Hide object mesh");
             setMeshIconDisabled(false);
             sceneRef.current.sweepObject.visible = true;
+        }
+    };
+
+    const handleWireframeVisibilityOnClick = () => {
+        if (wireframeIconDisabled === false) {
+            setWireframeVisibilityText("Show object wireframe");
+            setWireFrameIconDisabled(true);
+            scene.sweepObject.toggleWireframe();
+        } else {
+            setWireframeVisibilityText("Hide object wireframe");
+            setWireFrameIconDisabled(false);
+            scene.sweepObject.toggleWireframe();
         }
     };
 
