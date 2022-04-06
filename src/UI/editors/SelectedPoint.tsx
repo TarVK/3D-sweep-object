@@ -72,6 +72,7 @@ export const SelectedPoint: FC<SelectedPointProps> = props => {
                     flexDirection: "row",
                     justifyContent: "space-around",
                     alignItems: "center",
+                    borderBottom: "2px dashed #145DA0"
                 }}>
                 <h3
                     css={{
