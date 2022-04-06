@@ -280,6 +280,11 @@ export const Canvas: FC<ICanvasProps> = ({
             scene.sweepObject.updateMesh(sweepObjectMesh);
             const sweepLine = sweepObjectState.getSweepLine().getSegments(h);
             scene.sweepLine.updateLine(sweepLine);
+
+            const crossSections = sweepObjectState.getCrossSections(h);
+            crossSections?.forEach(crossSection => {
+                scene.crossSection.updateCrossSection(crossSection.getSegments(h))
+            })
             scene.sweepPoints.updatePoints(sweepLine);
 
             // update controls, so that sweep line points are editable
