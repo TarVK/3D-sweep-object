@@ -44,7 +44,6 @@ export class SweepObject extends THREE.Object3D implements IMateriable {
                 new THREE.Float32BufferAttribute(vertices, 3)
             );
             geometry.setIndex(faces);
-            console.log(vertices, faces);
         }
 
         geometry.computeVertexNormals();
