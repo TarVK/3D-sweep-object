@@ -12,11 +12,11 @@ import {
     Grid4x4Outlined,
     MouseOutlined,
     RestartAltOutlined,
-    ChangeHistory as TriangleIcon,
     ViewInArOutlined,
     VisibilityOffOutlined,
     VisibilityOutlined,
     ZoomOutMapOutlined,
+    LightbulbOutlined,
 } from "@mui/icons-material";
 import {Menu} from "../Menu";
 import {Observer, useDataHook} from "model-react";
@@ -153,7 +153,7 @@ export const Canvas: FC<ICanvasProps> = ({
             onClick: () => setWireframeEnabled(!wireframeEnabled),
         },
         {
-            icon: TriangleIcon, // TODO: find better icon
+            icon: LightbulbOutlined,
             hoverText: smoothLightingEnabled
                 ? "Disable smooth lighting"
                 : "Enable smooth lighting",
@@ -294,8 +294,9 @@ export const Canvas: FC<ICanvasProps> = ({
     const prevObjectState = usePrevious(sweepObjectState);
     useEffect(() => {
         if (sweepObjectMesh) {
-            const sweepLineObserver = new Observer(h =>
-                sweepObjectState.getSweepLine().getSegments(h)
+            const sweepLineObserver = new Observer(
+                h => sweepObjectState.getSweepLine().getSegments(h),
+                {debounce: -1}
             ).listen(sweepLine => {
                 const forceUpdate = prevObjectState != sweepObjectState;
 

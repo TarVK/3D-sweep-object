@@ -6,7 +6,7 @@ import {ExportModel} from "../editors/ExportModel";
 import {IInputMenuProps} from "../_types/IInputMenuProps";
 import {ImportButton} from "./ImportButton";
 import {HelpButton} from "./HelpButton";
-
+import logo from "../../../public/sweeper-logo.png";
 export const InputMenu: FC<IInputMenuProps> = ({
     sweepObjectState,
     exportToFile,
@@ -44,7 +44,7 @@ export const InputMenu: FC<IInputMenuProps> = ({
                 css={{
                     ...theme.typography.h1,
                 }}>
-                Logo
+                    <img src={logo} alt="image" height={50} width={50}/>
             </h1>
             <Button variant="contained" size="small">
                 <ImportButton onInput={onSweepObjectChange} />

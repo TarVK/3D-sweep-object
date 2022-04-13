@@ -28,7 +28,7 @@ export class CrossSection extends THREE.Object3D implements IMateriable {
     public setSelected(selected: boolean): void {
         this.material = selected
             ? // TODO: add proper color
-              new THREE.LineBasicMaterial({color: 0x00ff00})
+              new THREE.LineBasicMaterial({color: colors.CROSS_SECTION})
             : new THREE.LineBasicMaterial({color: colors.SWEEP_LINE});
 
         this.updateCrossSection();

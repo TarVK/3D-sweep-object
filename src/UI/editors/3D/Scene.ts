@@ -78,7 +78,7 @@ export class Scene extends THREE.Scene {
     }
 
     public addDirectionalLight(color: number) {
-        const directionalLight = new THREE.DirectionalLight(color, 0.6);
+        const directionalLight = new THREE.DirectionalLight(color, 0.5);
         directionalLight.position.set(0, 200, 0);
         this.add(directionalLight);
 
