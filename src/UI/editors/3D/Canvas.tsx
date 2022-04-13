@@ -294,8 +294,9 @@ export const Canvas: FC<ICanvasProps> = ({
     const prevObjectState = usePrevious(sweepObjectState);
     useEffect(() => {
         if (sweepObjectMesh) {
-            const sweepLineObserver = new Observer(h =>
-                sweepObjectState.getSweepLine().getSegments(h)
+            const sweepLineObserver = new Observer(
+                h => sweepObjectState.getSweepLine().getSegments(h),
+                {debounce: -1}
             ).listen(sweepLine => {
                 const forceUpdate = prevObjectState != sweepObjectState;
 
