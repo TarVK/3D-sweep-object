@@ -56,6 +56,7 @@ export const Canvas: FC<ICanvasProps> = ({
     const [wireframeEnabled, setWireframeEnabled] = useState(false);
     const [smoothLightingEnabled, setSmoothLightingEnabled] = useState(true);
     const [plainMode, setPlainMode] = useState(false); // Used for taking report pictures
+    const [animateSweep, setAnimateSweep] = useState(false); // Used for demo video
 
     useEffect(() => {
         updateScene?.(sceneRef);
@@ -180,11 +181,37 @@ export const Canvas: FC<ICanvasProps> = ({
     useEffect(() => {
         scene.setPlainMode(plainMode);
     }, [plainMode]);
+    useEffect(() => {
+        if (animateSweep) {
+            const duration = 3;
+
+            let prevTime = Date.now();
+            const update = () => {
+                id = requestAnimationFrame(update);
+                const time = Date.now();
+                const delta = time - prevTime;
+                prevTime = time;
+
+                const {end} = sweepObjectState.getRange();
+                const newEnd =
+                    end == 1 ? 0 : Math.min(1, end + (delta / 1000) * (1 / duration));
+                sweepObjectState.setRange({start: 0, end: newEnd});
+            };
+            let id = requestAnimationFrame(update);
+            return () => cancelAnimationFrame(id);
+        } else {
+            sweepObjectState.setRange({start: 0, end: 1});
+        }
+    }, [animateSweep, sweepObjectState]);
 
     useEffect(() => {
         const listener = (e: KeyboardEvent) => {
             if (e.ctrlKey && e.key == "p") {
                 setPlainMode(plain => !plain);
+                e.preventDefault();
+            }
+            if (e.ctrlKey && e.key == "o") {
+                setAnimateSweep(animate => !animate);
                 e.preventDefault();
             }
         };

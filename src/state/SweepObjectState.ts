@@ -7,6 +7,7 @@ import {ISweepLineSpecification} from "../sweepOperation/_types/spec/ISweepLineS
 import {ISweepObjectSpecification} from "../sweepOperation/_types/spec/ISweepObjectSpecification";
 import {Vec2} from "../util/linearAlgebra/Vec2";
 import {CrossSectionState} from "./CrossSectionState";
+import {IRange} from "./JSON/_types/IRange";
 import {SweepLineState} from "./SweepLineState";
 
 /**
@@ -18,6 +19,9 @@ export class SweepObjectState {
     // TODO: add getter/setters
     protected sweepLineInterpolationPoints = new Field(20);
     protected crossSectionInterpolationPoints = new Field(30);
+
+    // The sweep line range to use, used for getting a sub-shape
+    protected range = new Field({start: 0, end: 1});
 
     /**
      * Creates a new sweep object from the given cross sections and sweepline
@@ -77,6 +81,15 @@ export class SweepObjectState {
         return this.crossSectionInterpolationPoints.get(hook);
     }
 
+    /**
+     * Retrieves the range of the sweep line to generate the object for
+     * @param hook The hook to subscribe to changes
+     * @returns The current range to be generated
+     */
+    public getRange(hook?: IDataHook): IRange {
+        return this.range.get(hook);
+    }
+
     // Setters
     /**
      * Sets the number of points to sample the sweep line with
@@ -100,6 +113,14 @@ export class SweepObjectState {
      */
     public setCrossSections(crossSections: CrossSectionState[]): void {
         this.crossSections.set(crossSections);
+    }
+
+    /**
+     * Sets the range to generate the object for
+     * @param range The range of positional values to generate the object of
+     */
+    public setRange(range: IRange): void {
+        this.range.set(range);
     }
 
     // Utils
@@ -142,21 +163,22 @@ export class SweepObjectState {
 
     /** Create a sweep line specification that caches the result to reduce recomputation */
     protected sweepLineCache = new DataCacher<ISweepLineSpecification>(hook => {
-        let cached: null | {
+        let cachedSample: null | {
             count: number;
             result: ISweepLineNode[];
         } = null;
 
         return {
             sample: samples => {
-                if (cached?.count == samples) return cached.result;
+                if (cachedSample?.count == samples) return cachedSample.result;
                 const sample = this.sweepLine.sample(samples, hook);
-                cached = {
+                cachedSample = {
                     count: samples,
                     result: sample,
                 };
                 return sample;
             },
+            samplePoint: per => this.sweepLine.getNode(per),
         };
     });
     /** A cache for the sweep object specification */
@@ -172,6 +194,7 @@ export class SweepObjectState {
                 sweepLine: this.sweepLineInterpolationPoints.get(hook),
                 crossSection: this.crossSectionInterpolationPoints.get(hook),
             },
+            range: this.getRange(hook),
         };
         return spec;
     });

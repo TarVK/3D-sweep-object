@@ -1,3 +1,4 @@
+import {IRange} from "../../../state/JSON/_types/IRange";
 import {ICrossSectionSpecification} from "./ICrossSectionSpecification";
 import {ISweepLineSpecification} from "./ISweepLineSpecification";
 
@@ -17,4 +18,6 @@ export type ISweepObjectSpecification = {
         /** The number of points to approximate the cross sections by */
         crossSection: number;
     };
+    /** The range of the sweep line to be used */
+    range?: IRange;
 };

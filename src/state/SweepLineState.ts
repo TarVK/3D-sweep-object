@@ -60,30 +60,10 @@ export class SweepLineState {
      * @returns The sweep line samples with the requested number of elements
      */
     public sample(pointCount: number, hook?: IDataHook): ISweepLineNode[] {
-        const out: ISweepLineNode[] = [];
-
-        const segments = this.segments.get(hook);
-        for (let i = 0; i < segments.length; i++) {
-            const segment = segments[i];
-            // TODO: Use overall distance in circumference
-            const per = (i + 1) / segments.length;
-            const targetPoints = Math.round(per * pointCount);
-            const addPoints = targetPoints - out.length;
-
-            if (addPoints > 0) {
-                let points: IBezierNode<Vec3>[] = [];
-                const dropFirstPoint = i != 0;
-                if (dropFirstPoint)
-                    points = sampleBezier(segment.getPlain(hook), addPoints + 1).slice(1);
-                else points = sampleBezier(segment.getPlain(hook), addPoints);
-                out.push(
-                    ...points.map(({point, dir}) => ({
-                        direction: dir,
-                        position: point,
-                    }))
-                );
-            }
-        }
+        const step = pointCount - 1;
+        const out = new Array(pointCount)
+            .fill(0)
+            .map((_, index) => this.getNode(index / step, hook));
 
         return out;
     }
@@ -95,6 +75,7 @@ export class SweepLineState {
      * @returns The sample node at the given position
      */
     public getNode(per: number, hook?: IDataHook): ISweepLineNode {
+        // TODO: Use overall distance in circumference
         const segments = this.segments.get(hook);
 
         const sl = segments.length;
