@@ -228,6 +228,7 @@ export const Canvas: FC<ICanvasProps> = ({
                 getSweepLine().setSegments(segments, true);
                 scene.sweepPoints.updatePoints(segments, true);
             });
+            controls.onSelect(setSelectedObj);
 
             setSelectedMode(controls.getMode());
 

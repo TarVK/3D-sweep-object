@@ -26,6 +26,8 @@ export class OrbitTransformControls {
     private addListeners: ((point: THREE.Vector3) => void)[] = [];
     private deleteListeners: ((point: THREE.Object3D) => void)[] = [];
     private orbitListeners: (() => void)[] = [];
+    private selectListeners: ((point: THREE.Object3D | null) => void)[] = [];
+
     private allowOrbitListeners = true;
 
     private hoverObj: THREE.Object3D | undefined;
@@ -89,6 +91,7 @@ export class OrbitTransformControls {
             this.orbitControls.mouseButtons.left = CameraControls.ACTION.ROTATE;
             this.orbitControls.mouseButtons.right = CameraControls.ACTION.OFFSET;
         } else if (this.mode == "move") {
+            this.orbitControls.enabled = true;
             this.disposeTransform();
             this.orbitControls.mouseButtons.left = CameraControls.ACTION.ROTATE;
             this.orbitControls.mouseButtons.right = CameraControls.ACTION.OFFSET;
@@ -131,6 +134,8 @@ export class OrbitTransformControls {
         if (intersects.length == 0) {
             this.disposeTransform();
         }
+
+        this.selectListeners.forEach(cb => cb(null));
     };
 
     private hoverPoint = (event: MouseEvent) => {
@@ -173,7 +178,11 @@ export class OrbitTransformControls {
                 this.transformListeners.forEach(cb => cb());
             });
             this.setObjectColors();
+
+            this.selectListeners.forEach(cb => cb(this.currObj!));
         }
+
+        this.orbitControls.enabled = intersects.length == 0;
     };
 
     private createNewPointOnClick(event: MouseEvent) {
@@ -251,6 +260,10 @@ export class OrbitTransformControls {
 
     public onDelete(cb: (point: THREE.Object3D) => void) {
         this.deleteListeners.push(cb);
+    }
+
+    public onSelect(cb: (point: THREE.Object3D) => void) {
+        this.selectListeners.push(cb);
     }
 
     public onOrbiting(cb: () => void) {

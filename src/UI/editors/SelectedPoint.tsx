@@ -1,6 +1,6 @@
 import {HelpOutline, HelpOutlined} from "@mui/icons-material";
-import {Input, Tooltip, useTheme} from "@mui/material";
-import {FC, useEffect, useState} from "react";
+import {Input, Tooltip, useTheme, Typography} from "@mui/material";
+import {FC, useEffect, useRef, useState} from "react";
 import {Object3D} from "three";
 
 interface SelectedPointProps {
@@ -8,44 +8,47 @@ interface SelectedPointProps {
     triggerUpdate: Function;
 }
 
-export const SelectedPoint: FC<SelectedPointProps> = props => {
+export const SelectedPoint: FC<SelectedPointProps> = ({point, triggerUpdate}) => {
     const theme = useTheme();
-    const [localX, setLocalX] = useState<number>(props.point.position.x);
-    const [localY, setLocalY] = useState<number>(props.point.position.y);
-    const [localZ, setLocalZ] = useState<number>(props.point.position.z);
+    const [localX, setLocalX] = useState<number>(point.position.x);
+    const [localY, setLocalY] = useState<number>(point.position.y);
+    const [localZ, setLocalZ] = useState<number>(point.position.z);
 
     const [xIsOnEditMode, setXIsOnEditMode] = useState<boolean>(false);
     const [yIsOnEditMode, setYIsOnEditMode] = useState<boolean>(false);
     const [zIsOnEditMode, setZIsOnEditMode] = useState<boolean>(false);
 
     useEffect(() => {
-        setLocalX(props.point.position.x);
-    }, [props.point.position.x]);
+        setLocalX(point.position.x);
+    }, [point.position.x]);
 
     useEffect(() => {
-        setLocalY(props.point.position.y);
-    }, [props.point.position.y]);
+        setLocalY(point.position.y);
+    }, [point.position.y]);
 
     useEffect(() => {
-        setLocalZ(props.point.position.z);
-    }, [props.point.position.z]);
+        setLocalZ(point.position.z);
+    }, [point.position.z]);
 
-    const enterXValue = (event: any) => {
-        props.point.position.set(parseFloat(event.target.value), localY, localZ);
-        setLocalX(props.point.position.x);
-        props.triggerUpdate();
+    const enterXValue = (value: number) => {
+        point.position.set(value, localY, localZ);
+        setLocalX(value);
+        triggerUpdate();
+        setXIsOnEditMode(false);
     };
 
-    const enterYValue = (event: any) => {
-        props.point.position.set(localX, parseFloat(event.target.value), localZ);
-        props.triggerUpdate();
-        setLocalY(event.target.value);
+    const enterYValue = (value: number) => {
+        point.position.set(localX, value, localZ);
+        triggerUpdate();
+        setLocalY(value);
+        setYIsOnEditMode(false);
     };
 
-    const enterZValue = (event: any) => {
-        props.point.position.set(localX, localY, parseFloat(event.target.value));
-        props.triggerUpdate();
-        setLocalZ(event.target.value);
+    const enterZValue = (value: number) => {
+        point.position.set(localX, localY, value);
+        triggerUpdate();
+        setLocalZ(value);
+        setZIsOnEditMode(false);
     };
 
     return (
@@ -72,17 +75,18 @@ export const SelectedPoint: FC<SelectedPointProps> = props => {
                     flexDirection: "row",
                     justifyContent: "space-around",
                     alignItems: "center",
-                    borderBottom: "2px dashed #145DA0"
+                    borderBottom: "2px dashed #145DA0",
                 }}>
-                <h3
+                <Typography
+                    variant="h3"
+                    component="h3"
                     css={{
                         margin: "0",
-                        fontSize: theme.typography.h3.fontSize
                     }}>
                     Selected point
-                </h3>{" "}
+                </Typography>{" "}
                 <Tooltip title="Double click on value to update.">
-                    <HelpOutline sx={{transform: "scale(0.7)", opacity: .7}} />
+                    <HelpOutline sx={{transform: "scale(0.7)", opacity: 0.7}} />
                 </Tooltip>
             </div>
 
@@ -99,59 +103,67 @@ export const SelectedPoint: FC<SelectedPointProps> = props => {
                         className="xCoordinate"
                         css={{
                             margin: "5px",
-                            ...theme.typography.h4
+                            ...theme.typography.h4,
                         }}
-                        onDoubleClick={() => setXIsOnEditMode(true)}>
+                        onClick={() => setXIsOnEditMode(true)}>
                         <b>X:</b> {Number(localX).toFixed(2)}
                     </h4>
                 ) : (
-                    <Input
-                        value={localX}
-                        onChange={enterXValue}
-                        onKeyDown={event => {
-                            if (event.key === "Enter") setXIsOnEditMode(false);
-                        }}
-                    />
+                    <CoordinateInput value={localX} onChange={enterXValue} />
                 )}
                 {!yIsOnEditMode ? (
                     <h4
                         className="yCoordinate"
                         css={{
                             margin: "5px",
-                            ...theme.typography.h4
+                            ...theme.typography.h4,
                         }}
-                        onDoubleClick={() => setYIsOnEditMode(true)}>
+                        onClick={() => setYIsOnEditMode(true)}>
                         <b>Y:</b> {Number(localY).toFixed(2)}
                     </h4>
                 ) : (
-                    <Input
-                        value={localY}
-                        onChange={enterYValue}
-                        onKeyDown={event => {
-                            if (event.key === "Enter") setYIsOnEditMode(false);
-                        }}
-                    />
+                    <CoordinateInput value={localY} onChange={enterYValue} />
                 )}
                 {!zIsOnEditMode ? (
                     <h4
                         className="zCoordinate"
                         css={{
                             margin: "5px",
-                            ...theme.typography.h4
+                            ...theme.typography.h4,
                         }}
-                        onDoubleClick={() => setZIsOnEditMode(true)}>
+                        onClick={() => setZIsOnEditMode(true)}>
                         <b>Z:</b> {Number(localZ).toFixed(2)}
                     </h4>
                 ) : (
-                    <Input
-                        value={localZ}
-                        onChange={enterZValue}
-                        onKeyDown={event => {
-                            if (event.key === "Enter") setZIsOnEditMode(false);
-                        }}
-                    />
+                    <CoordinateInput value={localZ} onChange={enterZValue} />
                 )}
             </div>
         </div>
+    );
+};
+
+const CoordinateInput: FC<{value: number; onChange: (value: number) => void}> = ({
+    value,
+    onChange,
+}) => {
+    const [newValueText, setNewValueText] = useState(value + "");
+    useEffect(() => setNewValueText(value + ""), [value]);
+
+    const updateValue = () => {
+        const newValue = Number(newValueText);
+        if (isNaN(newValue)) onChange(value);
+        else onChange(newValue);
+    };
+
+    return (
+        <Input
+            value={newValueText}
+            onChange={e => setNewValueText(e.target.value)}
+            onBlur={updateValue}
+            autoFocus
+            onKeyDown={event => {
+                if (event.key === "Enter") updateValue();
+            }}
+        />
     );
 };
