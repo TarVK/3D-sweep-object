@@ -8,6 +8,8 @@ export type Modes = "add" | "delete" | "transform" | "move";
 
 //Thanks https://sbcode.net/threejs/multi-controls-example/#video-lecture
 export class OrbitTransformControls {
+    private readonly zoomScale = 0.5;
+
     private initialOrbitRadius: number;
     private transformControls: TransformControls;
     private orbitControls: CameraControls;
@@ -52,7 +54,6 @@ export class OrbitTransformControls {
         this.orbitControls.mouseButtons.middle = CameraControls.ACTION.NONE;
 
         this.orbitControls.saveState();
-        this.initialOrbitRadius = this.orbitControls.distance;
         this.orbitControls.addEventListener("transitionstart", () => {
             this.allowOrbitListeners = true;
         });
@@ -61,7 +62,7 @@ export class OrbitTransformControls {
         });
         this.orbitControls.addEventListener("update", () => {
             if (this.camera instanceof THREE.OrthographicCamera) {
-                const dolly = this.getDollyFromZoom(this.camera.zoom);
+                const dolly = this.getDollyFromZoom(this.camera.zoom) * this.zoomScale;
                 this.setDolly(dolly);
             }
         });
@@ -79,7 +80,9 @@ export class OrbitTransformControls {
 
         // Set the defaults
         this.orbitControls.setTarget(0, 15, 0);
+        this.setZoom(1);
         this.orbitControls.saveState();
+        this.initialOrbitRadius = this.orbitControls.distance;
     }
 
     public setMode(mode: Modes) {
@@ -292,7 +295,7 @@ export class OrbitTransformControls {
     private fixZoomAndDoly() {
         if (this.camera instanceof THREE.PerspectiveCamera) {
             // dolly is the radius of the control sphere
-            const dolly = this.getDollyFromZoom(this.camera.zoom);
+            const dolly = this.getDollyFromZoom(this.camera.zoom * (1 / this.zoomScale));
             this.setZoom(1);
             this.setDolly(dolly);
             this.orbitControls.mouseButtons.wheel = CameraControls.ACTION.DOLLY;
@@ -300,7 +303,7 @@ export class OrbitTransformControls {
             // zoom is the fraction of the initial control radius and the current one
             const zoom = this.initialOrbitRadius / this.orbitControls.distance;
             const dolly = this.getDollyFromZoom(zoom);
-            this.setZoom(zoom);
+            this.setZoom(zoom * this.zoomScale);
             this.setDolly(dolly);
             this.orbitControls.mouseButtons.wheel = CameraControls.ACTION.ZOOM;
         }
