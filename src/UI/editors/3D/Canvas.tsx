@@ -19,10 +19,13 @@ import {
     ZoomOutMapOutlined,
 } from "@mui/icons-material";
 import {Menu} from "../Menu";
-import {useDataHook} from "model-react";
+import {Observer, useDataHook} from "model-react";
 import {OrbitTransformControls, Modes} from "./controllers/OrbitTransformControls";
 import editSweepPoints from "./EditSweepPoints";
 import {Object3D} from "three";
+import {CrossSection} from "./CrossSection";
+import {getSweepLineTransformationMatrices} from "./getSweeplineTransformationMatrices";
+import {useCrossSectionEditorState} from "../crossSections/CrossSectionEditorStateContext";
 
 export const Canvas: FC<ICanvasProps> = ({
     sweepObjectState,
@@ -57,8 +60,9 @@ export const Canvas: FC<ICanvasProps> = ({
         useState<string>("Hide object mesh");
     const [meshIconDisabled, setMeshIconDisabled] = useState<boolean>(false);
 
-    const [wireframeVisibilityText, setWireframeVisibilityText] =
-        useState<string>("Show object wireframe");
+    const [wireframeVisibilityText, setWireframeVisibilityText] = useState<string>(
+        "Show object wireframe"
+    );
     const [wireframeIconDisabled, setWireFrameIconDisabled] = useState<boolean>(true);
 
     useEffect(() => {
@@ -157,7 +161,7 @@ export const Canvas: FC<ICanvasProps> = ({
             hoverText: wireframeVisibilityText,
             isDisabled: wireframeIconDisabled,
             onClick: () => handleWireframeVisibilityOnClick(),
-        }
+        },
     ];
 
     useEffect(() => {
@@ -277,20 +281,68 @@ export const Canvas: FC<ICanvasProps> = ({
 
     useEffect(() => {
         if (sweepObjectMesh) {
-            scene.sweepObject.updateMesh(sweepObjectMesh);
-            const sweepLine = sweepObjectState.getSweepLine().getSegments(h);
-            scene.sweepLine.updateLine(sweepLine);
+            const sweepLineObserver = new Observer(h =>
+                sweepObjectState.getSweepLine().getSegments(h)
+            ).listen(sweepLine => {
+                scene.sweepObject.updateMesh(sweepObjectMesh);
+                scene.sweepLine.updateLine(sweepLine);
 
-            const crossSections = sweepObjectState.getCrossSections(h);
-            crossSections?.forEach(crossSection => {
-                scene.crossSection.updateCrossSection(crossSection.getSegments(h))
-            })
-            scene.sweepPoints.updatePoints(sweepLine);
+                scene.sweepPoints.updatePoints(sweepLine);
 
-            // update controls, so that sweep line points are editable
-            controlsRef.current!.changeObjects(scene.sweepPoints.points);
+                // update controls, so that sweep line points are editable
+                controlsRef.current!.changeObjects(scene.sweepPoints.points);
+            }, true);
+
+            return () => sweepLineObserver.destroy();
         }
     }, [sweepObjectMesh]);
+
+    const crossSectionStates = sweepObjectState.getCrossSections(h);
+    const crossSectionEditorState = useCrossSectionEditorState();
+    useEffect(() => {
+        const sweepLine = sweepObjectState.getSweepLine();
+
+        const crossSections = crossSectionStates.map(
+            crossSectionState => new CrossSection(crossSectionState)
+        );
+        sceneRef.current.setCrossSections(crossSections);
+
+        const crossSectionPositioner = new Observer(h => {
+            const sweepPoints = sweepObjectState.getSweepLineInterpolationPointCount(h);
+            const positions = crossSectionStates.map(crossSectionState => ({
+                position: crossSectionState.getPosition(h),
+                angle: crossSectionState.getRotation(h),
+                scale: crossSectionState.getScale(h),
+            }));
+            const transformations = getSweepLineTransformationMatrices(
+                sweepLine,
+                positions,
+                sweepPoints,
+                h
+            );
+            return transformations;
+        }).listen(transformations => {
+            crossSections.forEach((crossSection, i) => {
+                const transformation = transformations[i];
+                if (transformation) crossSection.setTransformation(transformation);
+            });
+        }, true);
+
+        const crossSectionSelector = new Observer(h =>
+            crossSectionEditorState.getSelectCrossSectionIndex(h)
+        ).listen((index, _, prevIndex) => {
+            const prevCrossSection = crossSections[prevIndex];
+            if (prevCrossSection) prevCrossSection.setSelected(false);
+            const crossSection = crossSections[index];
+            if (crossSection) crossSection.setSelected(true);
+        }, true);
+
+        return () => {
+            crossSections.forEach(crossSection => crossSection.destroy());
+            crossSectionPositioner.destroy();
+            crossSectionSelector.destroy();
+        };
+    }, [sweepObjectState, crossSectionStates]);
 
     // this div decides the size of the canvas
     return (

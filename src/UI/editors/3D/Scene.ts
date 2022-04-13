@@ -8,7 +8,7 @@ import {colors} from "./ColorSchema";
 
 export class Scene extends THREE.Scene {
     public sweepObject: SweepObject;
-    public crossSection: CrossSection;
+    public crossSections: CrossSection[];
     public sweepLine: SweepLine;
     public sweepPoints: SweepPoints;
     public objects: IMateriable[] = [];
@@ -22,17 +22,12 @@ export class Scene extends THREE.Scene {
         this.addGround(colors.GROUND);
 
         this.sweepObject = new SweepObject();
-        this.crossSection = new CrossSection();
+        this.crossSections = [];
         this.sweepLine = new SweepLine(true);
         this.sweepPoints = new SweepPoints(true);
 
-        this.objects.push(
-            this.sweepObject,
-            this.sweepLine,
-            this.crossSection,
-            this.sweepPoints
-        );
-        this.add(this.sweepObject, this.sweepLine, this.crossSection, this.sweepPoints);
+        this.objects.push(this.sweepObject, this.sweepLine, this.sweepPoints);
+        this.add(this.sweepObject, this.sweepLine, this.sweepPoints);
 
         this.addGrid(10000, 1000);
     }
@@ -82,5 +77,17 @@ export class Scene extends THREE.Scene {
 
     public removeFog() {
         this.fog = new THREE.Fog(0x000000, Number.MAX_VALUE, Number.MAX_VALUE);
+    }
+
+    public setCrossSections(crossSections: CrossSection[]): void {
+        this.crossSections.forEach(crossSection => {
+            crossSection.removeFromParent();
+            const index = this.objects.indexOf(crossSection);
+            if (index != -1) this.objects.splice(index, 1);
+        });
+
+        this.objects.push(...crossSections);
+        this.crossSections = crossSections;
+        this.add(...crossSections);
     }
 }
