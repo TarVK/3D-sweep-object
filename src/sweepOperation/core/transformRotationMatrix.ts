@@ -21,7 +21,7 @@ export function transformRotationMatrix(
     if (cross.length() == 0) return rotationMatrix;
     const perpendicular = cross.normalize();
     const cosAngle = oldDirection.dot(newDirection);
-    const safeCosAngle = Math.max(0, Math.min(cosAngle, 1)); // Fix rounding errors
+    const safeCosAngle = Math.max(-1, Math.min(cosAngle, 1)); // Fix rounding errors
     const angle = Math.acos(safeCosAngle);
     const sinAngleHalf = Math.sin(angle / 2);
     const cosAngleHalf = Math.cos(angle / 2);

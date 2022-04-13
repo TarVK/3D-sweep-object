@@ -26,6 +26,7 @@ import {Object3D} from "three";
 import {CrossSection} from "./CrossSection";
 import {getSweepLineTransformationMatrices} from "./getSweeplineTransformationMatrices";
 import {useCrossSectionEditorState} from "../crossSections/CrossSectionEditorStateContext";
+import {usePrevious} from "../../hooks/usePrevious";
 
 export const Canvas: FC<ICanvasProps> = ({
     sweepObjectState,
@@ -176,6 +177,7 @@ export const Canvas: FC<ICanvasProps> = ({
                 renderer.getCamera(),
                 renderer.getRendererDomElem()
             ));
+            const getSweepLine = () => sweepObjectRef.current.getSweepLine();
             renderer.attachControls(controls);
             controls.resetCamera();
 
@@ -201,23 +203,17 @@ export const Canvas: FC<ICanvasProps> = ({
             } = editSweepPoints(scene.sweepPoints);
             controls.onTransform(() => {
                 if (controls.currObj) {
-                    movePoint(
-                        sweepObjectState.getSweepLine().getSegments(),
-                        controls.currObj
-                    );
+                    movePoint(getSweepLine().getSegments(), controls.currObj);
                 }
             });
             controls.onAdd(pointVec => {
-                const segments = addPoint(
-                    sweepObjectState.getSweepLine().getSegments(),
-                    pointVec
-                );
-                sweepObjectState.getSweepLine().setSegments(segments, true);
+                const segments = addPoint(getSweepLine().getSegments(), pointVec);
+                getSweepLine().setSegments(segments, true);
                 scene.sweepPoints.updatePoints(segments, true);
             });
             controls.onDelete(pointObj => {
                 const segments = deletePoint(pointObj);
-                sweepObjectState.getSweepLine().setSegments(segments, true);
+                getSweepLine().setSegments(segments, true);
                 scene.sweepPoints.updatePoints(segments, true);
             });
 
@@ -227,13 +223,13 @@ export const Canvas: FC<ICanvasProps> = ({
         }
     }, []);
 
-    // TO-DO figure out how to do with transformEvents
+    // TODO:  figure out how to do with transformEvents
     const triggerUpdate = () => {
         const {getSweeplineAsBezierSegments: getBezierSegments} = editSweepPoints(
             scene.sweepPoints
         );
         const segments = getBezierSegments();
-        sweepObjectState.getSweepLine().setSegments(segments, true);
+        sweepObjectRef.current.getSweepLine().setSegments(segments, true);
         scene.sweepPoints.updatePoints(segments);
     };
 
@@ -279,15 +275,17 @@ export const Canvas: FC<ICanvasProps> = ({
 
     const sweepObjectMesh = sweepObjectState.getMesh(h);
 
+    const prevObjectState = usePrevious(sweepObjectState);
     useEffect(() => {
         if (sweepObjectMesh) {
             const sweepLineObserver = new Observer(h =>
                 sweepObjectState.getSweepLine().getSegments(h)
             ).listen(sweepLine => {
-                scene.sweepObject.updateMesh(sweepObjectMesh);
-                scene.sweepLine.updateLine(sweepLine);
+                const forceUpdate = prevObjectState != sweepObjectState;
 
-                scene.sweepPoints.updatePoints(sweepLine);
+                scene.sweepObject.updateMesh(sweepObjectMesh, forceUpdate);
+                scene.sweepLine.updateLine(sweepLine);
+                scene.sweepPoints.updatePoints(sweepLine, forceUpdate);
 
                 // update controls, so that sweep line points are editable
                 controlsRef.current!.changeObjects(scene.sweepPoints.points);

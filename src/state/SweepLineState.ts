@@ -16,7 +16,7 @@ export class SweepLineState {
      * @param initial The initial curves to use for the sweep line
      */
     public constructor(initial: BezierSegmentState<Vec3>[]) {
-        this.setSegments(initial);
+        this.setSegments(initial, true);
     }
 
     // Getters
