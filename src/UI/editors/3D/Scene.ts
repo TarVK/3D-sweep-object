@@ -62,15 +62,23 @@ export class Scene extends THREE.Scene {
         this.fog = new THREE.Fog(color, near, far);
     }
 
-    public addDirectionalLight = (color: number) => {
-        const directionalLight = new THREE.DirectionalLight(color);
-        directionalLight.position.set(0, 200, 100);
-        directionalLight.castShadow = true;
+    public addDirectionalLight(color: number) {
+        const directionalLight = new THREE.DirectionalLight(color, 0.6);
+        directionalLight.position.set(0, 200, 0);
         this.add(directionalLight);
-    };
+
+        // TODO: make dynamic shadow size
+        // directionalLight.castShadow = true;
+        // const sc = directionalLight.shadow.camera;
+        // const s = 50;
+        // sc.left = -s;
+        // sc.right = s;
+        // sc.top = s;
+        // sc.bottom = -s;
+    }
 
     public addHemiLight(skyColor: number, groundColor: number) {
-        const hemiLight = new THREE.HemisphereLight(skyColor, groundColor);
+        const hemiLight = new THREE.HemisphereLight(skyColor, groundColor, 0.6);
         hemiLight.position.set(0, 200, 0);
         this.add(hemiLight);
     }

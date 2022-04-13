@@ -28,7 +28,10 @@ export class Renderer {
         this.height = target.offsetHeight;
         this.container = target;
         this.scene = scene;
-        this.renderer = new THREE.WebGLRenderer({antialias: true, preserveDrawingBuffer: true});
+        this.renderer = new THREE.WebGLRenderer({
+            antialias: true,
+            preserveDrawingBuffer: true,
+        });
         this.renderer.shadowMap.enabled = true;
         this.renderer.setSize(this.width, this.height);
         this.renderer.autoClear = false;
@@ -130,8 +133,8 @@ export class Renderer {
     }
 
     private setLightToCamera() {
-        const pointLight = new THREE.PointLight(colors.LIGHT, 5, 0, 2);
-        pointLight.castShadow = true;
+        const pointLight = new THREE.PointLight(colors.LIGHT, 0.7, 100);
+        // pointLight.castShadow = true;
         pointLight.position.set(0, 0, -10);
         this.camera.add(pointLight);
     }

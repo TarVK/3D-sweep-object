@@ -12,7 +12,7 @@ import {
     Grid4x4Outlined,
     MouseOutlined,
     RestartAltOutlined,
-    SvgIconComponent,
+    ChangeHistory as TriangleIcon,
     ViewInArOutlined,
     VisibilityOffOutlined,
     VisibilityOutlined,
@@ -54,6 +54,7 @@ export const Canvas: FC<ICanvasProps> = ({
     const [skeletonEnabled, setSkeletonEnabled] = useState(true);
     const [meshEnabled, setMeshEnabled] = useState(true);
     const [wireframeEnabled, setWireframeEnabled] = useState(false);
+    const [smoothLightingEnabled, setSmoothLightingEnabled] = useState(true);
 
     useEffect(() => {
         updateScene?.(sceneRef);
@@ -149,6 +150,14 @@ export const Canvas: FC<ICanvasProps> = ({
             isDisabled: !wireframeEnabled,
             onClick: () => setWireframeEnabled(!wireframeEnabled),
         },
+        {
+            icon: TriangleIcon, // TODO: find better icon
+            hoverText: smoothLightingEnabled
+                ? "Disable smooth lighting"
+                : "Enable smooth lighting",
+            isDisabled: !smoothLightingEnabled,
+            onClick: () => setSmoothLightingEnabled(!smoothLightingEnabled),
+        },
     ];
 
     useEffect(() => {
@@ -164,6 +173,9 @@ export const Canvas: FC<ICanvasProps> = ({
     useEffect(() => {
         scene.sweepObject.setWireframe(wireframeEnabled);
     }, [wireframeEnabled]);
+    useEffect(() => {
+        scene.sweepObject.setSmoothLighting(smoothLightingEnabled);
+    }, [smoothLightingEnabled]);
 
     useEffect(() => {
         const cubeEl = cubeRef.current;
@@ -233,6 +245,7 @@ export const Canvas: FC<ICanvasProps> = ({
         scene.sweepPoints.updatePoints(segments);
     };
 
+    // Synchronize sweep object/line
     const sweepObjectMesh = sweepObjectState.getMesh(h);
 
     const prevObjectState = usePrevious(sweepObjectState);
@@ -243,7 +256,7 @@ export const Canvas: FC<ICanvasProps> = ({
             ).listen(sweepLine => {
                 const forceUpdate = prevObjectState != sweepObjectState;
 
-                scene.sweepObject.updateMesh(sweepObjectMesh, forceUpdate);
+                scene.sweepObject.updateMesh(sweepObjectMesh);
                 scene.sweepLine.updateLine(sweepLine);
                 scene.sweepPoints.updatePoints(sweepLine, forceUpdate);
 
@@ -255,6 +268,7 @@ export const Canvas: FC<ICanvasProps> = ({
         }
     }, [sweepObjectMesh]);
 
+    // Synchronize cross sections
     const crossSectionStates = sweepObjectState.getCrossSections(h);
     const crossSectionEditorState = useCrossSectionEditorState();
     useEffect(() => {
