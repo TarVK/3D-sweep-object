@@ -1,10 +1,11 @@
-import {HelpOutline} from "@mui/icons-material";
-import {Button, TextField, Tooltip, useTheme} from "@mui/material";
+import {GitHub, HelpOutline} from "@mui/icons-material";
+import {Button, IconButton, TextField, Tooltip, useTheme} from "@mui/material";
 import {FC, useEffect, useState} from "react";
 import {useDataHook} from "model-react";
 import {ExportModel} from "../editors/ExportModel";
 import {IInputMenuProps} from "../_types/IInputMenuProps";
 import {ImportButton} from "./ImportButton";
+import {HelpButton} from "./HelpButton";
 
 export const InputMenu: FC<IInputMenuProps> = ({
     sweepObjectState,
@@ -149,6 +150,21 @@ export const InputMenu: FC<IInputMenuProps> = ({
                     />
                 </Tooltip>
             </div>
+
+            <div css={{flex: 1}} />
+            <HelpButton />
+            <a
+                href="https://github.com/TarVK/3D-sweep-object"
+                css={{textDecoration: "none", color: "inherit"}}>
+                <IconButton
+                    size="large"
+                    edge="start"
+                    color="inherit"
+                    aria-label="Help"
+                    sx={{mr: 2}}>
+                    <GitHub fontSize="large" />
+                </IconButton>
+            </a>
         </div>
     );
 };
