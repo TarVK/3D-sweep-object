@@ -66,10 +66,10 @@ export class SweepObject extends THREE.Object3D implements IMateriable {
 
     public updateMaterial(material: THREE.Material): void {}
 
-    public toggleWireframe() {
-        this.wireframe = !this.wireframe;
+    public setWireframe(wireFrame: boolean) {
+        this.wireframe = wireFrame;
         //@ts-ignore
-        this.mesh.material.wireframe = this.wireframe;
+        this.mesh?.material.wireframe = wireframe;
     }
 
     public getMesh(): THREE.Mesh {

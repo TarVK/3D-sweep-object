@@ -19,10 +19,13 @@ import {
     ZoomOutMapOutlined,
 } from "@mui/icons-material";
 import {Menu} from "../Menu";
-import {useDataHook} from "model-react";
+import {Observer, useDataHook} from "model-react";
 import {OrbitTransformControls, Modes} from "./controllers/OrbitTransformControls";
 import editSweepPoints from "./EditSweepPoints";
 import {Object3D} from "three";
+import {CrossSection} from "./CrossSection";
+import {getSweepLineTransformationMatrices} from "./getSweeplineTransformationMatrices";
+import {useCrossSectionEditorState} from "../crossSections/CrossSectionEditorStateContext";
 import {usePrevious} from "../../hooks/usePrevious";
 
 export const Canvas: FC<ICanvasProps> = ({
@@ -48,20 +51,9 @@ export const Canvas: FC<ICanvasProps> = ({
 
     const [selectedMode, setSelectedMode] = useState<Modes>("transform");
 
-    const [skeletonVisibilityIcon, setSkeletonVisibilityIcon] =
-        useState<SvgIconComponent>(VisibilityOffOutlined);
-    const [skeletonVisibilityText, setSkeletonVisibilityText] =
-        useState<string>("Hide object skeleton");
-    const [skeletonIconDisabled, setSkeletonIconDisabled] = useState<boolean>(false);
-
-    const [meshVisibilityText, setMeshVisibilityText] =
-        useState<string>("Hide object mesh");
-    const [meshIconDisabled, setMeshIconDisabled] = useState<boolean>(false);
-
-    const [wireframeVisibilityText, setWireframeVisibilityText] = useState<string>(
-        "Show object wireframe"
-    );
-    const [wireframeIconDisabled, setWireFrameIconDisabled] = useState<boolean>(true);
+    const [skeletonEnabled, setSkeletonEnabled] = useState(true);
+    const [meshEnabled, setMeshEnabled] = useState(true);
+    const [wireframeEnabled, setWireframeEnabled] = useState(false);
 
     useEffect(() => {
         updateScene?.(sceneRef);
@@ -84,9 +76,8 @@ export const Canvas: FC<ICanvasProps> = ({
             isSelected: selectedMode === "add",
             onClick: () => {
                 controlsRef.current!.setMode("add");
-                scene.sweepPoints.visible = true;
-                scene.sweepLine.visible = true;
                 setSelectedMode(controlsRef.current!.getMode());
+                setSkeletonEnabled(true);
             },
         },
         {
@@ -95,9 +86,8 @@ export const Canvas: FC<ICanvasProps> = ({
             isSelected: selectedMode === "transform",
             onClick: () => {
                 controlsRef.current!.setMode("transform");
-                scene.sweepPoints.visible = true;
-                scene.sweepLine.visible = true;
                 setSelectedMode(controlsRef.current!.getMode());
+                setSkeletonEnabled(true);
             },
         },
         {
@@ -106,9 +96,8 @@ export const Canvas: FC<ICanvasProps> = ({
             isSelected: selectedMode === "delete",
             onClick: () => {
                 controlsRef.current!.setMode("delete");
-                scene.sweepPoints.visible = true;
-                scene.sweepLine.visible = true;
                 setSelectedMode(controlsRef.current!.getMode());
+                setSkeletonEnabled(true);
             },
         },
         {
@@ -117,8 +106,6 @@ export const Canvas: FC<ICanvasProps> = ({
             isSelected: selectedMode === "move",
             onClick: () => {
                 controlsRef.current!.setMode("move");
-                scene.sweepPoints.visible = true;
-                scene.sweepLine.visible = true;
                 setSelectedMode(controlsRef.current!.getMode());
             },
         },
@@ -143,24 +130,40 @@ export const Canvas: FC<ICanvasProps> = ({
 
     const visibilityMenuItems = [
         {
-            icon: skeletonVisibilityIcon,
-            hoverText: skeletonVisibilityText,
-            isDisabled: skeletonIconDisabled,
-            onClick: () => handleSkeletonVisibilityOnClick(),
+            icon: skeletonEnabled ? VisibilityOffOutlined : VisibilityOutlined,
+            hoverText: skeletonEnabled ? "Hide object skeleton" : "Show object skeleton",
+            isDisabled: !skeletonEnabled,
+            onClick: () => setSkeletonEnabled(!skeletonEnabled),
         },
         {
             icon: ViewInArOutlined,
-            hoverText: meshVisibilityText,
-            isDisabled: meshIconDisabled,
-            onClick: () => handleMeshVisibilityOnClick(),
+            hoverText: meshEnabled ? "Hide object mesh" : "Show object mesh",
+            isDisabled: !meshEnabled,
+            onClick: () => setMeshEnabled(!meshEnabled),
         },
         {
             icon: Grid4x4Outlined,
-            hoverText: wireframeVisibilityText,
-            isDisabled: wireframeIconDisabled,
-            onClick: () => handleWireframeVisibilityOnClick(),
+            hoverText: wireframeEnabled
+                ? "Hide object wireframe"
+                : "Show object wireframe",
+            isDisabled: !wireframeEnabled,
+            onClick: () => setWireframeEnabled(!wireframeEnabled),
         },
     ];
+
+    useEffect(() => {
+        sceneRef.current.sweepLine.visible = skeletonEnabled;
+        sceneRef.current.sweepPoints.visible = skeletonEnabled;
+        sceneRef.current.crossSections.forEach(crossSection => {
+            crossSection.visible = skeletonEnabled;
+        });
+    }, [skeletonEnabled]);
+    useEffect(() => {
+        sceneRef.current.sweepObject.visible = meshEnabled;
+    }, [meshEnabled]);
+    useEffect(() => {
+        scene.sweepObject.setWireframe(wireframeEnabled);
+    }, [wireframeEnabled]);
 
     useEffect(() => {
         const cubeEl = cubeRef.current;
@@ -230,62 +233,77 @@ export const Canvas: FC<ICanvasProps> = ({
         scene.sweepPoints.updatePoints(segments);
     };
 
-    const handleSkeletonVisibilityOnClick = () => {
-        if (skeletonIconDisabled === false) {
-            setSkeletonVisibilityIcon(VisibilityOutlined);
-            setSkeletonVisibilityText("Show object skeleton");
-            setSkeletonIconDisabled(true);
-            sceneRef.current.sweepLine.visible = false;
-            sceneRef.current.sweepPoints.visible = false;
-        } else {
-            setSkeletonVisibilityIcon(VisibilityOffOutlined);
-            setSkeletonVisibilityText("Hide object skeleton");
-            setSkeletonIconDisabled(false);
-            sceneRef.current.sweepLine.visible = true;
-            sceneRef.current.sweepPoints.visible = true;
-        }
-    };
-
-    const handleMeshVisibilityOnClick = () => {
-        if (meshIconDisabled === false) {
-            setMeshVisibilityText("Show object mesh");
-            setMeshIconDisabled(true);
-            sceneRef.current.sweepObject.visible = false;
-        } else {
-            setMeshVisibilityText("Hide object mesh");
-            setMeshIconDisabled(false);
-            sceneRef.current.sweepObject.visible = true;
-        }
-    };
-
-    const handleWireframeVisibilityOnClick = () => {
-        if (wireframeIconDisabled === false) {
-            setWireframeVisibilityText("Show object wireframe");
-            setWireFrameIconDisabled(true);
-            scene.sweepObject.toggleWireframe();
-        } else {
-            setWireframeVisibilityText("Hide object wireframe");
-            setWireFrameIconDisabled(false);
-            scene.sweepObject.toggleWireframe();
-        }
-    };
-
     const sweepObjectMesh = sweepObjectState.getMesh(h);
 
     const prevObjectState = usePrevious(sweepObjectState);
     useEffect(() => {
         if (sweepObjectMesh) {
-            const forceUpdate = prevObjectState != sweepObjectState;
+            const sweepLineObserver = new Observer(h =>
+                sweepObjectState.getSweepLine().getSegments(h)
+            ).listen(sweepLine => {
+                const forceUpdate = prevObjectState != sweepObjectState;
 
-            scene.sweepObject.updateMesh(sweepObjectMesh, forceUpdate);
-            const sweepLine = sweepObjectRef.current.getSweepLine().getSegments(h);
-            scene.sweepLine.updateLine(sweepLine);
-            scene.sweepPoints.updatePoints(sweepLine, forceUpdate);
+                scene.sweepObject.updateMesh(sweepObjectMesh, forceUpdate);
+                scene.sweepLine.updateLine(sweepLine);
+                scene.sweepPoints.updatePoints(sweepLine, forceUpdate);
 
-            // update controls, so that sweep line points are editable
-            controlsRef.current!.changeObjects(scene.sweepPoints.points);
+                // update controls, so that sweep line points are editable
+                controlsRef.current!.changeObjects(scene.sweepPoints.points);
+            }, true);
+
+            return () => sweepLineObserver.destroy();
         }
     }, [sweepObjectMesh]);
+
+    const crossSectionStates = sweepObjectState.getCrossSections(h);
+    const crossSectionEditorState = useCrossSectionEditorState();
+    useEffect(() => {
+        const sweepLine = sweepObjectState.getSweepLine();
+
+        const crossSections = crossSectionStates.map(
+            crossSectionState => new CrossSection(crossSectionState)
+        );
+        sceneRef.current.setCrossSections(crossSections);
+        crossSections.forEach(crossSection => {
+            crossSection.visible = skeletonEnabled;
+        });
+
+        const crossSectionPositioner = new Observer(h => {
+            const sweepPoints = sweepObjectState.getSweepLineInterpolationPointCount(h);
+            const positions = crossSectionStates.map(crossSectionState => ({
+                position: crossSectionState.getPosition(h),
+                angle: crossSectionState.getRotation(h),
+                scale: crossSectionState.getScale(h),
+            }));
+            const transformations = getSweepLineTransformationMatrices(
+                sweepLine,
+                positions,
+                sweepPoints,
+                h
+            );
+            return transformations;
+        }).listen(transformations => {
+            crossSections.forEach((crossSection, i) => {
+                const transformation = transformations[i];
+                if (transformation) crossSection.setTransformation(transformation);
+            });
+        }, true);
+
+        const crossSectionSelector = new Observer(h =>
+            crossSectionEditorState.getSelectCrossSectionIndex(h)
+        ).listen((index, _, prevIndex) => {
+            const prevCrossSection = crossSections[prevIndex];
+            if (prevCrossSection) prevCrossSection.setSelected(false);
+            const crossSection = crossSections[index];
+            if (crossSection) crossSection.setSelected(true);
+        }, true);
+
+        return () => {
+            crossSections.forEach(crossSection => crossSection.destroy());
+            crossSectionPositioner.destroy();
+            crossSectionSelector.destroy();
+        };
+    }, [sweepObjectState, crossSectionStates]);
 
     // this div decides the size of the canvas
     return (

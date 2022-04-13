@@ -87,4 +87,24 @@ export class SweepLineState {
 
         return out;
     }
+
+    /**
+     * Retrieves the sweep line node at a given fraction
+     * @param per The fraction between 0 and 1 to get the node at
+     * @param hook The hook to subscribe to changes
+     * @returns The sample node at the given position
+     */
+    public getNode(per: number, hook?: IDataHook): ISweepLineNode {
+        const segments = this.segments.get(hook);
+
+        const sl = segments.length;
+        const increment = 1 / sl;
+        const segmentIndex = Math.min(Math.floor(sl * per), sl - 1);
+
+        const segmentPer = (per - increment * segmentIndex) / increment;
+        const segment = segments[segmentIndex];
+        const direction = segment.getDirection(segmentPer, hook);
+        const position = segment.getPoint(segmentPer, hook);
+        return {direction, position};
+    }
 }
