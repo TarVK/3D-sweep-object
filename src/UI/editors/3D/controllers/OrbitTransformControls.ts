@@ -43,6 +43,7 @@ export class OrbitTransformControls {
     ) {
         CameraControls.install({THREE: THREE});
 
+        camera.position.set(-18, 35, 22);
         this.orbitControls = new CameraControls(camera, domElem);
         this.orbitControls.mouseButtons.left = CameraControls.ACTION.ROTATE;
         this.orbitControls.mouseButtons.wheel = CameraControls.ACTION.DOLLY;
@@ -75,6 +76,10 @@ export class OrbitTransformControls {
         domElem.addEventListener("mousemove", this.hoverPoint);
         domElem.addEventListener("mousedown", this.onMouseDown);
         domElem.addEventListener("dblclick", this.deselectOnDoubleClick);
+
+        // Set the defaults
+        this.orbitControls.setTarget(0, 15, 0);
+        this.orbitControls.saveState();
     }
 
     public setMode(mode: Modes) {
@@ -331,7 +336,7 @@ export class OrbitTransformControls {
         this.orbitControls.rotateTo(azimuthAngle, polarAngle, smooth);
     }
 
-    public resetCamera(smooth = false) {
+    public resetCamera(smooth = true) {
         this.orbitControls.reset(smooth);
         this.orbitListeners.forEach(cb => cb());
     }

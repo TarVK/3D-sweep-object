@@ -40,8 +40,6 @@ export class Renderer {
         target.appendChild(this.renderer.domElement);
 
         this.setPerspectiveCamera();
-        this.camera.position.set(-10, 6, 12);
-        this.camera.rotation.set(0, 0, 0);
         this.camera.zoom = 1;
 
         this.animate();

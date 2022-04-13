@@ -17,7 +17,6 @@ import {SweepObject} from "./editors/3D/SweepObject";
 import {STLExporter} from "../exporters/STLExporter";
 import {useStateLazy} from "./hooks/useStateLazy";
 import {sweepObjectToJSON} from "../state/JSON/sweepObjectToJSON";
-import {ArcSegmentState} from "../state/segments/ArcSegmentState";
 import {theme} from "../themes/MUITheme";
 import {ThemeProvider} from "@mui/system";
 import {Renderer} from "./editors/3D/Renderer";
@@ -26,38 +25,29 @@ import {Scene} from "./editors/3D/Scene";
 
 export const App: FC = () => {
     const [sweepObjectState, setSweepObjectState] = useStateLazy(() => {
-        const crossSection1 = new CrossSectionState([
-            new StraightSegmentState(new Vec2(-3, 0), new Vec2(3, -3)),
-            new BezierSegmentState(new Vec2(3, -3), new Vec2(3, 3)),
-            new ArcSegmentState(new Vec2(3, 3), new Vec2(0, 0), new Vec2(-3, 0)),
-        ]);
-        // const crossSection2 = new CrossSectionState([
-        //     new StraightSegmentState(new Vec2(-3, 3), new Vec2(3, 3)),
-        //     new StraightSegmentState(new Vec2(3, 3), new Vec2(3, -3)),
-        //     new StraightSegmentState(new Vec2(3, -3), new Vec2(-3, -3)),
-        //     new StraightSegmentState(new Vec2(-3, -3), new Vec2(-3, 3)),
-        // ]);
-        // crossSection2.setPosition(1);
+        const size = 10;
+        const points = [
+            new Vec2(-1, -1),
+            new Vec2(1, -1),
+            new Vec2(1, 1),
+            new Vec2(-1, 1),
+        ];
+        const segments = points.map((point, i) => {
+            const nextPoint = points[(i + 1) % points.length];
+            return new StraightSegmentState(point.mul(size / 2), nextPoint.mul(size / 2));
+        });
+        const crossSection = new CrossSectionState(segments);
 
-        const crossSection2 = new CrossSectionState([
-            new StraightSegmentState(new Vec2(-3, 0), new Vec2(3, -3)),
-            new BezierSegmentState(new Vec2(3, -3), new Vec2(3, 3)),
-            new ArcSegmentState(new Vec2(3, 3), new Vec2(0, 3), new Vec2(-3, 0)),
+        const sweepLine = new SweepLineState([
+            new BezierSegmentState(
+                new Vec3(0, 0, 0).mul(size),
+                new Vec3(0, 1, 0).mul(size),
+                new Vec3(0, 2, 0).mul(size),
+                new Vec3(0, 3, 0).mul(size)
+            ),
         ]);
-        crossSection2.setRotation(2 * Math.PI);
-        crossSection2.setPosition(1);
 
-        return new SweepObjectState(
-            new SweepLineState([
-                new BezierSegmentState(
-                    new Vec3(0, 0, 0),
-                    new Vec3(0, 20, 0),
-                    new Vec3(20, 0, 0),
-                    new Vec3(20, 20, 0)
-                ),
-            ]),
-            [crossSection1, crossSection2]
-        );
+        return new SweepObjectState(sweepLine, [crossSection]);
     });
     const [scene, setScene] = useState<MutableRefObject<Scene>>();
     const [renderer, setRenderer] = useState<Renderer>();
