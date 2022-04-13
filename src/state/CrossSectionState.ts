@@ -207,7 +207,7 @@ export class CrossSectionState {
      */
     public replaceSegment(replace: ISegment<Vec2>, replacement: ISegment<Vec2>): boolean {
         const segments = this.segments.get();
-        if (segments.length <= 2) return false;
+        if (segments.length <= 1) return false;
 
         const index = segments.indexOf(replace);
         if (index != -1) {

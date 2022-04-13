@@ -17,7 +17,7 @@ export function createDeleteHandler(
 
             const crossSection = state.getSelectedCrossSection();
             const segments = crossSection.getSegments();
-            if (segments.length <= 3) return;
+            if (segments.length <= 2) return;
 
             const closest = segments.reduce(
                 (best, segment) => {
@@ -28,6 +28,7 @@ export function createDeleteHandler(
                 {distance: Infinity, segment: null, handle: null}
             );
             if (closest.segment) crossSection.deleteSegment(closest.segment);
+            state.selectHandle(null);
         },
         onMouseMove: (e, p) => {},
         onMouseUp: (s, p) => {},
