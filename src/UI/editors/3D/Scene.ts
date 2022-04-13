@@ -13,6 +13,9 @@ export class Scene extends THREE.Scene {
     public sweepPoints: SweepPoints;
     public objects: IMateriable[] = [];
 
+    protected ground: THREE.Mesh;
+    protected grid: THREE.GridHelper;
+
     public constructor() {
         super();
         this.addBackground(colors.BACKGROUND);
@@ -33,26 +36,38 @@ export class Scene extends THREE.Scene {
     }
 
     public addGrid = (size = 1000, divisions = 100) => {
-        const grid = new THREE.GridHelper(size, divisions, 0x000000, 0x000000);
+        this.grid = new THREE.GridHelper(size, divisions, 0x000000, 0x000000);
         // this is just to relax typescript.
-        if (!Array.isArray(grid.material)) {
-            grid.material.opacity = 0.2;
-            grid.material.transparent = true;
+        if (!Array.isArray(this.grid.material)) {
+            this.grid.material.opacity = 0.2;
+            this.grid.material.transparent = true;
         }
-        this.add(grid);
+        this.add(this.grid);
 
-        this.add(new THREE.AxesHelper(5));
+        // this.add(new THREE.AxesHelper(5));
     };
 
     public addGround = (color: number) => {
-        const ground = new THREE.Mesh(
+        this.ground = new THREE.Mesh(
             new THREE.PlaneGeometry(2000, 2000),
             new THREE.MeshPhongMaterial({color: color, depthWrite: false})
         );
-        ground.rotation.x = -Math.PI / 2;
-        ground.receiveShadow = true;
-        this.add(ground);
+        this.ground.rotation.x = -Math.PI / 2;
+        this.ground.receiveShadow = true;
+        this.add(this.ground);
     };
+
+    public setPlainMode(enabled: boolean): void {
+        if (enabled) {
+            this.remove(this.grid);
+            this.remove(this.ground);
+            this.addBackground(0xffffff);
+        } else {
+            this.add(this.grid);
+            this.add(this.ground);
+            this.addBackground(colors.BACKGROUND);
+        }
+    }
 
     public addBackground(color: number) {
         this.background = new THREE.Color(color);

@@ -17,7 +17,7 @@ export class SweepLine extends THREE.Object3D implements IMateriable {
 
     public updateMaterial(material: THREE.Material): void {}
 
-    public updateLine(segments: BezierSegmentState<Vec3>[]) {
+    public updateLine(segments: BezierSegmentState<Vec3>[], skipControlLines: boolean) {
         if (this.lines && this.lines.length > 0) {
             this.lines.forEach(line => this.remove(line));
             this.lines = [];
@@ -44,6 +44,7 @@ export class SweepLine extends THREE.Object3D implements IMateriable {
 
             this.add(curveLine);
             this.lines.push(curveLine);
+            if (skipControlLines) return;
 
             const helperLine1 = this.createStraightLine(
                 start,

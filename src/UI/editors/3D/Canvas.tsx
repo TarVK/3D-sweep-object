@@ -55,6 +55,7 @@ export const Canvas: FC<ICanvasProps> = ({
     const [meshEnabled, setMeshEnabled] = useState(true);
     const [wireframeEnabled, setWireframeEnabled] = useState(false);
     const [smoothLightingEnabled, setSmoothLightingEnabled] = useState(true);
+    const [plainMode, setPlainMode] = useState(false); // Used for taking report pictures
 
     useEffect(() => {
         updateScene?.(sceneRef);
@@ -162,11 +163,11 @@ export const Canvas: FC<ICanvasProps> = ({
 
     useEffect(() => {
         sceneRef.current.sweepLine.visible = skeletonEnabled;
-        sceneRef.current.sweepPoints.visible = skeletonEnabled;
+        sceneRef.current.sweepPoints.visible = skeletonEnabled && !plainMode;
         sceneRef.current.crossSections.forEach(crossSection => {
             crossSection.visible = skeletonEnabled;
         });
-    }, [skeletonEnabled]);
+    }, [skeletonEnabled, plainMode]);
     useEffect(() => {
         sceneRef.current.sweepObject.visible = meshEnabled;
     }, [meshEnabled]);
@@ -176,6 +177,18 @@ export const Canvas: FC<ICanvasProps> = ({
     useEffect(() => {
         scene.sweepObject.setSmoothLighting(smoothLightingEnabled);
     }, [smoothLightingEnabled]);
+    useEffect(() => {
+        scene.setPlainMode(plainMode);
+    }, [plainMode]);
+
+    useEffect(() => {
+        const listener = (e: KeyboardEvent) => {
+            if (e.ctrlKey && e.key == "p") setPlainMode(plain => !plain);
+            e.preventDefault();
+        };
+        window.addEventListener("keydown", listener);
+        return () => window.removeEventListener("keydown", listener);
+    }, []);
 
     useEffect(() => {
         const cubeEl = cubeRef.current;
@@ -258,7 +271,7 @@ export const Canvas: FC<ICanvasProps> = ({
                 const forceUpdate = prevObjectState != sweepObjectState;
 
                 scene.sweepObject.updateMesh(sweepObjectMesh);
-                scene.sweepLine.updateLine(sweepLine);
+                scene.sweepLine.updateLine(sweepLine, plainMode);
                 scene.sweepPoints.updatePoints(sweepLine, forceUpdate);
 
                 // update controls, so that sweep line points are editable
@@ -267,7 +280,7 @@ export const Canvas: FC<ICanvasProps> = ({
 
             return () => sweepLineObserver.destroy();
         }
-    }, [sweepObjectMesh]);
+    }, [sweepObjectMesh, plainMode]);
 
     // Synchronize cross sections
     const crossSectionStates = sweepObjectState.getCrossSections(h);
@@ -310,7 +323,7 @@ export const Canvas: FC<ICanvasProps> = ({
             const prevCrossSection = crossSections[prevIndex];
             if (prevCrossSection) prevCrossSection.setSelected(false);
             const crossSection = crossSections[index];
-            if (crossSection) crossSection.setSelected(true);
+            if (crossSection && !plainMode) crossSection.setSelected(true);
         }, true);
 
         return () => {
@@ -318,7 +331,7 @@ export const Canvas: FC<ICanvasProps> = ({
             crossSectionPositioner.destroy();
             crossSectionSelector.destroy();
         };
-    }, [sweepObjectState, crossSectionStates]);
+    }, [sweepObjectState, crossSectionStates, plainMode]);
 
     // this div decides the size of the canvas
     return (
