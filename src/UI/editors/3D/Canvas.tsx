@@ -183,8 +183,10 @@ export const Canvas: FC<ICanvasProps> = ({
 
     useEffect(() => {
         const listener = (e: KeyboardEvent) => {
-            if (e.ctrlKey && e.key == "p") setPlainMode(plain => !plain);
-            e.preventDefault();
+            if (e.ctrlKey && e.key == "p") {
+                setPlainMode(plain => !plain);
+                e.preventDefault();
+            }
         };
         window.addEventListener("keydown", listener);
         return () => window.removeEventListener("keydown", listener);
