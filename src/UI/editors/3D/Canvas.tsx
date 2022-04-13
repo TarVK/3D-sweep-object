@@ -84,7 +84,7 @@ export const Canvas: FC<ICanvasProps> = ({
         },
         {
             icon: MouseOutlined,
-            hoverText: "Select point",
+            hoverText: "Move point",
             isSelected: selectedMode === "transform",
             onClick: () => {
                 controlsRef.current!.setMode("transform");

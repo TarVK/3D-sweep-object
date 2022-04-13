@@ -1,4 +1,4 @@
-import {FC, useMemo} from "react";
+import {FC} from "react";
 import {Menu} from "../Menu";
 import {ICanvasProps} from "../3D/_types/ICanvasProps";
 import {AddCircleOutlineSharp, ClearOutlined, MouseOutlined} from "@mui/icons-material";
@@ -24,7 +24,7 @@ export const CrossSectionCanvas: FC<ICanvasProps> = ({sweepObjectState, ...props
             {
                 id: 1,
                 icon: MouseOutlined,
-                hoverText: "Select point",
+                hoverText: "Move point",
                 isSelected: selectedTool == "edit",
                 onClick: () => editorState.selectTool("edit"),
             },
