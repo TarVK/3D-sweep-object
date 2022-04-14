@@ -18,6 +18,10 @@ export const InputMenu: FC<IInputMenuProps> = ({
     const currentLinePoints = sweepObjectState.getSweepLineInterpolationPointCount(h);
     const [linePoints, setLinePoints] = useState(currentLinePoints + "");
     useEffect(() => setLinePoints(currentLinePoints + ""), [currentLinePoints]);
+    const submitLinePoints = () =>
+        sweepObjectState.setSweepLineInterpolationPointCount(
+            Math.max(5, Number(linePoints))
+        );
 
     const currentCrossSectionPoints =
         sweepObjectState.getCrossSectionInterpolationPointCount(h);
@@ -28,6 +32,11 @@ export const InputMenu: FC<IInputMenuProps> = ({
         () => setCrossSectionPoints(currentCrossSectionPoints + ""),
         [currentCrossSectionPoints]
     );
+    const submitCrossSectionPoints = () => {
+        sweepObjectState.setCrossSectionInterpolationPointCount(
+            Math.max(3, Number(crossSectionPoints))
+        );
+    };
 
     return (
         <div
@@ -44,7 +53,7 @@ export const InputMenu: FC<IInputMenuProps> = ({
                 css={{
                     ...theme.typography.h1,
                 }}>
-                    <img src={logo} alt="image" height={50} width={50}/>
+                <img src={logo} alt="image" height={50} width={50} />
             </h1>
             <Button variant="contained" size="small">
                 <ImportButton onInput={onSweepObjectChange} />
@@ -61,11 +70,10 @@ export const InputMenu: FC<IInputMenuProps> = ({
                     size="small"
                     value={linePoints}
                     onChange={e => setLinePoints(e.target.value)}
-                    onBlur={() =>
-                        sweepObjectState.setSweepLineInterpolationPointCount(
-                            Math.max(5, Number(linePoints))
-                        )
-                    }
+                    onBlur={submitLinePoints}
+                    onKeyDown={e => {
+                        if (e.key === "Enter") submitLinePoints();
+                    }}
                     InputLabelProps={{
                         style: {
                             color: "#FFF",
@@ -110,11 +118,10 @@ export const InputMenu: FC<IInputMenuProps> = ({
                     size="small"
                     value={crossSectionPoints}
                     onChange={e => setCrossSectionPoints(e.target.value)}
-                    onBlur={e =>
-                        sweepObjectState.setCrossSectionInterpolationPointCount(
-                            Math.max(3, Number(crossSectionPoints))
-                        )
-                    }
+                    onBlur={submitCrossSectionPoints}
+                    onKeyDown={e => {
+                        if (e.key === "Enter") submitCrossSectionPoints();
+                    }}
                     InputLabelProps={{
                         style: {
                             color: "#FFF",

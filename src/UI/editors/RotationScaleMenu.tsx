@@ -1,5 +1,5 @@
 import {TextField} from "@mui/material";
-import { useTheme } from "@mui/system";
+import {useTheme} from "@mui/system";
 import {useDataHook} from "model-react";
 import {FC, useCallback, useState} from "react";
 import {useCrossSectionEditorState} from "./crossSections/CrossSectionEditorStateContext";
@@ -48,6 +48,7 @@ export const RotationScaleMenu: FC = () => {
                         borderRadius: "4px",
                         borderColor: "transparent",
                     },
+                    step: "45",
                 }}
             />
             <TextField
@@ -57,6 +58,7 @@ export const RotationScaleMenu: FC = () => {
                 value={crossSection.getScale(h)}
                 size="small"
                 onChange={value => crossSection.setScale(Number(value.target.value))}
+                inputProps={{step: "0.25"}}
             />
         </div>
     );
