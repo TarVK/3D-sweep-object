@@ -58,6 +58,9 @@ export const HelpButton: FC = () => {
         setOpen(false);
     };
 
+    const width = 1168;
+    const height = width * 0.5625;
+
     return (
         <div>
             <IconButton
@@ -71,6 +74,8 @@ export const HelpButton: FC = () => {
             <BootstrapDialog
                 onClose={handleClose}
                 aria-labelledby="help-menu"
+                fullWidth
+                maxWidth="lg"
                 open={open}>
                 <BootstrapDialogTitle id="help-menu" onClose={handleClose}>
                     What is this website?
@@ -82,9 +87,9 @@ export const HelpButton: FC = () => {
                         tool can be used.
                     </Typography>
                     <iframe
-                        width="560"
-                        height="315"
-                        src="https://www.youtube.com/embed/Omt5hVE0YDY"
+                        width={width}
+                        height={height}
+                        src="https://www.youtube.com/embed/15veuH4wk1k"
                         title="YouTube video player"
                         frameBorder={0}
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
