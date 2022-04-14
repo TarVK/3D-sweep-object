@@ -16,7 +16,8 @@ export function makePolygonCCW(polygon: ICrossSection): ICrossSection {
     const isCounterClockWise = getSideOfLine(prev, topLeft, next) == -1;
 
     if (isCounterClockWise) return polygon;
-    else return [...polygon].reverse();
+    // Reverse the list, but ensure that the first point remains first
+    else return [...polygon.slice(1), polygon[0]].reverse();
 }
 
 /**

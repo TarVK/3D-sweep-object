@@ -285,11 +285,12 @@ export class ArcSegmentState implements ISegment<Vec2> {
     }
 
     // Segment approximation
-    public approximate(points: number, skipLast: boolean, hook?: IDataHook): Vec2[] {
-        const delta = 1 / (points - 1);
-        const out: Vec2[] = [];
-        for (let i = 0; i < points; i++) out.push(this.getPoint(i * delta, hook));
-        return skipLast ? out.slice(0, -1) : out;
+    public approximate(pointCount: number, skipLast: boolean, hook?: IDataHook): Vec2[] {
+        const steps = pointCount - 1;
+        const points = new Array(pointCount)
+            .fill(0)
+            .map((_, i) => this.getPoint(i / steps, hook));
+        return skipLast ? points.slice(0, -1) : points;
     }
 
     // Interaction
