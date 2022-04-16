@@ -27,6 +27,7 @@ The application is entirely OS under the MIT license, allowing anyone to use it 
 ## Usage
 
 Below is a demonstration/explanation video of the application. This video can also be accessed by clicking the question mark in the application itself.
+
 [![Sweeper demo](https://img.youtube.com/vi/15veuH4wk1k/0.jpg)](https://www.youtube.com/watch?v=15veuH4wk1k)
 
 The application primarily consists of two views:
